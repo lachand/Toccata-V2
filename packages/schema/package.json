@@ -1,0 +1,28 @@
+{
+  "name": "@toccata/schema",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Modèle de données Toccata : schémas, résolution master/instance, planification des modifications.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "fractional-indexing": "^4.0.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "fast-check": "^4.10.2",
+    "rxdb": "^17.6.0",
+    "rxjs": "^7.8.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

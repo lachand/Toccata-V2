@@ -11,3 +11,7 @@ Une instance d'activité référence son master et ne stocke que des **surcharge
 
 **Raison** : l'ancienne implémentation clonait tous les documents (`_duplicate_<guid>`) et
 la propagation master → copies était cassée. Une surcouche supprime la divergence.
+
+## Mise en œuvre (Phase 1)
+Implémentée et testée dans `packages/schema` ; détails, formes exactes des surcharges,
+déliaison par instantané et propriétés vérifiées dans [`../data-model.md`](../data-model.md).
