@@ -10,3 +10,6 @@ coverage/
 playwright-report/
 test-results/
 storybook-static/
+
+# Catalogues compilés (générés par lingui compile)
+apps/web/src/locales/*/messages.mjs

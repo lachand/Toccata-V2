@@ -3,7 +3,7 @@
 | Phase | Objet |
 |---|---|
 | 0 | Cadrage, dépôt, spikes de risque, ADR — **terminée**, voir [`phase0-spikes.md`](phase0-spikes.md) |
-| 1 | Fondations : monorepo, schémas, couche données, design system v0, PWA shell |
+| 1 | Fondations : monorepo, schémas, couche données, design system v0, PWA shell — **en cours** : coque web + i18n fr/en faites (`apps/web`) |
 | 2 | Auth, rôles, droits CouchDB |
 | 3 | Scripting : étapes, ressources, apps (texte, chrono, kanban, questionnaire) |
 | 4 | Distribution et exécution : instances, état participant, reprise, propagation ciblée |
