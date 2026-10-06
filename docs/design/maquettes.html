@@ -4,46 +4,31 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Maquettes Toccata</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Instrument+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
 <style>
-/* Concept : une seule coque d'application (rail + barre + timeline d'étapes + zone de travail) déclinée en 5 écrans, avec deux directions de style comparables côte à côte. */
+/* Concept : direction « Atelier », fond clair uniquement. Une coque unique (rail + barre + timeline d'étapes + zone de travail) déclinée en 5 écrans et 4 palettes claires. */
 :root{
-  --bg:#EEF1F6; --surface:#FFFFFF; --surface2:#E4E9F2; --line:#D3DAE6;
-  --fg:#121B33; --muted:#5B6683; --accent:#2C4FD8; --accent-fg:#FFFFFF; --accent-soft:#DDE4FB;
-  --ok:#1C8A55; --warn:#B36B00; --crit:#C73A3A; --rail:#121B33; --rail-fg:#E8ECF8;
-  --ok-soft:#DDF3E8; --warn-soft:#FBEBCF; --crit-soft:#F9DEDE;
-  --r:6px; --r-lg:10px; --staff:.55;
-  --font-display:"Fraunces",Georgia,serif; --font-body:"Instrument Sans",system-ui,sans-serif; --font-mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:light;
+  /* palette Menthe (défaut) */
+  --bg:#F0F5F4; --surface:#FFFFFF; --surface2:#E1ECEA; --line:#CCDAD7;
+  --fg:#12302C; --muted:#4F6E6A; --accent:#08796A; --accent-fg:#FFFFFF; --accent-soft:#D1EEE9;
+  --rail:#FFFFFF; --rail-fg:#12302C;
+  /* sémantique, commune aux palettes */
+  --ok:#2A7F3A; --warn:#A85F00; --crit:#BF3737;
+  --ok-soft:#DCF1E0; --warn-soft:#FAEACF; --crit-soft:#F8DEDE;
+  --r:14px; --r-lg:20px;
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif; --font-mono:"JetBrains Mono",ui-monospace,monospace;
   --g1:#E4572E; --g2:#6C7A96; --g3:#2BB39A; --g4:#E0A100;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0D1326; --surface:#151D36; --surface2:#1D2745; --line:#2A3558;
-  --fg:#E8ECF8; --muted:#98A2C2; --accent:#7C98FF; --accent-fg:#0D1326; --accent-soft:#22305F;
-  --ok:#4CC38A; --warn:#F0A93B; --crit:#FF7A7A; --rail:#0A0F1E; --rail-fg:#E8ECF8;
-  --ok-soft:#14352A; --warn-soft:#3A2C10; --crit-soft:#3C1A1D; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0D1326; --surface:#151D36; --surface2:#1D2745; --line:#2A3558;
-  --fg:#E8ECF8; --muted:#98A2C2; --accent:#7C98FF; --accent-fg:#0D1326; --accent-soft:#22305F;
-  --ok:#4CC38A; --warn:#F0A93B; --crit:#FF7A7A; --rail:#0A0F1E; --rail-fg:#E8ECF8;
-  --ok-soft:#14352A; --warn-soft:#3A2C10; --crit-soft:#3C1A1D; color-scheme:dark}
-/* Direction B « Atelier » : clair, arrondi, rail blanc, vert d'eau */
-:root[data-dir="b"]{
-  --bg:#F0F5F4; --surface:#FFFFFF; --surface2:#E1ECEA; --line:#CCDAD7;
-  --fg:#12302C; --muted:#557470; --accent:#0B8F7E; --accent-fg:#FFFFFF; --accent-soft:#D1EEE9;
-  --ok:#2A7F3A; --warn:#A85F00; --crit:#BF3737; --rail:#FFFFFF; --rail-fg:#12302C;
-  --ok-soft:#DCF1E0; --warn-soft:#FAEACF; --crit-soft:#F8DEDE;
-  --r:14px; --r-lg:20px; --staff:0;
-  --font-display:"Bricolage Grotesque",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif}
-@media (prefers-color-scheme: dark){:root[data-dir="b"]:not([data-theme="light"]){
-  --bg:#0C1815; --surface:#13241F; --surface2:#1B312B; --line:#294640;
-  --fg:#E1F1EE; --muted:#8FB0AA; --accent:#3FD1BC; --accent-fg:#06201C; --accent-soft:#17463F;
-  --ok:#62D27A; --warn:#F0A93B; --crit:#FF8383; --rail:#0F1D19; --rail-fg:#E1F1EE;
-  --ok-soft:#15361F; --warn-soft:#3A2C10; --crit-soft:#3C1B1D}}
-:root[data-dir="b"][data-theme="dark"]{
-  --bg:#0C1815; --surface:#13241F; --surface2:#1B312B; --line:#294640;
-  --fg:#E1F1EE; --muted:#8FB0AA; --accent:#3FD1BC; --accent-fg:#06201C; --accent-soft:#17463F;
-  --ok:#62D27A; --warn:#F0A93B; --crit:#FF8383; --rail:#0F1D19; --rail-fg:#E1F1EE;
-  --ok-soft:#15361F; --warn-soft:#3A2C10; --crit-soft:#3C1B1D}
+:root[data-palette="ciel"]{
+  --bg:#F1F5FB; --surface2:#E2EAF6; --line:#CDD8EA; --fg:#14233F; --muted:#506686;
+  --accent:#2563C9; --accent-soft:#DCE8FB}
+:root[data-palette="lilas"]{
+  --bg:#F6F3FB; --surface2:#E9E3F5; --line:#D8D0EA; --fg:#271C42; --muted:#625585;
+  --accent:#6B46C1; --accent-soft:#E8DFF9}
+:root[data-palette="abricot"]{
+  --bg:#FAF4EE; --surface2:#F1E5D8; --line:#E3D3C1; --fg:#3A2412; --muted:#755C47;
+  --accent:#C2410C; --accent-soft:#FCE3D3}
 
 *{box-sizing:border-box}
 body{margin:0;padding-inline:clamp(16px,3vw,36px);padding-block:24px 56px;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font-body)}
@@ -101,8 +86,6 @@ svg.i{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-
 
 /* ---- timeline d'étapes (portée) ---- */
 .tl{position:relative;display:flex;gap:10px;align-items:center;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--line);overflow-x:auto}
-.tl::before{content:"";position:absolute;inset:14px 0;pointer-events:none;opacity:var(--staff);
-  background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 11px)}
 .step{position:relative;display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 8px 7px 14px;min-height:44px;white-space:nowrap}
 .step .n{font:600 12px var(--font-mono);color:var(--muted)}
 .step.is-active{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
@@ -188,8 +171,6 @@ svg.i{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 
-
-
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -214,14 +195,16 @@ svg.i{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-
 <header class="head">
   <div>
     <div class="eyebrow">Toccata 2 · maquettes d'interface v0</div>
-    <h1>Cinq écrans, deux directions</h1>
-    <p>Une même coque pour écrire, distribuer et piloter une activité. Changez de direction pour comparer, cliquez sur les étapes, l'œil, les boutons du monitoring.</p>
+    <h1>Cinq écrans, quatre palettes claires</h1>
+    <p>Une même coque pour écrire, distribuer et piloter une activité. Changez de palette pour comparer, cliquez sur les étapes, l'œil, les boutons du monitoring.</p>
   </div>
   <div class="controls">
-    <span class="eyebrow">Direction visuelle</span>
-    <div class="seg" role="group" aria-label="Direction visuelle">
-      <button type="button" data-dir="a" aria-pressed="true">A · Partition</button>
-      <button type="button" data-dir="b" aria-pressed="false">B · Atelier</button>
+    <span class="eyebrow">Palette</span>
+    <div class="seg" role="group" aria-label="Palette">
+      <button type="button" data-palette="menthe" aria-pressed="true">Menthe</button>
+      <button type="button" data-palette="ciel" aria-pressed="false">Ciel</button>
+      <button type="button" data-palette="lilas" aria-pressed="false">Lilas</button>
+      <button type="button" data-palette="abricot" aria-pressed="false">Abricot</button>
     </div>
   </div>
 </header>
@@ -477,10 +460,10 @@ svg.i{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-
   function $(s,c){return (c||document).querySelector(s)}
   function $$(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))}
 
-  /* direction */
-  $$('[data-dir]').forEach(function(b){b.addEventListener('click',function(){
-    root.setAttribute('data-dir',b.dataset.dir);
-    $$('[data-dir]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+  /* palette */
+  $$('[data-palette]').forEach(function(b){b.addEventListener('click',function(){
+    if(b.dataset.palette==='menthe')root.removeAttribute('data-palette');else root.setAttribute('data-palette',b.dataset.palette);
+    $$('[data-palette]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
   })});
 
   /* onglets */

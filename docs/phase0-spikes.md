@@ -30,4 +30,4 @@ sous Node avec le stockage mémoire de RxDB ; en production le stockage sera Dex
 - Stockage Dexie/IndexedDB réel et comportement iOS Safari (éviction du stockage).
 
 ## Maquettes d'interface
-Propositions v0 (cinq écrans, deux directions « Partition » et « Atelier ») : [`design/maquettes.html`](design/maquettes.html), à ouvrir dans un navigateur.
+Propositions v0 (cinq écrans, direction Atelier retenue, quatre palettes claires ; voir [ADR 0006](adr/0006-direction-visuelle.md)) : [`design/maquettes.html`](design/maquettes.html), à ouvrir dans un navigateur.
