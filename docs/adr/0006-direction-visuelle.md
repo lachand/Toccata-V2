@@ -1,4 +1,4 @@
-# ADR 0006 — Direction visuelle : « Atelier », fond clair
+# ADR 0006 — Direction visuelle : « Atelier », palette Menthe, fond clair
 
 **Statut** : accepté
 
@@ -8,12 +8,13 @@
 - **Fond clair uniquement** : pas de mode sombre. Les écrans de classe sont lus sous
   éclairage de salle et projetés ; un seul thème réduit aussi le travail de conception et
   de test.
-- Quatre palettes claires à départager (Menthe, Ciel, Lilas, Abricot), toutes déclinées par
-  jetons CSS (`--bg`, `--surface`, `--accent`…). Les couleurs sémantiques (ok, attention,
-  critique) et les couleurs de groupe sont communes à toutes les palettes.
+- **Palette Menthe** (retenue parmi Menthe, Ciel, Lilas, Abricot) : jetons CSS `--bg`,
+  `--surface`, `--accent`… Les couleurs sémantiques (ok, attention, critique) et les
+  couleurs de groupe sont communes à toute palette.
 - Contrastes : texte d'accent ≥ 4,5:1 sur surface blanche ; à re-mesurer avec axe en Phase 8.
 
 ## Écartée
-Direction A « Partition » (rail sombre, titres en serif, portée musicale) et mode sombre.
+Direction A « Partition » (rail sombre, titres en serif, portée musicale), mode sombre et
+les palettes Ciel, Lilas, Abricot.
 
-Maquettes : `docs/design/maquettes.html`.
+Maquettes (bilingues fr/en) : `docs/design/maquettes.html`.
