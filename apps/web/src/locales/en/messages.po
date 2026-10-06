@@ -7,19 +7,316 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
-#. placeholder {0}: a.students
-#: src/App.tsx
-msgid "{0, plural, one {# student} other {# students}}"
-msgstr "{0, plural, one {# student} other {# students}}"
+#: src/pages/Gallery.tsx
+msgid "{hidden, plural, one {# other person} other {# other people}}"
+msgstr "{hidden, plural, one {# other person} other {# other people}}"
 
-#: src/LocaleSwitcher.tsx
+#: src/pages/Activities.tsx
+#: src/pages/Gallery.tsx
+msgid "{pendingCount, plural, one {# change waiting to sync} other {# changes waiting to sync}}"
+msgstr "{pendingCount, plural, one {# change waiting to sync} other {# changes waiting to sync}}"
+
+#: src/pages/Activities.tsx
+msgid "{stepCount, plural, one {# step} other {# steps}}"
+msgstr "{stepCount, plural, one {# step} other {# steps}}"
+
+#: src/pages/Activities.tsx
+msgid "{studentCount, plural, one {# student} other {# students}}"
+msgstr "{studentCount, plural, one {# student} other {# students}}"
+
+#: src/pages/Gallery.tsx
+msgid "200 characters at most"
+msgstr "200 characters at most"
+
+#: src/UpdatePrompt.tsx
+msgid "A new version is available."
+msgstr "A new version is available."
+
+#: src/pages/Gallery.tsx
+msgid "Activity name"
+msgstr "Activity name"
+
+#: src/pages/Gallery.tsx
+msgid "Add"
+msgstr "Add"
+
+#: src/pages/Gallery.tsx
+msgid "Add a resource"
+msgstr "Add a resource"
+
+#: src/pages/Gallery.tsx
+msgid "Add a step"
+msgstr "Add a step"
+
+#: src/pages/Gallery.tsx
+msgid "Add documents, images or web pages for this step."
+msgstr "Add documents, images or web pages for this step."
+
+#: src/pages/Activities.tsx
+msgid "All"
+msgstr "All"
+
+#: src/pages/Gallery.tsx
+msgid "Backlog"
+msgstr "Backlog"
+
+#: src/pages/Gallery.tsx
+msgid "Bonus"
+msgstr "Bonus"
+
+#: src/pages/Gallery.tsx
+msgid "Build"
+msgstr "Build"
+
+#: src/pages/Gallery.tsx
+msgid "Buttons"
+msgstr "Buttons"
+
+#: src/pages/Gallery.tsx
+msgid "Cancel"
+msgstr "Cancel"
+
+#: src/pages/Gallery.tsx
+msgid "Choose a file or paste a link."
+msgstr "Choose a file or paste a link."
+
+#: src/components/Layout.tsx
+msgid "Classes"
+msgstr "Classes"
+
+#: src/pages/Gallery.tsx
+msgid "Close"
+msgstr "Close"
+
+#: src/components/Layout.tsx
+#: src/pages/Gallery.tsx
+msgid "Components"
+msgstr "Components"
+
+#: src/pages/Activities.tsx
+msgid "Copy to my activities"
+msgstr "Copy to my activities"
+
+#: src/pages/Activities.tsx
+msgid "Create your first activity to get started."
+msgstr "Create your first activity to get started."
+
+#: src/pages/Gallery.tsx
+msgid "Delete"
+msgstr "Delete"
+
+#: src/pages/Gallery.tsx
+msgid "Dialog and empty state"
+msgstr "Dialog and empty state"
+
+#: src/UpdatePrompt.tsx
+msgid "Dismiss"
+msgstr "Dismiss"
+
+#: src/pages/Gallery.tsx
+msgid "Display mode"
+msgstr "Display mode"
+
+#: src/pages/Gallery.tsx
+msgid "done"
+msgstr "done"
+
+#: src/pages/Activities.tsx
+msgid "Draft"
+msgstr "Draft"
+
+#: src/pages/Activities.tsx
+msgid "Drafts"
+msgstr "Drafts"
+
+#: src/pages/Activities.tsx
+msgid "Edit"
+msgstr "Edit"
+
+#: src/pages/Gallery.tsx
+msgid "Embedded"
+msgstr "Embedded"
+
+#: src/pages/Gallery.tsx
+msgid "Estimate"
+msgstr "Estimate"
+
+#: src/pages/Activities.tsx
+msgid "Example data"
+msgstr "Example data"
+
+#: src/pages/Activities.tsx
+msgid "Filter activities"
+msgstr "Filter activities"
+
+#: src/pages/Gallery.tsx
+msgid "For example: Fact-checking"
+msgstr "For example: Fact-checking"
+
+#: src/pages/Gallery.tsx
+msgid "Form controls"
+msgstr "Form controls"
+
+#: src/pages/Gallery.tsx
+msgid "Hand out"
+msgstr "Hand out"
+
+#: src/pages/Gallery.tsx
+msgid "hidden from students"
+msgstr "hidden from students"
+
+#: src/pages/Gallery.tsx
+msgid "Hide step {s}"
+msgstr "Hide step {s}"
+
+#: src/pages/Gallery.tsx
+msgid "I've finished the step"
+msgstr "I've finished the step"
+
+#: src/pages/Activities.tsx
+#: src/pages/Gallery.tsx
+msgid "In progress"
+msgstr "In progress"
+
+#: src/pages/Activities.tsx
+msgid "In progress · step {current} of {total}"
+msgstr "In progress · step {current} of {total}"
+
+#: src/components/LocaleSwitcher.tsx
 msgid "Language"
 msgstr "Language"
 
-#: src/App.tsx
-msgid "Last session: <0>{lastSession}</0>"
-msgstr "Last session: <0>{lastSession}</0>"
+#: src/pages/Activities.tsx
+msgid "Last session: <0>{when}</0>"
+msgstr "Last session: <0>{when}</0>"
 
-#: src/App.tsx
+#: src/pages/Gallery.tsx
+msgid "Link"
+msgstr "Link"
+
+#: src/pages/Gallery.tsx
+msgid "Linked window"
+msgstr "Linked window"
+
+#: src/pages/Gallery.tsx
+msgid "locked"
+msgstr "locked"
+
+#: src/components/Layout.tsx
+msgid "Main navigation"
+msgstr "Main navigation"
+
+#: src/components/Layout.tsx
+#: src/pages/Activities.tsx
 msgid "My activities"
 msgstr "My activities"
+
+#: src/pages/Gallery.tsx
+msgid "Needs help"
+msgstr "Needs help"
+
+#: src/pages/Activities.tsx
+msgid "New activity"
+msgstr "New activity"
+
+#: src/pages/Activities.tsx
+msgid "No activity here yet"
+msgstr "No activity here yet"
+
+#: src/pages/Gallery.tsx
+msgid "No resource yet"
+msgstr "No resource yet"
+
+#: src/components/Layout.tsx
+#: src/pages/Gallery.tsx
+msgid "Offline, your changes are kept"
+msgstr "Offline, your changes are kept"
+
+#: src/pages/Gallery.tsx
+msgid "On time"
+msgstr "On time"
+
+#: src/pages/Gallery.tsx
+msgid "One step behind"
+msgstr "One step behind"
+
+#: src/components/Layout.tsx
+#: src/pages/Gallery.tsx
+msgid "Online"
+msgstr "Online"
+
+#: src/pages/Gallery.tsx
+msgid "People"
+msgstr "People"
+
+#: src/UpdatePrompt.tsx
+msgid "Ready to work offline."
+msgstr "Ready to work offline."
+
+#: src/UpdatePrompt.tsx
+msgid "Reload"
+msgstr "Reload"
+
+#: src/pages/Activities.tsx
+msgid "Resume"
+msgstr "Resume"
+
+#: src/pages/Gallery.tsx
+msgid "Saving"
+msgstr "Saving"
+
+#: src/pages/Activities.tsx
+msgid "Shared templates"
+msgstr "Shared templates"
+
+#: src/pages/Gallery.tsx
+msgid "Show step {s}"
+msgstr "Show step {s}"
+
+#: src/pages/Gallery.tsx
+msgid "Show to students"
+msgstr "Show to students"
+
+#: src/pages/Gallery.tsx
+msgid "Status"
+msgstr "Status"
+
+#: src/pages/Gallery.tsx
+msgid "Step name"
+msgstr "Step name"
+
+#: src/pages/Gallery.tsx
+msgid "Steps"
+msgstr "Steps"
+
+#: src/pages/Gallery.tsx
+msgid "Student preview"
+msgstr "Student preview"
+
+#: src/pages/Gallery.tsx
+msgid "Syncing"
+msgstr "Syncing"
+
+#: src/pages/Activities.tsx
+msgid "Template"
+msgstr "Template"
+
+#: src/components/Layout.tsx
+msgid "Templates"
+msgstr "Templates"
+
+#: src/pages/Gallery.tsx
+msgid "The name is required"
+msgstr "The name is required"
+
+#: src/pages/Gallery.tsx
+msgid "Time left"
+msgstr "Time left"
+
+#: src/pages/Gallery.tsx
+msgid "Unavailable"
+msgstr "Unavailable"
+
+#: src/pages/Gallery.tsx
+msgid "Visible to students"
+msgstr "Visible to students"

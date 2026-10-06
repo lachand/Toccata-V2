@@ -7,19 +7,316 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: fr\n"
 
-#. placeholder {0}: a.students
-#: src/App.tsx
-msgid "{0, plural, one {# student} other {# students}}"
-msgstr "{0, plural, one {# élève} many {# d'élèves} other {# élèves}}"
+#: src/pages/Gallery.tsx
+msgid "{hidden, plural, one {# other person} other {# other people}}"
+msgstr "{hidden, plural, one {# autre personne} other {# autres personnes}}"
 
-#: src/LocaleSwitcher.tsx
+#: src/pages/Activities.tsx
+#: src/pages/Gallery.tsx
+msgid "{pendingCount, plural, one {# change waiting to sync} other {# changes waiting to sync}}"
+msgstr "{pendingCount, plural, one {# modification en attente de synchronisation} other {# modifications en attente de synchronisation}}"
+
+#: src/pages/Activities.tsx
+msgid "{stepCount, plural, one {# step} other {# steps}}"
+msgstr "{stepCount, plural, one {# étape} other {# étapes}}"
+
+#: src/pages/Activities.tsx
+msgid "{studentCount, plural, one {# student} other {# students}}"
+msgstr "{studentCount, plural, one {# élève} many {# d'élèves} other {# élèves}}"
+
+#: src/pages/Gallery.tsx
+msgid "200 characters at most"
+msgstr "200 caractères au plus"
+
+#: src/UpdatePrompt.tsx
+msgid "A new version is available."
+msgstr "Une nouvelle version est disponible."
+
+#: src/pages/Gallery.tsx
+msgid "Activity name"
+msgstr "Nom de l'activité"
+
+#: src/pages/Gallery.tsx
+msgid "Add"
+msgstr "Ajouter"
+
+#: src/pages/Gallery.tsx
+msgid "Add a resource"
+msgstr "Ajouter une ressource"
+
+#: src/pages/Gallery.tsx
+msgid "Add a step"
+msgstr "Ajouter une étape"
+
+#: src/pages/Gallery.tsx
+msgid "Add documents, images or web pages for this step."
+msgstr "Ajoutez des documents, des images ou des pages web pour cette étape."
+
+#: src/pages/Activities.tsx
+msgid "All"
+msgstr "Toutes"
+
+#: src/pages/Gallery.tsx
+msgid "Backlog"
+msgstr "Backlog"
+
+#: src/pages/Gallery.tsx
+msgid "Bonus"
+msgstr "Bonus"
+
+#: src/pages/Gallery.tsx
+msgid "Build"
+msgstr "Construire"
+
+#: src/pages/Gallery.tsx
+msgid "Buttons"
+msgstr "Boutons"
+
+#: src/pages/Gallery.tsx
+msgid "Cancel"
+msgstr "Annuler"
+
+#: src/pages/Gallery.tsx
+msgid "Choose a file or paste a link."
+msgstr "Choisissez un fichier ou collez un lien."
+
+#: src/components/Layout.tsx
+msgid "Classes"
+msgstr "Classes"
+
+#: src/pages/Gallery.tsx
+msgid "Close"
+msgstr "Fermer"
+
+#: src/components/Layout.tsx
+#: src/pages/Gallery.tsx
+msgid "Components"
+msgstr "Composants"
+
+#: src/pages/Activities.tsx
+msgid "Copy to my activities"
+msgstr "Copier dans mes activités"
+
+#: src/pages/Activities.tsx
+msgid "Create your first activity to get started."
+msgstr "Créez votre première activité pour commencer."
+
+#: src/pages/Gallery.tsx
+msgid "Delete"
+msgstr "Supprimer"
+
+#: src/pages/Gallery.tsx
+msgid "Dialog and empty state"
+msgstr "Dialogue et état vide"
+
+#: src/UpdatePrompt.tsx
+msgid "Dismiss"
+msgstr "Ignorer"
+
+#: src/pages/Gallery.tsx
+msgid "Display mode"
+msgstr "Mode d'affichage"
+
+#: src/pages/Gallery.tsx
+msgid "done"
+msgstr "terminée"
+
+#: src/pages/Activities.tsx
+msgid "Draft"
+msgstr "Brouillon"
+
+#: src/pages/Activities.tsx
+msgid "Drafts"
+msgstr "Brouillons"
+
+#: src/pages/Activities.tsx
+msgid "Edit"
+msgstr "Modifier"
+
+#: src/pages/Gallery.tsx
+msgid "Embedded"
+msgstr "Intégré"
+
+#: src/pages/Gallery.tsx
+msgid "Estimate"
+msgstr "Estimer"
+
+#: src/pages/Activities.tsx
+msgid "Example data"
+msgstr "Données d'exemple"
+
+#: src/pages/Activities.tsx
+msgid "Filter activities"
+msgstr "Filtrer les activités"
+
+#: src/pages/Gallery.tsx
+msgid "For example: Fact-checking"
+msgstr "Par exemple : Vérifier l'information"
+
+#: src/pages/Gallery.tsx
+msgid "Form controls"
+msgstr "Champs de formulaire"
+
+#: src/pages/Gallery.tsx
+msgid "Hand out"
+msgstr "Distribuer"
+
+#: src/pages/Gallery.tsx
+msgid "hidden from students"
+msgstr "masquée aux élèves"
+
+#: src/pages/Gallery.tsx
+msgid "Hide step {s}"
+msgstr "Masquer l'étape {s}"
+
+#: src/pages/Gallery.tsx
+msgid "I've finished the step"
+msgstr "J'ai terminé l'étape"
+
+#: src/pages/Activities.tsx
+#: src/pages/Gallery.tsx
+msgid "In progress"
+msgstr "En cours"
+
+#: src/pages/Activities.tsx
+msgid "In progress · step {current} of {total}"
+msgstr "En cours · étape {current} sur {total}"
+
+#: src/components/LocaleSwitcher.tsx
 msgid "Language"
 msgstr "Langue"
 
-#: src/App.tsx
-msgid "Last session: <0>{lastSession}</0>"
-msgstr "Dernière séance : <0>{lastSession}</0>"
+#: src/pages/Activities.tsx
+msgid "Last session: <0>{when}</0>"
+msgstr "Dernière séance : <0>{when}</0>"
 
-#: src/App.tsx
+#: src/pages/Gallery.tsx
+msgid "Link"
+msgstr "Lien"
+
+#: src/pages/Gallery.tsx
+msgid "Linked window"
+msgstr "Fenêtre liée"
+
+#: src/pages/Gallery.tsx
+msgid "locked"
+msgstr "verrouillée"
+
+#: src/components/Layout.tsx
+msgid "Main navigation"
+msgstr "Navigation principale"
+
+#: src/components/Layout.tsx
+#: src/pages/Activities.tsx
 msgid "My activities"
 msgstr "Mes activités"
+
+#: src/pages/Gallery.tsx
+msgid "Needs help"
+msgstr "Demande de l'aide"
+
+#: src/pages/Activities.tsx
+msgid "New activity"
+msgstr "Nouvelle activité"
+
+#: src/pages/Activities.tsx
+msgid "No activity here yet"
+msgstr "Aucune activité ici pour l'instant"
+
+#: src/pages/Gallery.tsx
+msgid "No resource yet"
+msgstr "Aucune ressource pour l'instant"
+
+#: src/components/Layout.tsx
+#: src/pages/Gallery.tsx
+msgid "Offline, your changes are kept"
+msgstr "Hors ligne, vos modifications sont conservées"
+
+#: src/pages/Gallery.tsx
+msgid "On time"
+msgstr "Dans les temps"
+
+#: src/pages/Gallery.tsx
+msgid "One step behind"
+msgstr "Une étape de retard"
+
+#: src/components/Layout.tsx
+#: src/pages/Gallery.tsx
+msgid "Online"
+msgstr "En ligne"
+
+#: src/pages/Gallery.tsx
+msgid "People"
+msgstr "Personnes"
+
+#: src/UpdatePrompt.tsx
+msgid "Ready to work offline."
+msgstr "Prêt à fonctionner hors ligne."
+
+#: src/UpdatePrompt.tsx
+msgid "Reload"
+msgstr "Recharger"
+
+#: src/pages/Activities.tsx
+msgid "Resume"
+msgstr "Reprendre"
+
+#: src/pages/Gallery.tsx
+msgid "Saving"
+msgstr "Enregistrement"
+
+#: src/pages/Activities.tsx
+msgid "Shared templates"
+msgstr "Modèles partagés"
+
+#: src/pages/Gallery.tsx
+msgid "Show step {s}"
+msgstr "Afficher l'étape {s}"
+
+#: src/pages/Gallery.tsx
+msgid "Show to students"
+msgstr "Afficher aux élèves"
+
+#: src/pages/Gallery.tsx
+msgid "Status"
+msgstr "États"
+
+#: src/pages/Gallery.tsx
+msgid "Step name"
+msgstr "Nom de l'étape"
+
+#: src/pages/Gallery.tsx
+msgid "Steps"
+msgstr "Étapes"
+
+#: src/pages/Gallery.tsx
+msgid "Student preview"
+msgstr "Aperçu élève"
+
+#: src/pages/Gallery.tsx
+msgid "Syncing"
+msgstr "Synchronisation"
+
+#: src/pages/Activities.tsx
+msgid "Template"
+msgstr "Modèle"
+
+#: src/components/Layout.tsx
+msgid "Templates"
+msgstr "Modèles"
+
+#: src/pages/Gallery.tsx
+msgid "The name is required"
+msgstr "Le nom est obligatoire"
+
+#: src/pages/Gallery.tsx
+msgid "Time left"
+msgstr "Temps restant"
+
+#: src/pages/Gallery.tsx
+msgid "Unavailable"
+msgstr "Indisponible"
+
+#: src/pages/Gallery.tsx
+msgid "Visible to students"
+msgstr "Visible par les élèves"

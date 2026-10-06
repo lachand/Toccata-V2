@@ -1,0 +1,69 @@
+/* Jetons du design system : direction « Atelier », palette Menthe, fond clair (ADR 0006).
+   Source unique : apps/web et les composants ne définissent aucune couleur en dehors de ce fichier. */
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --bg: #f0f5f4;
+  --surface: #ffffff;
+  --surface-2: #e1ecea;
+  --line: #ccdad7; /* séparateurs décoratifs */
+  --line-strong: #6f8f8a; /* contours de champs et de boutons : 3:1 minimum */
+
+  /* texte */
+  --fg: #12302c;
+  --muted: #4f6e6a;
+
+  /* accent */
+  --accent: #08796a;
+  --accent-hover: #066356;
+  --accent-fg: #ffffff;
+  --accent-soft: #d1eee9;
+  --accent-ink: #055a4d; /* texte d'accent sur fond clair ou sur --accent-soft */
+
+  /* sémantique (communs à toute palette) ; *-ink = couleur de texte, le jeton nu = remplissage et icônes */
+  --ok: #2a7f3a;
+  --ok-ink: #1f6a2d;
+  --ok-soft: #dcf1e0;
+  --warn: #a85f00;
+  --warn-ink: #8a4d00;
+  --warn-soft: #faeacf;
+  --crit: #bf3737;
+  --crit-ink: #a52d2d;
+  --crit-soft: #f8dede;
+
+  /* couleurs de groupe (pastilles, avatars) */
+  --g1: #c9431c;
+  --g2: #5c6a86;
+  --g3: #0b7a66;
+  --g4: #8f6a00;
+
+  /* forme */
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow-1: 0 1px 2px rgb(18 48 44 / 0.08), 0 1px 1px rgb(18 48 44 / 0.04);
+  --shadow-2: 0 8px 24px rgb(18 48 44 / 0.14);
+  --focus: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent);
+
+  /* espacement (échelle de 4 px) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --hit: 44px; /* cible tactile minimale */
+
+  /* typographie */
+  --font-display: "Bricolage Grotesque Variable", system-ui, sans-serif;
+  --font-body: "Figtree Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+}

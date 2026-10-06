@@ -1,12 +1,13 @@
 # @toccata/web
 
-PWA React 19 + Vite. Phase 1 : coque minimale + internationalisation (fr, en).
+PWA React 19 + Vite : coque hors ligne, écran « Mes activités » (données d'exemple), galerie de composants (`/gallery`), internationalisation fr/en.
 
 ```sh
 pnpm --filter @toccata/web dev          # serveur de développement
 pnpm --filter @toccata/web test         # tests (fr, en, pseudo-locale)
 pnpm --filter @toccata/web i18n:check   # extraction + vérification de complétude
 pnpm --filter @toccata/web build
+pnpm --filter @toccata/e2e e2e          # Playwright : hors ligne, langues (CHROMIUM_PATH=… sans téléchargement)
 ```
 
 ## Ajouter ou modifier un texte

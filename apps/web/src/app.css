@@ -1,0 +1,3 @@
+/* Mise en page de la page : l'application remplit la fenêtre et utilise la police du design system. */
+html, body, #root { block-size: 100%; margin: 0; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
