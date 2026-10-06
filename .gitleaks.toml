@@ -1,0 +1,12 @@
+# Les valeurs ci-dessous sont des secrets de DÉVELOPPEMENT jetables (voir spikes/README.md).
+title = "Toccata gitleaks"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Valeurs de développement des spikes"
+paths = [
+  '''infra/couchdb/local\.ini''',
+  '''spikes/src/couch\.ts''',
+]

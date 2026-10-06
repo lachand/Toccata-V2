@@ -1,0 +1,24 @@
+{
+  "name": "@toccata/spikes",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "Phase 0 — spikes de risque (nécessitent les CouchDB de infra/). Non exécutés en CI.",
+  "scripts": {
+    "spike": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "iframe-check": "tsx src/iframe-check.ts"
+  },
+  "dependencies": {
+    "jose": "^6.2.12",
+    "rxdb": "^17.6.0",
+    "rxjs": "^7.8.2",
+    "yjs": "^13.6.33"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.3"
+  }
+}

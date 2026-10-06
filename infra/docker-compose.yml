@@ -1,0 +1,17 @@
+# CouchDB de développement. `cp .env.example .env` puis `docker compose -f infra/docker-compose.yml up -d`.
+# "cloud" simule le serveur distant, "local" le serveur de classe (Raspberry Pi).
+x-couch: &couch
+  image: ${COUCHDB_IMAGE:-couchdb:3.4}
+  environment:
+    COUCHDB_USER: ${COUCHDB_USER:-admin}
+    COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-change-me}
+  volumes:
+    - ./couchdb/local.ini:/opt/couchdb/etc/local.d/10-toccata.ini
+
+services:
+  couch-cloud:
+    <<: *couch
+    ports: ["5984:5984"]
+  couch-local:
+    <<: *couch
+    ports: ["5985:5984"]
