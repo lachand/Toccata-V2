@@ -28,3 +28,6 @@ sous Node avec le stockage mémoire de RxDB ; en production le stockage sera Dex
 - Limite de connexions simultanées d'un navigateur (HTTP/1.1 vs HTTP/2) avec beaucoup de
   réplications live enseignant — à mesurer avec Playwright + Caddy.
 - Stockage Dexie/IndexedDB réel et comportement iOS Safari (éviction du stockage).
+
+## Maquettes d'interface
+Propositions v0 (cinq écrans, deux directions « Partition » et « Atelier ») : [`design/maquettes.html`](design/maquettes.html), à ouvrir dans un navigateur.

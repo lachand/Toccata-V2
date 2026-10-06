@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maquettes Toccata</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Instrument+Sans:wght@400;500;600&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Concept : une seule coque d'application (rail + barre + timeline d'étapes + zone de travail) déclinée en 5 écrans, avec deux directions de style comparables côte à côte. */
+:root{
+  --bg:#EEF1F6; --surface:#FFFFFF; --surface2:#E4E9F2; --line:#D3DAE6;
+  --fg:#121B33; --muted:#5B6683; --accent:#2C4FD8; --accent-fg:#FFFFFF; --accent-soft:#DDE4FB;
+  --ok:#1C8A55; --warn:#B36B00; --crit:#C73A3A; --rail:#121B33; --rail-fg:#E8ECF8;
+  --ok-soft:#DDF3E8; --warn-soft:#FBEBCF; --crit-soft:#F9DEDE;
+  --r:6px; --r-lg:10px; --staff:.55;
+  --font-display:"Fraunces",Georgia,serif; --font-body:"Instrument Sans",system-ui,sans-serif; --font-mono:"JetBrains Mono",ui-monospace,monospace;
+  --g1:#E4572E; --g2:#6C7A96; --g3:#2BB39A; --g4:#E0A100;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1326; --surface:#151D36; --surface2:#1D2745; --line:#2A3558;
+  --fg:#E8ECF8; --muted:#98A2C2; --accent:#7C98FF; --accent-fg:#0D1326; --accent-soft:#22305F;
+  --ok:#4CC38A; --warn:#F0A93B; --crit:#FF7A7A; --rail:#0A0F1E; --rail-fg:#E8ECF8;
+  --ok-soft:#14352A; --warn-soft:#3A2C10; --crit-soft:#3C1A1D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1326; --surface:#151D36; --surface2:#1D2745; --line:#2A3558;
+  --fg:#E8ECF8; --muted:#98A2C2; --accent:#7C98FF; --accent-fg:#0D1326; --accent-soft:#22305F;
+  --ok:#4CC38A; --warn:#F0A93B; --crit:#FF7A7A; --rail:#0A0F1E; --rail-fg:#E8ECF8;
+  --ok-soft:#14352A; --warn-soft:#3A2C10; --crit-soft:#3C1A1D; color-scheme:dark}
+/* Direction B « Atelier » : clair, arrondi, rail blanc, vert d'eau */
+:root[data-dir="b"]{
+  --bg:#F0F5F4; --surface:#FFFFFF; --surface2:#E1ECEA; --line:#CCDAD7;
+  --fg:#12302C; --muted:#557470; --accent:#0B8F7E; --accent-fg:#FFFFFF; --accent-soft:#D1EEE9;
+  --ok:#2A7F3A; --warn:#A85F00; --crit:#BF3737; --rail:#FFFFFF; --rail-fg:#12302C;
+  --ok-soft:#DCF1E0; --warn-soft:#FAEACF; --crit-soft:#F8DEDE;
+  --r:14px; --r-lg:20px; --staff:0;
+  --font-display:"Bricolage Grotesque",system-ui,sans-serif; --font-body:"Figtree",system-ui,sans-serif}
+@media (prefers-color-scheme: dark){:root[data-dir="b"]:not([data-theme="light"]){
+  --bg:#0C1815; --surface:#13241F; --surface2:#1B312B; --line:#294640;
+  --fg:#E1F1EE; --muted:#8FB0AA; --accent:#3FD1BC; --accent-fg:#06201C; --accent-soft:#17463F;
+  --ok:#62D27A; --warn:#F0A93B; --crit:#FF8383; --rail:#0F1D19; --rail-fg:#E1F1EE;
+  --ok-soft:#15361F; --warn-soft:#3A2C10; --crit-soft:#3C1B1D}}
+:root[data-dir="b"][data-theme="dark"]{
+  --bg:#0C1815; --surface:#13241F; --surface2:#1B312B; --line:#294640;
+  --fg:#E1F1EE; --muted:#8FB0AA; --accent:#3FD1BC; --accent-fg:#06201C; --accent-soft:#17463F;
+  --ok:#62D27A; --warn:#F0A93B; --crit:#FF8383; --rail:#0F1D19; --rail-fg:#E1F1EE;
+  --ok-soft:#15361F; --warn-soft:#3A2C10; --crit-soft:#3C1B1D}
+
+*{box-sizing:border-box}
+body{margin:0;padding-inline:clamp(16px,3vw,36px);padding-block:24px 56px;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font-body)}
+button{font:inherit;color:inherit;cursor:pointer}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;line-height:1.15}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg.i{width:1.15em;height:1.15em;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.2em}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+
+/* ---- page ---- */
+.head{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between;max-width:1200px;margin:0 auto 20px}
+.head h1{font-size:clamp(26px,4vw,38px)}
+.head p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.controls{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface);gap:2px}
+.seg button{border:0;background:transparent;padding:6px 14px;border-radius:999px;color:var(--muted);font-weight:500}
+.seg button[aria-pressed="true"],.seg button[aria-selected="true"]{background:var(--accent);color:var(--accent-fg)}
+.tabs{max-width:1200px;margin:0 auto 14px;display:flex;gap:8px;flex-wrap:wrap}
+.tabs .seg{flex-wrap:wrap;border-radius:var(--r-lg)}
+.tabs .seg button{border-radius:calc(var(--r-lg) - 4px)}
+.stage{max-width:1200px;margin:0 auto}
+.frame{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface2);overflow:hidden}
+.frame-bar{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;padding:8px 14px;font-size:12px;color:var(--muted);border-bottom:1px solid var(--line)}
+.frame-body{overflow-x:auto}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:18px}
+.note{padding:0 2px}
+.note h3{font-size:15px;margin-bottom:4px}
+.note p{margin:0;color:var(--muted);font-size:14px}
+.tag{display:inline-block;font:600 11px var(--font-mono);padding:1px 6px;border-radius:4px;background:var(--accent-soft);color:var(--accent);margin-right:6px}
+
+/* ---- shell ---- */
+.app{display:grid;grid-template-columns:200px 1fr;min-width:820px;background:var(--bg);min-height:560px}
+.rail{background:var(--rail);color:var(--rail-fg);padding:18px 14px;display:flex;flex-direction:column;gap:6px;border-right:1px solid var(--line)}
+.logo{font:600 20px var(--font-display);padding:2px 8px 14px;display:flex;align-items:center;gap:8px}
+.logo b{width:22px;height:22px;border-radius:calc(var(--r) - 1px);background:var(--accent);display:inline-block;position:relative}
+.logo b::after{content:"";position:absolute;inset:6px 4px;border-top:2px solid var(--accent-fg);border-bottom:2px solid var(--accent-fg)}
+.nav{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:var(--r);border:0;background:transparent;text-align:left;opacity:.78}
+.nav[aria-current="page"]{background:color-mix(in srgb,var(--rail-fg) 14%,transparent);opacity:1;font-weight:600}
+.rail .me{margin-top:auto;display:flex;gap:10px;align-items:center;padding:8px;font-size:13px}
+.main{min-width:0;display:flex;flex-direction:column}
+.topbar{display:flex;gap:12px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.topbar h2{font-size:20px;margin-right:auto}
+.avatar{width:28px;height:28px;border-radius:50%;display:inline-grid;place-items:center;font:600 12px var(--font-body);color:#fff;background:var(--g2);flex:none;border:2px solid var(--surface)}
+.avatars{display:inline-flex}.avatars .avatar{margin-left:-8px}.avatars .avatar:first-child{margin-left:0}
+.btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;border:1px solid var(--line);background:var(--surface);padding:8px 14px;border-radius:var(--r);font-weight:600;min-height:40px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn.warn{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.btn.big{min-height:56px;font-size:16px;padding-inline:20px}
+.pill{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.crit{background:var(--crit-soft);color:var(--crit)}.pill.acc{background:var(--accent-soft);color:var(--accent)}
+.content{padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg)}
+
+/* ---- timeline d'étapes (portée) ---- */
+.tl{position:relative;display:flex;gap:10px;align-items:center;padding:14px 20px;background:var(--surface);border-bottom:1px solid var(--line);overflow-x:auto}
+.tl::before{content:"";position:absolute;inset:14px 0;pointer-events:none;opacity:var(--staff);
+  background:repeating-linear-gradient(to bottom,var(--line) 0 1px,transparent 1px 11px)}
+.step{position:relative;display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 8px 7px 14px;min-height:44px;white-space:nowrap}
+.step .n{font:600 12px var(--font-mono);color:var(--muted)}
+.step.is-active{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.step.is-active .n{color:inherit;opacity:.8}
+.step.is-done .n::after{content:" ✓"}
+.step.is-hidden{border-style:dashed;color:var(--muted);background:transparent}
+.step.is-locked{color:var(--muted)}
+.eye{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:0;background:color-mix(in srgb,currentColor 12%,transparent)}
+.grip{opacity:.5;cursor:grab}
+.add-step{border:1px dashed var(--accent);color:var(--accent);background:transparent;min-width:44px;justify-content:center;padding:7px}
+
+/* ---- espace de travail ---- */
+.work{display:grid;grid-template-columns:260px 1fr;gap:0;flex:1;min-height:0}
+.side{padding:16px;border-right:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:14px;min-width:0}
+.side h3{font:600 12px var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.list li{display:flex;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);font-size:14px;min-width:0}
+.list li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list .scope{margin-left:auto;font-size:11px;color:var(--muted)}
+.instr{font-size:14px;color:var(--fg);line-height:1.55}
+.canvas{padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.canvas-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.canvas-head h3{font-size:18px;margin-right:auto}
+.target{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:10px 12px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:var(--r);font-size:14px}
+.target select{font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:6px 8px;min-height:36px}
+.kanban{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.col{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:8px;min-height:150px}
+.col h4{margin:0;font:600 12px var(--font-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;font-size:13px;display:flex;justify-content:space-between;gap:8px;box-shadow:0 1px 0 var(--line)}
+.post b{font:600 12px var(--font-mono);color:var(--accent)}
+.editor{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);overflow:hidden}
+.etool{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--line);background:var(--bg);flex-wrap:wrap}
+.etool span{padding:4px 10px;border-radius:var(--r);font-size:13px;font-weight:600;color:var(--muted)}
+.edoc{padding:18px 22px;font-size:16px;line-height:1.65;min-height:210px;max-width:68ch}
+.caret{display:inline-block;width:2px;height:1.1em;vertical-align:-.2em;margin-left:1px}
+.who{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.toast{align-self:flex-start;padding:8px 12px;border-radius:var(--r);background:var(--ok-soft);color:var(--ok);font-weight:600;font-size:14px;min-height:38px}
+.footbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:12px 20px;border-top:1px solid var(--line);background:var(--surface)}
+.chrono{display:inline-flex;gap:8px;align-items:center;font:600 18px var(--font-mono);padding:4px 12px;border-radius:var(--r);background:var(--ok-soft);color:var(--ok)}
+.chrono.amber{background:var(--warn-soft);color:var(--warn)}.chrono.red{background:var(--crit-soft);color:var(--crit)}
+
+/* ---- activités ---- */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:var(--surface);padding:6px 14px;border-radius:999px;font-weight:500}
+.chips button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.search{display:flex;gap:8px;align-items:center;border:1px solid var(--line);background:var(--bg);border-radius:var(--r);padding:0 10px;min-height:40px;color:var(--muted);min-width:200px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.act{padding:16px;display:flex;flex-direction:column;gap:12px;text-align:left;min-width:0}
+.act h3{font-size:18px}
+.act .meta{color:var(--muted);font-size:13px}
+.dots{display:flex;gap:5px}.dots i{height:6px;flex:1;border-radius:3px;background:var(--surface2)}.dots i.on{background:var(--accent)}.dots i.now{background:var(--warn)}
+.act .row{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+
+/* ---- monitoring ---- */
+.mon{display:grid;grid-template-columns:1fr 280px;gap:16px;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.tile{padding:14px;display:flex;flex-direction:column;gap:10px;position:relative;min-width:0}
+.tile header{display:flex;gap:10px;align-items:center}
+.tile h3{font-size:18px;margin-right:auto}
+.gdot{width:12px;height:12px;border-radius:50%;flex:none}
+.prog{display:flex;gap:4px}.prog i{flex:1;height:8px;border-radius:4px;background:var(--surface2)}.prog i.on{background:var(--accent)}.prog i.now{background:var(--warn)}
+.counts{display:flex;gap:14px;font-size:13px;color:var(--muted)}.counts b{color:var(--fg);font-family:var(--font-mono)}
+.tile.help{border-color:var(--crit)}
+.frozen .tile::after{content:"Écran figé";position:absolute;inset:0;border-radius:inherit;display:grid;place-items:center;background:color-mix(in srgb,var(--bg) 78%,transparent);font:600 18px var(--font-display);color:var(--accent)}
+.panel{display:flex;flex-direction:column;gap:12px}
+.micro{padding:14px;display:grid;gap:10px}
+.micro .btn{justify-content:flex-start}
+.feed{padding:14px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+.feed div{display:flex;gap:8px}.feed time{font:500 12px var(--font-mono);color:var(--muted);flex:none}
+
+/* ---- téléphone ---- */
+.phone-wrap{display:flex;justify-content:center;padding:24px 16px}
+.phone{width:min(100%,340px);border:1px solid var(--line);border-radius:28px;background:var(--bg);overflow:hidden;box-shadow:0 10px 30px color-mix(in srgb,var(--fg) 12%,transparent)}
+.phone .ph-top{padding:18px 16px 12px;background:var(--surface);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.phone .ph-body{padding:14px;display:flex;flex-direction:column;gap:12px}
+.ph-list{display:flex;flex-direction:column;gap:8px}
+.ph-row{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.ph-row .st{margin-left:auto}
+.ph-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ph-actions .btn{flex-direction:column;gap:4px;min-height:72px;font-size:14px}
+
+@media (max-width:640px){.work{grid-template-columns:1fr}.side{border-right:0;border-bottom:1px solid var(--line)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+
+
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M3 3l18 18"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01" stroke-width="3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></symbol>
+  <symbol id="i-wifi" viewBox="0 0 24 24"><path d="M2 9a15 15 0 0120 0M5.5 12.5a10 10 0 0113 0M9 16a5 5 0 016 0"/><circle cx="12" cy="19.2" r=".8"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 015 0c0 1.7-2.5 2-2.5 4M12 17h.01"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-screen" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 013 3v13H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h11"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20a6 6 0 0112 0M16 5.5a3 3 0 010 5.5M18 14.5a5.5 5.5 0 013 5.5"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2"/></symbol>
+</svg>
+<header class="head">
+  <div>
+    <div class="eyebrow">Toccata 2 · maquettes d'interface v0</div>
+    <h1>Cinq écrans, deux directions</h1>
+    <p>Une même coque pour écrire, distribuer et piloter une activité. Changez de direction pour comparer, cliquez sur les étapes, l'œil, les boutons du monitoring.</p>
+  </div>
+  <div class="controls">
+    <span class="eyebrow">Direction visuelle</span>
+    <div class="seg" role="group" aria-label="Direction visuelle">
+      <button type="button" data-dir="a" aria-pressed="true">A · Partition</button>
+      <button type="button" data-dir="b" aria-pressed="false">B · Atelier</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="Écrans">
+  <div class="seg" role="tablist" id="tabs">
+    <button type="button" role="tab" data-tab="activites" aria-selected="true">1 · Mes activités</button>
+    <button type="button" role="tab" data-tab="editeur" aria-selected="false">2 · Éditeur de script</button>
+    <button type="button" role="tab" data-tab="eleve" aria-selected="false">3 · Vue élève</button>
+    <button type="button" role="tab" data-tab="monitoring" aria-selected="false">4 · Monitoring</button>
+    <button type="button" role="tab" data-tab="telecommande" aria-selected="false">5 · Télécommande</button>
+  </div>
+</nav>
+
+<main class="stage">
+
+<!-- ============ 1. ACTIVITÉS ============ -->
+<section data-panel="activites">
+  <div class="frame"><div class="frame-bar"><span>Ordinateur · enseignant</span><span>/activites</span></div>
+  <div class="frame-body"><div class="app">
+    <aside class="rail">
+      <div class="logo"><b></b>Toccata</div>
+      <button class="nav" aria-current="page"><svg class="i"><use href="#i-book"/></svg>Mes activités</button>
+      <button class="nav"><svg class="i"><use href="#i-copy"/></svg>Modèles</button>
+      <button class="nav"><svg class="i"><use href="#i-users"/></svg>Classes</button>
+      <div class="me"><span class="avatar" style="background:var(--g3)">MD</span><span>Mme Durand<br><small style="opacity:.7">Enseignante</small></span></div>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <h2>Mes activités</h2>
+        <label class="search"><svg class="i"><use href="#i-search"/></svg><input id="q" placeholder="Rechercher" style="border:0;background:transparent;font:inherit;color:var(--fg);min-width:0;width:130px;outline:none"></label>
+        <span class="pill ok"><svg class="i"><use href="#i-wifi"/></svg>Serveur de classe</span>
+        <button class="btn primary"><svg class="i"><use href="#i-plus"/></svg>Nouvelle activité</button>
+      </div>
+      <div class="content">
+        <div class="chips" id="filters" role="group" aria-label="Filtres">
+          <button aria-pressed="true" data-f="all">Toutes</button><button aria-pressed="false" data-f="run">En cours</button><button aria-pressed="false" data-f="draft">Brouillons</button><button aria-pressed="false" data-f="tpl">Modèles partagés</button>
+        </div>
+        <div class="grid" id="acts">
+          <article class="card act" data-k="run"><div class="row"><span class="pill acc">En cours · étape 2 sur 4</span><span class="pill ok">4 groupes</span></div>
+            <h3>Atelier Agile : la ville en Lego</h3><div class="meta">3 sprints · chrono et kanban · 20 élèves</div>
+            <div class="dots"><i class="on"></i><i class="now"></i><i></i><i></i></div><div class="row"><span class="meta">Séance d'hier, 16 h 05</span><button class="btn">Ouvrir</button></div></article>
+          <article class="card act" data-k="run"><div class="row"><span class="pill acc">Reprise · séance 2 sur 3</span><span class="pill">11 élèves</span></div>
+            <h3>Vérifier l'information</h3><div class="meta">3 étapes · éditeur de texte · pages web</div>
+            <div class="dots"><i class="on"></i><i class="now"></i><i></i></div><div class="row"><span class="meta">Mardi, 10 h 00</span><button class="btn">Reprendre</button></div></article>
+          <article class="card act" data-k="draft"><div class="row"><span class="pill warn"><svg class="i"><use href="#i-wifi"/></svg>3 modifications en attente</span></div>
+            <h3>Catalogue de plantes</h3><div class="meta">Brouillon · 3 étapes · tablettes</div>
+            <div class="dots"><i></i><i></i><i></i></div><div class="row"><span class="meta">Modifié hors ligne</span><button class="btn">Modifier</button></div></article>
+          <article class="card act" data-k="tpl"><div class="row"><span class="pill">Modèle de M. Roche</span></div>
+            <h3>Débat mouvant, 4e</h3><div class="meta">2 étapes · questionnaire · 12 copies</div>
+            <div class="dots"><i></i><i></i></div><div class="row"><span class="meta">Partagé il y a 2 jours</span><button class="btn">Copier dans mes activités</button></div></article>
+          <article class="card act" data-k="draft"><div class="row"><span class="pill">Brouillon</span></div>
+            <h3>Revue de fin de chapitre</h3><div class="meta">1 étape masquée · aucun élève</div>
+            <div class="dots"><i></i></div><div class="row"><span class="meta">Il y a 6 jours</span><button class="btn">Modifier</button></div></article>
+        </div>
+      </div>
+    </div>
+  </div></div></div>
+  <div class="notes">
+    <div class="note"><h3><span class="tag">D8</span>Réutiliser sans fouiller</h3><p>Les modèles sont une section à part entière : on copie, l'original ne bouge pas.</p></div>
+    <div class="note"><h3><span class="tag">D3</span>Le réseau se voit, sans alarme</h3><p>Une pastille dit où l'on se synchronise. Une carte hors ligne montre ce qui attend d'être envoyé.</p></div>
+    <div class="note"><h3><span class="tag">D6</span>Reprendre en un clic</h3><p>Le bouton devient « Reprendre » quand une séance est en cours, avec la position dans le script.</p></div>
+  </div>
+</section>
+
+<!-- ============ 2. ÉDITEUR ============ -->
+<section data-panel="editeur" hidden>
+  <div class="frame"><div class="frame-bar"><span>Tablette · enseignant · mode édition</span><span>/activite/atelier-agile</span></div>
+  <div class="frame-body"><div class="app">
+    <aside class="rail">
+      <div class="logo"><b></b>Toccata</div>
+      <button class="nav" aria-current="page"><svg class="i"><use href="#i-book"/></svg>Mes activités</button>
+      <button class="nav"><svg class="i"><use href="#i-copy"/></svg>Modèles</button>
+      <button class="nav"><svg class="i"><use href="#i-users"/></svg>Classes</button>
+      <div class="me"><span class="avatar" style="background:var(--g3)">MD</span><span>Mme Durand</span></div>
+    </aside>
+    <div class="main">
+      <div class="topbar">
+        <h2>Atelier Agile : la ville en Lego</h2>
+        <span class="pill ok"><svg class="i"><use href="#i-wifi"/></svg>Synchronisé</span>
+        <button class="btn"><svg class="i"><use href="#i-screen"/></svg>Aperçu élève</button>
+        <button class="btn primary">Distribuer<svg class="i"><use href="#i-arrow"/></svg></button>
+      </div>
+      <div class="tl" id="edTl" role="list" aria-label="Étapes">
+        <button class="step is-done" data-s="0"><svg class="i grip"><use href="#i-grip"/></svg><span class="n">1</span>Backlog<span class="eye" role="button" tabindex="0" aria-label="Masquer l'étape"><svg class="i"><use href="#i-eye"/></svg></span></button>
+        <button class="step is-active" data-s="1"><svg class="i grip"><use href="#i-grip"/></svg><span class="n">2</span>Sprint 1 · Estimer<span class="eye" role="button" tabindex="0" aria-label="Masquer l'étape"><svg class="i"><use href="#i-eye"/></svg></span></button>
+        <button class="step" data-s="2"><svg class="i grip"><use href="#i-grip"/></svg><span class="n">3</span>Sprint 1 · Construire<span class="eye" role="button" tabindex="0" aria-label="Masquer l'étape"><svg class="i"><use href="#i-eye"/></svg></span></button>
+        <button class="step is-hidden" data-s="3"><svg class="i grip"><use href="#i-grip"/></svg><span class="n">4</span>Bonus · Extension<span class="eye" role="button" tabindex="0" aria-label="Afficher l'étape"><svg class="i"><use href="#i-eyeoff"/></svg></span></button>
+        <button class="step add-step" aria-label="Ajouter une étape"><svg class="i"><use href="#i-plus"/></svg></button>
+      </div>
+      <div class="work">
+        <div class="side">
+          <div><h3>Consigne de l'étape</h3><p class="instr" contenteditable="true" spellcheck="false" style="margin:6px 0 0;outline:none">Chaque groupe estime les tâches du backlog en points de complexité. Vous avez 3 minutes. Une carte ne peut pas dépasser 8 points.</p></div>
+          <div><h3>Ressources</h3><ul class="list"><li><svg class="i"><use href="#i-book"/></svg><span>Règles du sprint (PDF)</span><em class="scope">cette étape</em></li><li><svg class="i"><use href="#i-book"/></svg><span>Plan de la ville</span><em class="scope">activité</em></li></ul></div>
+          <div><h3>Applications</h3><ul class="list"><li><svg class="i"><use href="#i-clock"/></svg><span>Chronomètre 3:00</span></li><li><svg class="i"><use href="#i-check"/></svg><span>Kanban d'estimation</span></li></ul>
+            <button class="btn" style="margin-top:8px;width:100%"><svg class="i"><use href="#i-plus"/></svg>Ajouter ressource ou app</button></div>
+        </div>
+        <div class="canvas">
+          <div class="canvas-head"><h3>Kanban d'estimation</h3><span class="pill">Édition</span></div>
+          <div class="target"><b>Appliquer cette modification à</b>
+            <select id="target" aria-label="Cible de la modification"><option value="all">Toute la classe (4 groupes)</option><option value="sel">Groupes Corail et Menthe</option><option value="one">Safran seulement</option></select>
+            <span id="targetNote" style="color:var(--muted)">Les groupes liés suivent le script en direct.</span></div>
+          <div class="kanban">
+            <div class="col"><h4>À faire <span>3</span></h4><div class="post">Fondations<b>5</b></div><div class="post">Route principale<b>3</b></div><div class="post">Gare<b>8</b></div></div>
+            <div class="col"><h4>En cours <span>1</span></h4><div class="post">Pont<b>5</b></div></div>
+            <div class="col"><h4>Fait <span>0</span></h4></div>
+          </div>
+          <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+        </div>
+      </div>
+    </div>
+  </div></div></div>
+  <div class="notes">
+    <div class="note"><h3><span class="tag">D4</span>La timeline est le script</h3><p>Les étapes se réordonnent en glissant. L'œil masque une étape sans la supprimer : brouillon, bonus ou variante par groupe.</p></div>
+    <div class="note"><h3><span class="tag">D5</span>À qui s'adresse le changement ?</h3><p>Le sélecteur de cible dit si la modification va au script commun ou à certains groupes seulement.</p></div>
+    <div class="note"><h3><span class="tag">§4.1</span>Même cadre qu'en classe</h3><p>Le cadre est celui de l'élève, avec des commandes d'édition en plus : l'aperçu est fidèle.</p></div>
+  </div>
+</section>
+
+<!-- ============ 3. ÉLÈVE ============ -->
+<section data-panel="eleve" hidden>
+  <div class="frame"><div class="frame-bar"><span>Tablette · élève · groupe Corail</span><span>/activite/atelier-agile/etape-2</span></div>
+  <div class="frame-body"><div class="app" style="grid-template-columns:1fr">
+    <div class="main">
+      <div class="topbar">
+        <span class="logo" style="padding:0;color:var(--fg)"><b></b>Toccata</span>
+        <h2 style="margin-left:8px">Atelier Agile : la ville en Lego</h2>
+        <span class="pill warn"><svg class="i"><use href="#i-wifi"/></svg>Hors ligne, vos changements sont gardés</span>
+        <span class="avatars"><span class="avatar" style="background:var(--g1)">LA</span><span class="avatar" style="background:var(--g3)">HU</span><span class="avatar" style="background:var(--g4)">EM</span></span>
+      </div>
+      <div class="tl" id="stuTl" role="list" aria-label="Étapes">
+        <button class="step is-done" data-s="0"><span class="n">1</span>Backlog</button>
+        <button class="step is-active" data-s="1"><span class="n">2</span>Sprint 1 · Estimer</button>
+        <button class="step is-locked" data-s="2"><svg class="i"><use href="#i-lock"/></svg><span class="n">3</span>Sprint 1 · Construire</button>
+      </div>
+      <div class="work">
+        <div class="side">
+          <div><h3>Consigne</h3><p class="instr" style="margin:6px 0 0">Estimez chaque tâche du backlog en points de complexité. Une carte ne peut pas dépasser 8 points.</p></div>
+          <div><h3>Ouvrir</h3><ul class="list"><li style="border-color:var(--accent);background:var(--accent-soft)"><svg class="i"><use href="#i-check"/></svg><span>Notes du groupe</span></li><li><svg class="i"><use href="#i-clock"/></svg><span>Chronomètre</span></li><li><svg class="i"><use href="#i-book"/></svg><span>Règles du sprint</span></li></ul></div>
+          <div><h3>Participants</h3><p class="who"><span class="avatar" style="background:var(--g3);width:22px;height:22px;font-size:10px">HU</span>Hugo écrit…</p></div>
+        </div>
+        <div class="canvas">
+          <div class="canvas-head"><h3>Notes du groupe</h3><span class="chrono amber" id="stuChrono"><svg class="i"><use href="#i-clock"/></svg><span class="mono" id="stuT">04:12</span></span></div>
+          <div class="editor">
+            <div class="etool"><span>Titre</span><span>Gras</span><span>Italique</span><span>Liste</span><span style="margin-left:auto;color:var(--ok)">Enregistré</span></div>
+            <div class="edoc">Nos estimations : la <b>gare</b> est la tâche la plus lourde (8 points) car il faut quatre quais. Le <b>pont</b> passe à 5 points parce que Lina a déjà une idée de structure.<span class="caret" style="background:var(--g3)"></span><span class="caret" style="background:var(--g1);margin-left:4px"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="footbar">
+        <button class="btn primary big" id="doneBtn"><svg class="i"><use href="#i-check"/></svg>J'ai terminé l'étape</button>
+        <button class="btn big" id="helpBtn"><svg class="i"><use href="#i-help"/></svg>J'ai besoin d'aide</button>
+        <span id="stuMsg" class="pill" style="margin-left:auto" role="status" aria-live="polite">L'enseignante voit votre avancement</span>
+      </div>
+    </div>
+  </div></div></div>
+  <div class="notes">
+    <div class="note"><h3><span class="tag">§4.3</span>Un seul élément à la fois</h3><p>On ouvre un outil, les autres restent dans la liste. L'attention reste sur la tâche.</p></div>
+    <div class="note"><h3><span class="tag">§7.3</span>Dire « fini » ou « aidez-moi »</h3><p>Deux boutons simples. Aujourd'hui, l'élève n'a aucun moyen d'alerter l'enseignant.</p></div>
+    <div class="note"><h3><span class="tag">D3</span>Hors ligne sans panique</h3><p>La barre le dit, le travail continue, tout part au retour du réseau.</p></div>
+  </div>
+</section>
+
+<!-- ============ 4. MONITORING ============ -->
+<section data-panel="monitoring" hidden>
+  <div class="frame"><div class="frame-bar"><span>Ordinateur ou vidéoprojecteur · enseignant · séance en direct</span><span>/seance/atelier-agile</span></div>
+  <div class="frame-body"><div class="app" style="grid-template-columns:1fr">
+    <div class="main">
+      <div class="topbar">
+        <h2>Sprint 1 · Construire</h2>
+        <span class="chrono" id="gChrono"><svg class="i"><use href="#i-clock"/></svg><span class="mono" id="gT">07:00</span></span>
+        <span class="pill ok"><svg class="i"><use href="#i-wifi"/></svg>Serveur de classe · 20 connectés</span>
+        <button class="btn"><svg class="i"><use href="#i-screen"/></svg>Mode projecteur</button>
+      </div>
+      <div class="content">
+        <div class="mon">
+          <div class="tiles" id="tiles">
+            <article class="card tile"><header><span class="gdot" style="background:var(--g1)"></span><h3>Corail</h3><span class="pill ok">Dans les temps</span></header>
+              <div class="prog"><i class="on"></i><i class="now"></i><i></i><i></i></div><div class="meta" style="color:var(--muted);font-size:13px">Sprint 1 · Construire</div>
+              <div class="counts"><span>À faire <b>3</b></span><span>En cours <b>2</b></span><span>Fait <b>4</b></span></div>
+              <div class="row" style="display:flex;justify-content:space-between;align-items:center"><span class="chrono" data-sec="402"><svg class="i"><use href="#i-clock"/></svg><span class="mono t">06:42</span></span><button class="btn"><svg class="i"><use href="#i-screen"/></svg>Voir l'écran</button></div></article>
+            <article class="card tile help"><header><span class="gdot" style="background:var(--g2)"></span><h3>Ardoise</h3><span class="pill crit"><svg class="i"><use href="#i-help"/></svg>Demande de l'aide</span></header>
+              <div class="prog"><i class="on"></i><i class="now"></i><i></i><i></i></div><div style="color:var(--muted);font-size:13px">Sprint 1 · Estimer</div>
+              <div class="counts"><span>À faire <b>5</b></span><span>En cours <b>0</b></span><span>Fait <b>0</b></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="chrono red" data-sec="95"><svg class="i"><use href="#i-clock"/></svg><span class="mono t">01:35</span></span><button class="btn primary"><svg class="i"><use href="#i-screen"/></svg>Voir l'écran</button></div></article>
+            <article class="card tile"><header><span class="gdot" style="background:var(--g3)"></span><h3>Menthe</h3><span class="pill ok">Dans les temps</span></header>
+              <div class="prog"><i class="on"></i><i class="now"></i><i></i><i></i></div><div style="color:var(--muted);font-size:13px">Sprint 1 · Construire</div>
+              <div class="counts"><span>À faire <b>2</b></span><span>En cours <b>3</b></span><span>Fait <b>4</b></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="chrono" data-sec="400"><svg class="i"><use href="#i-clock"/></svg><span class="mono t">06:40</span></span><button class="btn"><svg class="i"><use href="#i-screen"/></svg>Voir l'écran</button></div></article>
+            <article class="card tile"><header><span class="gdot" style="background:var(--g4)"></span><h3>Safran</h3><span class="pill warn">Une étape de retard</span></header>
+              <div class="prog"><i class="on"></i><i class="now"></i><i></i><i></i></div><div style="color:var(--muted);font-size:13px">Backlog</div>
+              <div class="counts"><span>À faire <b>6</b></span><span>En cours <b>0</b></span><span>Fait <b>0</b></span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center"><span class="chrono amber" data-sec="250"><svg class="i"><use href="#i-clock"/></svg><span class="mono t">04:10</span></span><button class="btn"><svg class="i"><use href="#i-screen"/></svg>Voir l'écran</button></div></article>
+          </div>
+          <div class="panel">
+            <section class="card micro"><h3 style="font-size:16px">Actions rapides</h3>
+              <button class="btn" id="plus2"><svg class="i"><use href="#i-clock"/></svg>Ajouter 2 minutes</button>
+              <button class="btn" id="freeze"><svg class="i"><use href="#i-pause"/></svg>Figer les écrans</button>
+              <button class="btn"><svg class="i"><use href="#i-msg"/></svg>Message à la classe</button>
+              <button class="btn primary"><svg class="i"><use href="#i-check"/></svg>Valider l'étape pour tous</button></section>
+            <section class="card feed"><h3 style="font-size:16px">Fil de séance</h3>
+              <div><time>10:42</time><span>Ardoise demande de l'aide</span></div>
+              <div><time>10:40</time><span>Menthe a déplacé « Gare » vers Fait</span></div>
+              <div><time>10:37</time><span>Safran a rouvert le Backlog</span></div>
+              <div><time>10:35</time><span>Étape lancée pour 4 groupes</span></div></section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div></div></div>
+  <div class="notes">
+    <div class="note"><h3><span class="tag">§6.2.2</span>Une tuile, un coup d'œil</h3><p>Étape, avancement et chrono coloré. L'article montre que les enseignants regardent surtout les tablettes : l'essentiel doit tenir en une phrase par groupe.</p></div>
+    <div class="note"><h3><span class="tag">§7.3</span>Actions rapides</h3><p>Prolonger le chrono, figer les écrans, valider une étape : les gestes que les enseignants font déjà à la voix.</p></div>
+    <div class="note"><h3><span class="tag">§4.3</span>Voir l'écran</h3><p>Ouvre la vue du groupe en lecture seule, construite à partir de son état partagé.</p></div>
+  </div>
+</section>
+
+<!-- ============ 5. TÉLÉCOMMANDE ============ -->
+<section data-panel="telecommande" hidden>
+  <div class="frame"><div class="frame-bar"><span>Téléphone · enseignant en déplacement</span><span>/telecommande</span></div>
+  <div class="frame-body"><div class="phone-wrap"><div class="phone">
+    <div class="ph-top">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span class="eyebrow">Sprint 1 · Construire</span><span class="pill ok"><svg class="i"><use href="#i-wifi"/></svg>En ligne</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between"><span class="chrono" id="pChrono" style="font-size:26px"><span class="mono" id="pT">06:50</span></span><span class="pill crit"><svg class="i"><use href="#i-help"/></svg>1 demande</span></div>
+    </div>
+    <div class="ph-body">
+      <div class="ph-list">
+        <div class="ph-row" style="border-color:var(--crit)"><span class="gdot" style="background:var(--g2)"></span><b>Ardoise</b><span class="pill crit st">Aide</span></div>
+        <div class="ph-row"><span class="gdot" style="background:var(--g4)"></span><b>Safran</b><span class="pill warn st">En retard</span></div>
+        <div class="ph-row"><span class="gdot" style="background:var(--g1)"></span><b>Corail</b><span class="pill ok st">OK</span></div>
+        <div class="ph-row"><span class="gdot" style="background:var(--g3)"></span><b>Menthe</b><span class="pill ok st">OK</span></div>
+      </div>
+      <div class="ph-actions">
+        <button class="btn"><svg class="i"><use href="#i-clock"/></svg>+2 min</button>
+        <button class="btn"><svg class="i"><use href="#i-pause"/></svg>Figer</button>
+        <button class="btn"><svg class="i"><use href="#i-msg"/></svg>Message</button>
+        <button class="btn primary"><svg class="i"><use href="#i-check"/></svg>Valider</button>
+      </div>
+    </div>
+  </div></div></div></div>
+  <div class="notes">
+    <div class="note"><h3><span class="tag">§7.2</span>Une télécommande, pas un second écran</h3><p>Les enseignants posent la tablette de pilotage. Le téléphone se range dans la poche et ne montre que ce qui demande une action.</p></div>
+    <div class="note"><h3><span class="tag">D1</span>Gros boutons, une main</h3><p>Quatre actions à pouce, dans la moitié basse. Les groupes en difficulté remontent en tête.</p></div>
+    <div class="note"><h3><span class="tag">D7</span>Rôle enseignant</h3><p>Cette vue n'existe que pour le rôle enseignant ; les droits sont vérifiés côté serveur, pas seulement masqués.</p></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  function $(s,c){return (c||document).querySelector(s)}
+  function $$(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))}
+
+  /* direction */
+  $$('[data-dir]').forEach(function(b){b.addEventListener('click',function(){
+    root.setAttribute('data-dir',b.dataset.dir);
+    $$('[data-dir]').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+  })});
+
+  /* onglets */
+  function show(name){
+    var ok=$$('[data-panel]').some(function(p){return p.dataset.panel===name});
+    if(!ok)name='activites';
+    $$('[data-panel]').forEach(function(p){p.hidden=p.dataset.panel!==name});
+    $$('[data-tab]').forEach(function(t){t.setAttribute('aria-selected',String(t.dataset.tab===name))});
+    try{history.replaceState(null,'','#'+name)}catch(e){}
+  }
+  $$('[data-tab]').forEach(function(t){t.addEventListener('click',function(){show(t.dataset.tab)})});
+  show((location.hash||'').replace('#',''));
+
+  /* filtres activités */
+  $$('#filters button').forEach(function(b){b.addEventListener('click',function(){
+    $$('#filters button').forEach(function(x){x.setAttribute('aria-pressed',String(x===b))});
+    filter();
+  })});
+  $('#q').addEventListener('input',filter);
+  function filter(){
+    var f=$('#filters [aria-pressed="true"]').dataset.f,q=$('#q').value.trim().toLowerCase();
+    $$('#acts .act').forEach(function(a){
+      var okF=f==='all'||a.dataset.k===f;
+      var okQ=!q||a.textContent.toLowerCase().indexOf(q)>-1;
+      a.hidden=!(okF&&okQ);
+    });
+  }
+
+  /* timeline (édition + élève) */
+  function steps(tl,canHide){
+    $$('.step[data-s]',tl).forEach(function(s){
+      s.addEventListener('click',function(e){
+        var eye=e.target.closest&&e.target.closest('.eye');
+        if(eye&&canHide){
+          s.classList.toggle('is-hidden');
+          var u=$('use',eye);u.setAttribute('href',s.classList.contains('is-hidden')?'#i-eyeoff':'#i-eye');
+          return;
+        }
+        if(s.classList.contains('is-locked'))return;
+        $$('.step',tl).forEach(function(x){x.classList.remove('is-active')});
+        s.classList.add('is-active');
+      });
+    });
+  }
+  steps($('#edTl'),true);steps($('#stuTl'),false);
+  $$('#edTl .eye').forEach(function(e){e.addEventListener('keydown',function(ev){if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();e.click()}})});
+
+  /* cible des modifications */
+  var notes={all:'Toute la classe : les 4 groupes liés suivent en direct.',sel:'Seuls Corail et Menthe reçoivent la modification (les autres gardent leur version).',one:'Seul Safran reçoit la modification.'};
+  var toast=$('#toast');
+  $('#target').addEventListener('change',function(e){
+    var v=e.target.value;$('#targetNote').textContent=notes[v];
+    toast.hidden=false;toast.textContent=v==='all'?'Modification envoyée à 4 groupes':v==='sel'?'Modification envoyée à 2 groupes':'Modification envoyée à 1 groupe';
+  });
+
+  /* élève */
+  $('#doneBtn').addEventListener('click',function(){
+    var a=$('#stuTl .is-active');if(!a)return;
+    a.classList.remove('is-active');a.classList.add('is-done');
+    var n=a.nextElementSibling;
+    if(n&&n.classList.contains('is-locked')){n.classList.remove('is-locked');n.classList.add('is-active');var l=$('use',n);if(l)l.parentNode.remove()}
+    $('#stuMsg').textContent='Étape envoyée à l\'enseignante';$('#stuMsg').className='pill ok';
+  });
+  $('#helpBtn').addEventListener('click',function(){
+    $('#stuMsg').textContent='L\'enseignante est prévenue';$('#stuMsg').className='pill warn';
+  });
+
+  /* chronos */
+  function fmt(s){s=Math.max(0,s);return ('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2)}
+  function tone(el,s){el.classList.remove('amber','red');if(s<120)el.classList.add('red');else if(s<300)el.classList.add('amber')}
+  var g=420,stu=252,ph=410;
+  var tiles=$$('#tiles .chrono[data-sec]').map(function(el){return {el:el,t:$('.t',el),s:+el.dataset.sec}});
+  setInterval(function(){
+    g=Math.max(0,g-1);stu=Math.max(0,stu-1);ph=Math.max(0,ph-1);
+    $('#gT').textContent=fmt(g);tone($('#gChrono'),g);
+    $('#stuT').textContent=fmt(stu);tone($('#stuChrono'),stu);
+    $('#pT').textContent=fmt(ph);tone($('#pChrono'),ph);
+    tiles.forEach(function(o){o.s=Math.max(0,o.s-1);o.t.textContent=fmt(o.s);tone(o.el,o.s)});
+  },1000);
+  $('#plus2').addEventListener('click',function(){g+=120;ph+=120;stu+=120;tiles.forEach(function(o){o.s+=120})});
+  $('#freeze').addEventListener('click',function(){
+    var on=$('#tiles').classList.toggle('frozen');
+    $('#freeze').lastChild.textContent=on?'Libérer les écrans':'Figer les écrans';
+  });
+})();
+</script>
+
+</body>
+</html>
