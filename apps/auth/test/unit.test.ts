@@ -20,6 +20,8 @@ describe("configuration", () => {
     const c = loadConfig(ok);
     expect(c.COOKIE_SECURE).toBe(true);
     expect(c.TRUST_PROXY).toBe(false);
+    expect(c.BASE_PATH).toBe("/api");
+    expect(c.OPEN_SIGNUP).toBe(false); // inscription fermée par défaut
     expect(c.ACCESS_TTL_SECONDS).toBe(900);
     expect(c.JWT_SECRET.byteLength).toBeGreaterThanOrEqual(32);
   });
@@ -33,6 +35,10 @@ describe("configuration", () => {
     try { loadConfig({ ...ok, JWT_SECRET: short }); } catch (e) { msg = (e as Error).message; }
     expect(msg).toMatch(/32 octets/);
     expect(msg).not.toContain(short); // le message ne répète jamais la valeur
+  });
+  it("refuse un préfixe d'API invalide", () => {
+    for (const bad of ["api", "/", "/a b", "/../x", "//x"]) expect(() => loadConfig({ ...ok, BASE_PATH: bad }), bad).toThrow();
+    expect(loadConfig({ ...ok, BASE_PATH: "/v1/api" }).BASE_PATH).toBe("/v1/api");
   });
   it("borne la durée du jeton d'accès", () => {
     expect(() => loadConfig({ ...ok, ACCESS_TTL_SECONDS: "86400" })).toThrow();

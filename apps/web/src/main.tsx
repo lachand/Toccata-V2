@@ -5,18 +5,19 @@ import "@toccata/ui/styles.css";
 import "./app.css";
 import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router";
-import { Layout } from "./components/Layout";
+import { BrowserRouter } from "react-router";
+import { session } from "./auth/session";
+import { AppRoutes } from "./routes";
 import { UpdatePrompt } from "./UpdatePrompt";
 import { type Locale, activateLocale, detectLocale } from "./i18n";
-import { Activities } from "./pages/Activities";
-import { Gallery } from "./pages/Gallery";
 
 function Root() {
   const [ready, setReady] = useState(false);
   const [locale, setLocale] = useState<Locale>(detectLocale());
   useEffect(() => {
     void activateLocale(locale).then(() => setReady(true));
+    void session.bootstrap();
+    session.watchNetwork();
     return i18n.on("change", () => setLocale(i18n.locale as Locale));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- activation initiale uniquement
   }, []);
@@ -24,12 +25,7 @@ function Root() {
   return (
     <I18nProvider i18n={i18n}>
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Activities locale={locale} />} />
-            <Route path="/gallery" element={<Gallery locale={locale} />} />
-          </Routes>
-        </Layout>
+        <AppRoutes locale={locale} />
       </BrowserRouter>
       <UpdatePrompt />
     </I18nProvider>

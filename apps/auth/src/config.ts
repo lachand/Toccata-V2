@@ -27,6 +27,8 @@ const schema = z.object({
   /** Clé HMAC partagée avec CouchDB (`[jwt_keys] hmac:<kid>`), en base64. Aucune valeur par défaut. */
   JWT_SECRET: secret,
   JWT_KID: z.string().regex(/^[A-Za-z0-9_-]{1,32}$/).default("k1"),
+  /** Préfixe public de l'API (le proxy y envoie `/api/*` vers ce service) : évite toute collision avec les routes de l'interface. */
+  BASE_PATH: z.string().regex(/^(\/[a-z0-9-]+)+$/).default("/api"),
   ACCESS_TTL_SECONDS: z.coerce.number().int().min(60).max(3600).default(900),
   REFRESH_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(30),
   /** `false` seulement en développement sans HTTPS. */
@@ -37,6 +39,8 @@ const schema = z.object({
   TRUST_PROXY: bool(false),
   /** Si défini, l'inscription d'un enseignant exige ce code (à distribuer par l'établissement). */
   SIGNUP_CODE: z.string().min(8).optional(),
+  /** Inscription ouverte à tous, sans code. Fermée par défaut : à n'activer qu'en connaissance de cause. */
+  OPEN_SIGNUP: bool(false),
 });
 
 export type Config = z.infer<typeof schema>;

@@ -56,6 +56,7 @@ export function createApp(deps: Deps) {
     signup: deps.limits?.signup ?? new RateLimiter(10, 60 * 60_000, now),
     refresh: deps.limits?.refresh ?? new RateLimiter(120, 60_000, now),
   };
+  const cookiePath = `${config.BASE_PATH}/auth`; // le navigateur voit l'API sous BASE_PATH ; le cookie doit correspondre
   const app = new Hono<{ Variables: Vars }>();
 
   app.use(secureHeaders());
@@ -121,7 +122,7 @@ export function createApp(deps: Deps) {
       httpOnly: true,
       secure: config.COOKIE_SECURE,
       sameSite: "Strict",
-      path: "/auth",
+      path: cookiePath,
       maxAge: config.REFRESH_TTL_DAYS * 86_400,
     });
     const accessToken = await mintAccessToken(config, { sub: user.id, role: user.role, couchRoles: rolesFor(user) }, t);
@@ -151,6 +152,7 @@ export function createApp(deps: Deps) {
   app.post("/auth/teachers", async (c) => {
     limit(limits.signup, clientIp(c));
     const b = await body(c, signupBody);
+    if (!config.SIGNUP_CODE && !config.OPEN_SIGNUP) throw new ApiError("signup_closed"); // fermé par défaut
     if (config.SIGNUP_CODE) {
       const given = Buffer.from(b.inviteCode ?? "");
       const want = Buffer.from(config.SIGNUP_CODE);
@@ -209,13 +211,13 @@ export function createApp(deps: Deps) {
     const session = await accounts.getSession(sid);
     const t = now();
     if (!session || session.revoked || session.expiresAt <= t || !secretMatches(secret, session.tokenHash)) {
-      deleteCookie(c, REFRESH_COOKIE, { path: "/auth" });
+      deleteCookie(c, REFRESH_COOKIE, { path: cookiePath });
       throw new ApiError("invalid_refresh");
     }
     // Réutilisation d'un jeton déjà échangé : vol probable, on révoque toute la famille de sessions.
     if (session.usedAt !== null && t - session.usedAt > REUSE_GRACE_MS) {
       await accounts.revokeFamily(session.familyId);
-      deleteCookie(c, REFRESH_COOKIE, { path: "/auth" });
+      deleteCookie(c, REFRESH_COOKIE, { path: cookiePath });
       throw new ApiError("refresh_reused");
     }
     const user = await accounts.getUser(session.userId);
@@ -240,7 +242,7 @@ export function createApp(deps: Deps) {
       const s = await accounts.getSession(sid);
       if (s) await accounts.revokeFamily(s.familyId);
     }
-    deleteCookie(c, REFRESH_COOKIE, { path: "/auth" });
+    deleteCookie(c, REFRESH_COOKIE, { path: cookiePath });
     return c.body(null, 204);
   });
 

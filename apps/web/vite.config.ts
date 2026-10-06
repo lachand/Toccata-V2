@@ -4,7 +4,13 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { defineConfig } from "vitest/config";
 
+// L'API (service apps/auth) est servie sous /api : le proxy évite toute requête inter-origines (donc tout CORS) et
+// laisse le cookie de rafraîchissement sur la même origine que l'interface.
+const api = { "/api": { target: process.env["AUTH_URL"] ?? "http://127.0.0.1:8787", changeOrigin: false } };
+
 export default defineConfig({
+  server: { proxy: api },
+  preview: { proxy: api },
   plugins: [
     react(),
     babel({ plugins: ["@lingui/babel-plugin-lingui-macro"] }),
@@ -32,6 +38,7 @@ export default defineConfig({
         // Coque, polices et catalogues de langues (chunks `messages-*.js`) : tout est précaché, donc disponible hors ligne.
         globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest}"],
         navigateFallback: "/index.html",
+        navigateFallbackDenylist: [/^\/api\//],
         cleanupOutdatedCaches: true,
       },
     }),

@@ -1,3 +1,12 @@
 /* Mise en page de la page : l'application remplit la fenêtre et utilise la police du design system. */
 html, body, #root { block-size: 100%; margin: 0; }
 body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
+
+/* Impression des fiches d'identifiants : seule la zone `.print-sheet` sort de l'imprimante. */
+@media print {
+  body * { visibility: hidden; }
+  .print-sheet, .print-sheet * { visibility: visible; }
+  .print-sheet { position: absolute; inset-inline: 0; inset-block-start: 0; padding: 0; }
+  .no-print { display: none !important; }
+  .cred-card { break-inside: avoid; box-shadow: none; border: 1px solid #000; }
+}

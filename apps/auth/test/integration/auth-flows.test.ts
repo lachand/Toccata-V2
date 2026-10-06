@@ -23,7 +23,7 @@ describe("inscription et connexion d'un enseignant", () => {
     expect(r.setCookie).toMatch(/toccata_rt=/);
     expect(r.setCookie).toMatch(/HttpOnly/i);
     expect(r.setCookie).toMatch(/SameSite=Strict/i);
-    expect(r.setCookie).toMatch(/Path=\/auth/i);
+    expect(r.setCookie).toMatch(/Path=\/api\/auth/i); // le navigateur voit l'API sous /api
   });
 
   it("refuse un identifiant déjà pris, quelle que soit la casse", async () => {
@@ -103,6 +103,15 @@ describe("limitation de débit", () => {
       expect((await c.call("POST", "/auth/teachers", { body: { username: "s.one", displayName: "a", password: c.PASSWORD } })).status).toBe(201);
       expect((await c.call("POST", "/auth/teachers", { body: { username: "s.two", displayName: "a", password: c.PASSWORD } })).status).toBe(201);
       expect((await c.call("POST", "/auth/teachers", { body: { username: "s.three", displayName: "a", password: c.PASSWORD } })).status).toBe(429);
+    } finally { await c.cleanup(); }
+  });
+
+  it("ferme l'inscription par défaut : ni code ni ouverture explicite", async () => {
+    const c = await bootstrap({ OPEN_SIGNUP: "false" });
+    try {
+      const r = await c.call("POST", "/auth/teachers", { body: { username: "any.one", displayName: "A", password: c.PASSWORD } });
+      expect(r.status).toBe(403);
+      expect(r.json).toEqual({ error: "signup_closed" });
     } finally { await c.cleanup(); }
   });
 

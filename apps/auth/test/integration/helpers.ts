@@ -29,6 +29,7 @@ export async function bootstrap(overrides: Partial<Record<string, string>> = {},
     JWT_SECRET: DEV_SECRET_B64,
     JWT_KID: "dev",
     COOKIE_SECURE: "false",
+    OPEN_SIGNUP: "true",
     ...overrides,
   });
   const accounts = new AccountStore(couch, accountsDb);

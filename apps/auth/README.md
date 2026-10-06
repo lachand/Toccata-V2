@@ -9,6 +9,8 @@ docker compose -f ../../infra/docker-compose.yml up -d   # CouchDB (clé JWT de 
 pnpm dev
 ```
 
+L'inscription des enseignants est **fermée par défaut** : définir `SIGNUP_CODE` (code à distribuer) ou `OPEN_SIGNUP=true` (développement).
+
 La clé `JWT_SECRET` doit être la même que celle de CouchDB (`[jwt_keys] hmac:<JWT_KID>`).
 
 ## Tests
@@ -16,6 +18,8 @@ La clé `JWT_SECRET` doit être la même que celle de CouchDB (`[jwt_keys] hmac:
 pnpm test                 # unitaires, sans service externe
 pnpm test:integration     # contre un vrai CouchDB (voir ci-dessus) ; utilise la clé de développement de infra/couchdb/local.ini
 ```
+
+Toutes les routes sont servies sous `BASE_PATH` (défaut `/api`) : `POST /api/auth/login`, etc. Le proxy du front envoie `/api/*` à ce service.
 
 ## API (réponses d'erreur : `{ "error": "<code>" }`, jamais de phrase)
 

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
-import { Field, NativeSelect, Segmented, Switch, TextInput } from "../src";
+import { Field, NativeSelect, Segmented, Switch, TextArea, TextInput } from "../src";
 import { expectNoA11yViolations } from "./axe";
 
 describe("Field + TextInput", () => {
@@ -30,6 +30,17 @@ describe("Field + TextInput", () => {
   it("deux champs ont des identifiants distincts", () => {
     render(<><Field label="A"><TextInput /></Field><Field label="B"><TextInput /></Field></>);
     expect(screen.getByLabelText("A").id).not.toBe(screen.getByLabelText("B").id);
+  });
+});
+
+describe("TextArea", () => {
+  it("est relié à son étiquette et à son aide, et accepte plusieurs lignes", async () => {
+    const { container } = render(<Field label="Élèves" hint="Un nom par ligne"><TextArea /></Field>);
+    const ta = screen.getByLabelText("Élèves");
+    expect(ta).toHaveAccessibleDescription("Un nom par ligne");
+    await userEvent.type(ta, "Lina{Enter}Hugo");
+    expect(ta).toHaveValue("Lina\nHugo");
+    await expectNoA11yViolations(container);
   });
 });
 

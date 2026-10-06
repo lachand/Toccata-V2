@@ -23,6 +23,20 @@
 - **Configuration** : le service refuse de démarrer sans secret de 32 octets minimum, sans jamais
   afficher de valeur. Aucun secret par défaut.
 
+## Côté client (`apps/web`)
+- Le jeton d'accès vit en mémoire ; seul le profil public est mis en cache (`toccata.profile`) pour
+  **ouvrir l'application hors ligne** sur les données locales. La synchronisation reprend au retour du réseau.
+- Renouvellement **à vol unique** (dix requêtes simultanées n'envoient qu'un seul `/api/auth/refresh`),
+  une minute avant l'expiration ; sur un refus 400/401/403 d'une base, **un** renouvellement puis un rejeu
+  (jeton expiré, ou droits qui viennent de changer).
+- L'API est servie sous **`/api`** (proxy du front) : l'interface et l'API sont de même origine (cookie sans
+  CORS) et les routes de l'API ne peuvent pas entrer en collision avec celles de l'interface ; le service
+  worker ne capture jamais `/api/*`.
+- Fiche d'identifiants d'un élève : **QR code de connexion rapide** dont le secret est dans le fragment de
+  l'adresse (jamais envoyé au serveur, effacé de l'historique à la lecture) ; affichée une seule fois.
+- Textes d'erreur : le client traduit les **codes** de l'API ; l'écran de connexion est sans pronom (il sert
+  aux élèves et aux enseignants).
+
 ## Constats qui ont changé la conception
 1. **Taille du jeton** : un rôle CouchDB par instance donnerait ≈ 30 Ko à un enseignant de 50
    activités. L'enseignant porte donc **un seul rôle `owner:<id>`**, et les `validate_doc_update`
@@ -31,7 +45,10 @@
 2. **Accents de la liste française BIP-39** : elle est en Unicode décomposé ; un élève qui tape
    « débattre » n'aurait jamais retrouvé la valeur générée. Phrases affichées sans accents,
    saisie normalisée.
-3. **Ordre des vérifications** : valider les inscriptions *avant* de créer une instance (sinon une
+3. **Collision API / interface** : `/classes` est à la fois une route d'API et une page ; un proxy simple
+   envoyait la page au service. Tout passe sous `/api`, et le cookie de rafraîchissement a pour chemin
+   `/api/auth`.
+4. **Ordre des vérifications** : valider les inscriptions *avant* de créer une instance (sinon une
    requête refusée laissait une instance orpheline).
 
 ## Limites connues

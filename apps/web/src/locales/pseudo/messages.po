@@ -7,8 +7,16 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: pseudo\n"
 
+#: src/pages/Classes.tsx
+msgid "{count, plural, one {# student} other {# students}}"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "{hidden, plural, one {# other person} other {# other people}}"
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
 msgstr ""
 
 #: src/pages/Activities.tsx
@@ -52,8 +60,20 @@ msgstr ""
 msgid "Add documents, images or web pages for this step."
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
+msgid "Add students"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "All"
+msgstr ""
+
+#: src/pages/Signup.tsx
+msgid "Already have an account? Sign in"
+msgstr ""
+
+#: src/pages/Signup.tsx
+msgid "At least 12 characters."
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -72,18 +92,34 @@ msgstr ""
 msgid "Buttons"
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
 #: src/pages/Gallery.tsx
 msgid "Cancel"
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "Check the fields and try again."
 msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Choose a file or paste a link."
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
+msgid "Class"
+msgstr ""
+
+#: src/pages/Classes.tsx
+msgid "Class name"
+msgstr ""
+
 #: src/components/Layout.tsx
+#: src/pages/Classes.tsx
 msgid "Classes"
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
+#: src/pages/Classes.tsx
 #: src/pages/Gallery.tsx
 msgid "Close"
 msgstr ""
@@ -95,6 +131,27 @@ msgstr ""
 
 #: src/pages/Activities.tsx
 msgid "Copy to my activities"
+msgstr ""
+
+#: src/pages/Classes.tsx
+msgid "Create a class to add your students."
+msgstr ""
+
+#: src/pages/Login.tsx
+#: src/pages/Signup.tsx
+msgid "Create a teacher account"
+msgstr ""
+
+#: src/pages/Signup.tsx
+msgid "Create account"
+msgstr ""
+
+#: src/pages/ClassDetail.tsx
+msgid "Create accounts"
+msgstr ""
+
+#: src/pages/Classes.tsx
+msgid "Create class"
 msgstr ""
 
 #: src/pages/Activities.tsx
@@ -119,6 +176,10 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "done"
+msgstr ""
+
+#: src/components/CredentialsSheet.tsx
+msgid "Done"
 msgstr ""
 
 #: src/pages/Activities.tsx
@@ -147,6 +208,10 @@ msgstr ""
 
 #: src/pages/Activities.tsx
 msgid "Filter activities"
+msgstr ""
+
+#: src/pages/Classes.tsx
+msgid "For example: 4th grade B"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -182,6 +247,14 @@ msgstr ""
 msgid "In progress · step {current} of {total}"
 msgstr ""
 
+#: src/auth/useErrorText.ts
+msgid "Incorrect username or password."
+msgstr ""
+
+#: src/pages/Signup.tsx
+msgid "Invitation code"
+msgstr ""
+
 #: src/components/LocaleSwitcher.tsx
 msgid "Language"
 msgstr ""
@@ -202,6 +275,10 @@ msgstr ""
 msgid "locked"
 msgstr ""
 
+#: src/components/CredentialsSheet.tsx
+msgid "Login details"
+msgstr ""
+
 #: src/components/Layout.tsx
 msgid "Main navigation"
 msgstr ""
@@ -209,6 +286,10 @@ msgstr ""
 #: src/components/Layout.tsx
 #: src/pages/Activities.tsx
 msgid "My activities"
+msgstr ""
+
+#: src/pages/Signup.tsx
+msgid "Name shown to students"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -219,12 +300,36 @@ msgstr ""
 msgid "New activity"
 msgstr ""
 
+#: src/pages/Classes.tsx
+msgid "New class"
+msgstr ""
+
+#: src/pages/ClassDetail.tsx
+msgid "New passphrase"
+msgstr ""
+
+#: src/pages/ClassDetail.tsx
+msgid "New passphrase for {name}"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "No activity here yet"
 msgstr ""
 
+#: src/pages/Classes.tsx
+msgid "No class yet"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "No resource yet"
+msgstr ""
+
+#: src/pages/ClassDetail.tsx
+msgid "No student yet."
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "Not found."
 msgstr ""
 
 #: src/components/Layout.tsx
@@ -236,6 +341,10 @@ msgstr ""
 msgid "On time"
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
+msgid "One name per line, 60 at most. Each student gets a username and a passphrase."
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "One step behind"
 msgstr ""
@@ -245,8 +354,37 @@ msgstr ""
 msgid "Online"
 msgstr ""
 
+#: src/pages/Classes.tsx
+msgid "Open"
+msgstr ""
+
+#: src/components/CredentialsSheet.tsx
+msgid "Passphrase"
+msgstr ""
+
+#: src/pages/Login.tsx
+#: src/pages/Signup.tsx
+msgid "Password"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "People"
+msgstr ""
+
+#: src/components/CredentialsSheet.tsx
+msgid "Print"
+msgstr ""
+
+#: src/components/CredentialsSheet.tsx
+msgid "Print or save these details now: passphrases cannot be shown again. A lost passphrase can be replaced by a new one."
+msgstr ""
+
+#: src/pages/Signup.tsx
+msgid "Provided by your school, if one is required."
+msgstr ""
+
+#: src/components/CredentialsSheet.tsx
+msgid "QR code to sign in as {name}"
 msgstr ""
 
 #: src/UpdatePrompt.tsx
@@ -257,12 +395,32 @@ msgstr ""
 msgid "Reload"
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
+msgid "Remove"
+msgstr ""
+
+#: src/pages/ClassDetail.tsx
+msgid "Remove {name}"
+msgstr ""
+
+#: src/pages/ClassDetail.tsx
+msgid "Remove this student?"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "Resume"
 msgstr ""
 
+#: src/pages/Classes.tsx
+msgid "Retry"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Saving"
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "Server unreachable. Check the connection."
 msgstr ""
 
 #: src/pages/Activities.tsx
@@ -277,6 +435,26 @@ msgstr ""
 msgid "Show to students"
 msgstr ""
 
+#: src/components/CredentialsSheet.tsx
+msgid "Shown only once"
+msgstr ""
+
+#: src/pages/Login.tsx
+msgid "Sign in"
+msgstr ""
+
+#: src/components/Layout.tsx
+msgid "Sign out"
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "Sign-ups are closed. An invitation code from your school may be required."
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "Something went wrong. Try again."
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Status"
 msgstr ""
@@ -289,8 +467,16 @@ msgstr ""
 msgid "Steps"
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
+msgid "Student names"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Student preview"
+msgstr ""
+
+#: src/pages/ClassDetail.tsx
+msgid "Students"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -305,16 +491,50 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
+#: src/pages/ClassDetail.tsx
+msgid "The account and its sessions will be deleted. This cannot be undone."
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "The name is required"
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "The password is too simple."
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "The password must have at least 12 characters."
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "The password must not contain the username."
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "This action is not allowed."
+msgstr ""
+
+#: src/auth/useErrorText.ts
+msgid "This username is already taken."
 msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Time left"
 msgstr ""
 
+#: src/auth/useErrorText.ts
+msgid "Too many requests. Try again in a moment."
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Unavailable"
+msgstr ""
+
+#: src/components/CredentialsSheet.tsx
+#: src/pages/Login.tsx
+#: src/pages/Signup.tsx
+msgid "Username"
 msgstr ""
 
 #: src/pages/Gallery.tsx

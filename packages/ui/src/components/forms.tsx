@@ -1,5 +1,5 @@
 import { Switch as RxSwitch, ToggleGroup } from "radix-ui";
-import { createContext, forwardRef, useContext, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes } from "react";
+import { createContext, forwardRef, useContext, useId, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { cx } from "../cx";
 
 type FieldCtx = { id: string; describedBy: string | undefined; invalid: boolean; required: boolean };
@@ -28,6 +28,11 @@ function useField() {
 export const TextInput = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(function TextInput({ className, ...rest }, ref) {
   const f = useField();
   return <input ref={ref} className={cx("tc-input", className)} id={f?.id} aria-describedby={f?.describedBy} aria-invalid={f?.invalid || undefined} required={f?.required || rest.required} {...rest} />;
+});
+
+export const TextArea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<HTMLTextAreaElement>>(function TextArea({ className, rows = 5, ...rest }, ref) {
+  const f = useField();
+  return <textarea ref={ref} rows={rows} className={cx("tc-input tc-textarea", className)} id={f?.id} aria-describedby={f?.describedBy} aria-invalid={f?.invalid || undefined} required={f?.required || rest.required} {...rest} />;
 });
 
 export const NativeSelect = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(function NativeSelect({ className, children, ...rest }, ref) {
