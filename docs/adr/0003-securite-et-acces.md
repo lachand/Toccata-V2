@@ -13,8 +13,15 @@
   - `inst_<id>` — données d'une instance (états d'apps, soumissions, texte, état participant).
     Accès : `inst:<id>:member` (élèves du groupe) et `inst:<id>:teacher`.
 - `validate_doc_update` : un élève ne peut pas usurper `authorId`, ni modifier un document
-  `teacherOnly`. Sources : `infra/couchdb/design/*.validate.js`.
+  `teacherOnly`. Générés par `apps/auth/src/vdu.ts` (les fichiers de `infra/couchdb/design/`
+  datent des spikes).
 - Comptes élèves créés par l'enseignant (liste de classe, code/QR). Aucun secret versionné.
+
+## Rôles (révisé en Phase 2, voir ADR 0009)
+Un enseignant porte **un seul rôle `owner:<userId>`** ; les `_security.members.roles` de chaque
+base listent `owner:<id>` et, pour les élèves, `inst:<id>:member` / `master:<id>:read`. Les
+`validate_doc_update` sont générés avec la liste des propriétaires. Raison : un rôle par
+instance donnait ≈ 30 Ko de jeton à un enseignant de 50 activités.
 
 ## Pourquoi une base par instance
 CouchDB n'a **pas de droit de lecture par document** : dans une même base, tout membre lit

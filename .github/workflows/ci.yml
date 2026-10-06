@@ -40,3 +40,24 @@ jobs:
         with:
           name: playwright-results
           path: e2e/test-results
+  auth-integration:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      COUCHDB_URL: http://127.0.0.1:5984
+      COUCHDB_ADMIN_USER: admin
+      COUCHDB_ADMIN_PASSWORD: ci-only-admin-pass
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      # CouchDB avec la configuration JWT de développement (clé jetable, voir infra/couchdb/local.ini)
+      - run: |
+          docker run -d --name couch -p 5984:5984 \
+            -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=ci-only-admin-pass \
+            -v "$PWD/infra/couchdb/local.ini:/opt/couchdb/etc/local.d/10-toccata.ini" couchdb:3.4
+          for i in $(seq 1 60); do curl -sf -u admin:ci-only-admin-pass http://127.0.0.1:5984/ >/dev/null && exit 0; sleep 1; done
+          docker logs couch; exit 1
+      - run: pnpm --filter @toccata/auth test:integration

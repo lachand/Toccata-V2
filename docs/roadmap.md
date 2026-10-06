@@ -4,7 +4,7 @@
 |---|---|
 | 0 | Cadrage, dépôt, spikes de risque, ADR — **terminée**, voir [`phase0-spikes.md`](phase0-spikes.md) |
 | 1 | Fondations : monorepo, modèle de données (`packages/schema`), design system (`packages/ui`), coque PWA hors ligne et i18n fr/en (`apps/web`), tests e2e — **terminée** |
-| 2 | Auth, rôles, droits CouchDB |
+| 2 | Auth, rôles, droits CouchDB — **service d'authentification fait** (`apps/auth`, 60 tests dont 33 contre un vrai CouchDB) ; reste le client web (connexion, classes) |
 | 3 | Scripting : étapes, ressources, apps (texte, chrono, kanban, questionnaire) |
 | 4 | Distribution et exécution : instances, état participant, reprise, propagation ciblée |
 | 5 | Orchestration : monitoring, miroir, télécommande, micro-orchestration, retours |

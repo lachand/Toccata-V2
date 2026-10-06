@@ -9,4 +9,6 @@ description = "Valeurs de développement des spikes"
 paths = [
   '''infra/couchdb/local\.ini''',
   '''spikes/src/couch\.ts''',
+  '''apps/auth/test/''',
+  '''\.github/workflows/ci\.yml''',
 ]
