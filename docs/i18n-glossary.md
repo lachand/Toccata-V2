@@ -32,6 +32,28 @@ toute l'interface, la documentation et les messages d'erreur.
 | synchronisé | synced | |
 | notes | notes | Annotations de l'enseignant |
 
-Règles : tutoiement ou vouvoiement unique par langue (vouvoiement en français pour
-l'interface enseignant et élève du secondaire, à confirmer), féminin et masculin traités par
-les formes ICU `select` plutôt que par l'écriture inclusive dans les phrases composées.
+## Registre en français
+
+| Public | Forme | Exemples |
+|---|---|---|
+| **Élèves** | **tutoiement** | « Ton enseignant voit ton avancement », « Tes changements sont gardés », « J'ai besoin d'aide » |
+| Enseignants | vouvoiement (par défaut, à confirmer) | « Vous pouvez masquer une étape », « Votre activité est synchronisée » |
+| Documentation et erreurs techniques | vouvoiement | |
+
+Quand un message s'adresse à un groupe d'élèves (une consigne rédigée par l'enseignant),
+c'est l'enseignant qui choisit ; l'interface elle-même parle à un élève : « tu ».
+
+Un même texte ne doit pas servir aux deux publics : les messages affichés aux élèves et aux
+enseignants sont des entrées distinctes du catalogue, même quand l'anglais est identique.
+
+## Genre
+
+Éviter « enseignant(e) » et le point médian dans les phrases. Quand le genre de la personne
+est connu, utiliser un `select` ICU :
+`{gender, select, female {Ton enseignante} male {Ton enseignant} other {Ton enseignant·e}} voit ton avancement`.
+Sans information, préférer nommer la personne (« Mme Durand voit ton avancement »).
+
+## Règle générale
+
+Un seul registre par public et par langue, appliqué partout : libellés, messages d'erreur,
+infobulles, e-mails.

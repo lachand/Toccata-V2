@@ -16,6 +16,9 @@
   langue active. Les catalogues fr et en sont précachés (usage hors ligne).
 - **Interface traduite, contenu non traduit** : ce que les enseignants saisissent est de la
   donnée. Un modèle porte un champ `locale`.
+- **Registre en français : tutoiement pour les élèves** ; vouvoiement pour les enseignants et
+  la documentation. Les textes destinés aux élèves et aux enseignants sont des entrées
+  distinctes du catalogue (détails dans le glossaire).
 - **URLs non localisées** (`/activities`, `/session/...`).
 - Serveur : codes d'erreur uniquement, traduits par le client. Journal de recherche : codes
   d'action neutres (jamais de texte localisé).
