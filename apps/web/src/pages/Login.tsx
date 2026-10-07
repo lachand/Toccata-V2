@@ -2,6 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import { Button, Field, TextInput } from "@toccata/ui";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
+import { checkPassphrase, type PassphraseHint } from "../auth/passphraseHint";
 import { useErrorText } from "../auth/useErrorText";
 import { session } from "../auth/session";
 import { AuthLayout } from "../components/AuthLayout";
@@ -22,6 +23,8 @@ export function Login({ locale }: { locale: Locale }) {
   const from = (useLocation().state as { from?: string } | null)?.from ?? "/";
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
+  const [hint, setHint] = useState<PassphraseHint | null>(null);
+  const warned = useRef<string | null>(null);
   const username = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
 
@@ -45,15 +48,34 @@ export function Login({ locale }: { locale: Locale }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- une seule fois, au chargement
   }, []);
 
-  function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    void signIn(username.current?.value ?? "", password.current?.value ?? "");
+    const p = password.current?.value ?? "";
+    // un mot inconnu bloque le premier envoi seulement : le second passe (mot de passe d'enseignant atypique)
+    if (warned.current !== p) {
+      const found = await checkPassphrase(p).catch(() => null);
+      if (found) {
+        warned.current = p;
+        setHint(found);
+        setError(null);
+        return;
+      }
+    }
+    setHint(null);
+    void signIn(username.current?.value ?? "", p);
   }
 
   return (
     <AuthLayout locale={locale} title={t`Sign in`}>
-      <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }} noValidate>
+      <form onSubmit={(e) => void onSubmit(e)} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }} noValidate>
         {error ? <p role="alert" className="tc-field__error" style={{ margin: 0 }}>{errorText(error)}</p> : null}
+        {hint ? (
+          <p role="alert" className="tc-field__error" style={{ margin: 0 }}>
+            {hint.suggestion
+              ? t`The word “${hint.typed}” is not in the list. Did you mean “${hint.suggestion}”? Check it, then sign in again.`
+              : t`The word “${hint.typed}” is not in the list. Check it, then sign in again.`}
+          </p>
+        ) : null}
         <Field label={t`Username`}>
           <TextInput ref={username} autoComplete="username" autoCapitalize="none" autoCorrect="off" spellCheck={false} required />
         </Field>

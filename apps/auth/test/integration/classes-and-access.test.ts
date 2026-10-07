@@ -10,7 +10,7 @@ describe("classes et comptes élèves", () => {
     const t = await ctx.signupTeacher("classes.t1", "fr");
     const { students } = await ctx.makeClass(t.token, ["Lina Aubert", "Hugo Martin", "Lina Aubert"]);
     expect(students.map((s) => s.username)).toEqual(["lina.a", "hugo.m", "lina.a2"]); // les homonymes sont départagés
-    for (const s of students) expect(s.passphrase).toMatch(/^[a-z]+(-[a-z]+){3}$/);
+    for (const s of students) expect(s.passphrase).toMatch(/^[a-z]+(-[a-z]+){5}$/);
     expect(new Set(students.map((s) => s.passphrase)).size).toBe(3);
 
     // la liste de la classe ne contient jamais de secret

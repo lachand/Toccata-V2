@@ -13,6 +13,7 @@ import { ApiError } from "./errors";
 import { baseUsername, foldPassphrase, generatePassphrase } from "./passphrase";
 import { hashPassword, normalizePassword, passwordProblem, verifyPassword } from "./passwords";
 import type { Provisioner } from "./provisioning";
+import { LoginGuard } from "./loginguard";
 import { RateLimiter } from "./ratelimit";
 import { rolesFor } from "./roles";
 import { hashSecret, mintAccessToken, newRefreshSecret, secretMatches, verifyAccessToken } from "./tokens";
@@ -23,7 +24,7 @@ export type Deps = {
   provisioner: Provisioner;
   clock?: () => number;
   random?: RandomBytes;
-  limits?: { login?: RateLimiter; loginUser?: RateLimiter; signup?: RateLimiter; refresh?: RateLimiter };
+  limits?: { guard?: LoginGuard; signup?: RateLimiter; refresh?: RateLimiter };
 };
 
 const REFRESH_COOKIE = "toccata_rt";
@@ -51,8 +52,7 @@ export function createApp(deps: Deps) {
   const { config, accounts, provisioner } = deps;
   const now = deps.clock ?? Date.now;
   const limits = {
-    login: deps.limits?.login ?? new RateLimiter(30, 5 * 60_000, now),
-    loginUser: deps.limits?.loginUser ?? new RateLimiter(10, 15 * 60_000, now),
+    guard: deps.limits?.guard ?? new LoginGuard({ now, onAttack: (i) => console.warn(`connexions : ${i.failuresPerMinute} échecs/min, mode « sous attaque » activé`) }),
     signup: deps.limits?.signup ?? new RateLimiter(10, 60 * 60_000, now),
     refresh: deps.limits?.refresh ?? new RateLimiter(120, 60_000, now),
   };
@@ -159,7 +159,7 @@ export function createApp(deps: Deps) {
       if (given.length !== want.length || !timingSafeEqual(given, want)) throw new ApiError("signup_closed");
     }
     const password = normalizePassword(b.password);
-    const problem = passwordProblem(password, b.username);
+    const problem = passwordProblem(password, b.username, [b.displayName]);
     if (problem) throw new ApiError("weak_password", { reason: problem });
     const user = await accounts.createUser({
       id: newId(now(), deps.random),
@@ -177,9 +177,9 @@ export function createApp(deps: Deps) {
   });
 
   app.post("/auth/login", async (c) => {
-    limit(limits.login, clientIp(c));
+    const ip = clientIp(c);
     const b = await body(c, loginBody);
-    limit(limits.loginUser, b.username);
+    limits.guard.check(ip, b.username);
     const user = await accounts.getUserByUsername(b.username);
     const t = now();
     const locked = !!user && user.lockedUntil > t;
@@ -195,9 +195,10 @@ export function createApp(deps: Deps) {
           return { ...u, failedLogins: failed, lockedUntil: wait ? t + wait : 0 };
         });
       }
+      limits.guard.recordFailure(ip, b.username);
       throw new ApiError("invalid_credentials");
     }
-    limits.loginUser.reset(b.username);
+    limits.guard.recordSuccess(ip, b.username);
     const fresh = user.failedLogins || user.lockedUntil ? await accounts.updateUser(user.id, (u) => ({ ...u, failedLogins: 0, lockedUntil: 0 })) : user;
     return c.json(await issue(c, fresh));
   });

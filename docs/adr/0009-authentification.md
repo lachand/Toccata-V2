@@ -10,11 +10,18 @@
 - **Jeton d'accès gardé en mémoire** par le client, jamais en `localStorage`.
 - **CSRF** : `SameSite=Strict` plus un en-tête `X-Requested-With: toccata` exigé sur les routes à cookie.
 - **Mots de passe d'enseignant** : Argon2id (19 Mio, 2 itérations, 1 voie), 12 caractères minimum,
-  normalisés en NFC. **Élèves** : phrase de passe générée de 4 mots (≈ 44 bits), **sans accents**,
+  normalisés en NFC, et **score zxcvbn-ts de 4** (dictionnaires commun, fr, en) ; refus avec un code
+  (`too_short`, `too_simple`, `too_common`, `contains_username`, nom affiché compris).
+  **Élèves** : phrase de passe générée de **6 mots (66 bits)**, **sans accents**,
   acceptée à la connexion quelle que soit la graphie (accents, majuscules, espaces).
 - **Pas de fuite d'information** : même réponse pour compte inconnu et mauvais mot de passe, et un
   hachage factice est calculé quand le compte n'existe pas (temps de réponse uniforme).
-- **Limitation de débit** par adresse et par identifiant, et **verrouillage temporaire** après 5 échecs
+- **Limitation de débit sur quatre axes** (`LoginGuard`) : par identifiant (20 essais/15 min), par adresse
+  (300 essais/5 min, 60 échecs/10 min, 40 identifiants distincts en échec/10 min : l'attaque
+  *horizontale*, un même mot de passe sur beaucoup de comptes, contourne tout plafond par compte) et
+  **global** (500 échecs/min bascule le service en mode « sous attaque » 10 min, aux seuils bien plus
+  bas). Les succès ne comptent jamais pour l'adresse : une classe entière derrière une même NAT doit
+  pouvoir se connecter. S'y ajoute le **verrouillage temporaire** d'un compte après 5 échecs
   (60 s, doublé à chaque échec, plafonné à 1 h). Un enseignant qui réinitialise le mot de passe d'un
   élève lève le verrouillage.
 - **Un compte supprimé n'agit plus**, même avec un jeton encore valide : chaque route recharge le compte.
@@ -50,6 +57,18 @@
    `/api/auth`.
 4. **Ordre des vérifications** : valider les inscriptions *avant* de créer une instance (sinon une
    requête refusée laissait une instance orpheline).
+
+## Revue de sécurité des phrases de passe d'élève
+
+- **Entropie** : 4 mots = 44 bits, trop peu si le hachage fuit (hors ligne, ~50 ms/essai : ≈ 28 000
+  cœurs·années). 6 mots = 66 bits : ≈ 1,2·10¹¹ cœurs·années. Retenu : **6 mots**.
+- **Biais du modulo** : non applicable, le tirage utilise un échantillonnage par rejet exactement
+  uniforme ; un test exhaustif (65 536 valeurs) le vérifie.
+- **Somme de contrôle** : volontairement non ajoutée (elle réduirait l'espace de recherche ou
+  allongerait la phrase). À la place, le client signale un mot absent de la liste BIP-39 avant l'envoi,
+  avec une suggestion ; seul le premier envoi est bloqué (un mot de passe d'enseignant atypique passe
+  au second), et cela économise un essai du compteur.
+- **Langue** : la liste (fr/en) suit la langue de l'enseignant qui crée la classe.
 
 ## Limites connues
 - Le limiteur de débit est **en mémoire** (un seul processus). Plusieurs instances du service

@@ -508,12 +508,27 @@ msgid "The password must have at least 12 characters."
 msgstr "The password must have at least 12 characters."
 
 #: src/auth/useErrorText.ts
-msgid "The password must not contain the username."
-msgstr "The password must not contain the username."
+msgid "The password must not contain the username or the displayed name."
+msgstr "The password must not contain the username or the displayed name."
+
+#. placeholder {0}: hint.typed
+#: src/pages/Login.tsx
+msgid "The word “{0}” is not in the list. Check it, then sign in again."
+msgstr "The word “{0}” is not in the list. Check it, then sign in again."
+
+#. placeholder {0}: hint.typed
+#. placeholder {1}: hint.suggestion
+#: src/pages/Login.tsx
+msgid "The word “{0}” is not in the list. Did you mean “{1}”? Check it, then sign in again."
+msgstr "The word “{0}” is not in the list. Did you mean “{1}”? Check it, then sign in again."
 
 #: src/auth/useErrorText.ts
 msgid "This action is not allowed."
 msgstr "This action is not allowed."
+
+#: src/auth/useErrorText.ts
+msgid "This password is too common or easy to guess."
+msgstr "This password is too common or easy to guess."
 
 #: src/auth/useErrorText.ts
 msgid "This username is already taken."

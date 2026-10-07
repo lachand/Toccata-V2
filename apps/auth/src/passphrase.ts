@@ -16,13 +16,16 @@ function uniform(max: number, random: RandomBytes): number {
   }
 }
 
-/** Phrase de passe de 4 mots tirés d'une liste de 2048 mots (≈ 44 bits), sans accents, séparés par un tiret. */
-export function generatePassphrase(lang: Lang, random: RandomBytes = defaultRandom, words = 4): string {
+/** Nombre de mots d'une phrase de passe d'élève : 6 × 11 bits = 66 bits (4 mots n'en donnaient que 44, trop peu en cas de fuite de la base). */
+export const PASSPHRASE_WORDS = 6;
+
+/** Phrase de passe de 6 mots tirés d'une liste de 2048 mots (66 bits), sans accents, séparés par un tiret. */
+export function generatePassphrase(lang: Lang, random: RandomBytes = defaultRandom, words = PASSPHRASE_WORDS): string {
   const list = LISTS[lang];
   return Array.from({ length: words }, () => strip(list[uniform(list.length, random)]!)).join("-");
 }
 
-export const PASSPHRASE_BITS = (words = 4) => words * Math.log2(2048);
+export const PASSPHRASE_BITS = (words = PASSPHRASE_WORDS) => words * Math.log2(2048);
 
 const strip = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "");
 

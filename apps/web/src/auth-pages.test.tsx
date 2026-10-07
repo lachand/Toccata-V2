@@ -80,6 +80,27 @@ describe.each([
     await noAxeViolations(container);
   });
 
+  it("signale un mot inconnu d'une phrase de passe avant l'envoi, puis laisse passer au second essai", async () => {
+    const calls = stubApi({ ...anonymous, "POST /api/auth/login": () => tokenFor(teacher) });
+    await session.bootstrap();
+    await renderApp(locale, "/login");
+    await fill("lina.a", "amusant-analyse-anaphore-anarchie-anatomie-anciem");
+    await submit();
+    expect(await screen.findByText(/anciem/)).toBeInTheDocument();
+    expect(calls.some((c) => c.key === "POST /api/auth/login")).toBe(false);
+    await submit();
+    await waitFor(() => expect(calls.some((c) => c.key === "POST /api/auth/login")).toBe(true));
+  });
+
+  it("n'interfère pas avec un mot de passe ordinaire", async () => {
+    const calls = stubApi({ ...anonymous, "POST /api/auth/login": () => tokenFor(teacher) });
+    await session.bootstrap();
+    await renderApp(locale, "/login");
+    await fill("marie", "Tb9#kLm2-vq8Zr!xW");
+    await submit();
+    await waitFor(() => expect(calls.some((c) => c.key === "POST /api/auth/login")).toBe(true));
+  });
+
   it("connecte puis ouvre l'accueil", async () => {
     const calls = stubApi({ ...anonymous, "POST /api/auth/login": () => tokenFor(teacher) });
     await session.bootstrap();
@@ -119,10 +140,10 @@ describe("connexion rapide par QR code", () => {
   it("lit le fragment, se connecte, puis l'efface de l'adresse", async () => {
     const calls = stubApi({ ...anonymous, "POST /api/auth/login": () => tokenFor(student) });
     await session.bootstrap();
-    window.history.replaceState(null, "", "/login#u=lina.a&p=sucre-mutuel-debut-viande");
+    window.history.replaceState(null, "", "/login#u=lina.a&p=sucre-mutuel-debut-viande-zebre-lampe");
     await renderApp("fr", "/login");
     await waitFor(() => expect(calls.some((c) => c.key === "POST /api/auth/login")).toBe(true));
-    expect(calls.find((c) => c.key === "POST /api/auth/login")!.body).toEqual({ username: "lina.a", password: "sucre-mutuel-debut-viande" });
+    expect(calls.find((c) => c.key === "POST /api/auth/login")!.body).toEqual({ username: "lina.a", password: "sucre-mutuel-debut-viande-zebre-lampe" });
     expect(window.location.hash).toBe(""); // le secret ne reste pas dans la barre d'adresse
     expect(await screen.findByRole("heading", { level: 1, name: "Mes activités" })).toBeInTheDocument();
   });
@@ -146,10 +167,10 @@ describe("inscription d'un enseignant", () => {
     const { calls } = await open("en", { "POST /api/auth/teachers": () => ({ ...tokenFor(teacher), status: 201 }) });
     await userEvent.type(await screen.findByLabelText("Name shown to students"), "Marie Durand");
     await userEvent.type(screen.getByLabelText("Username"), "marie");
-    await userEvent.type(screen.getByLabelText("Password"), "correct horse battery");
+    await userEvent.type(screen.getByLabelText("Password"), "Tb9#kLm2-vq8Zr!xW");
     await userEvent.click(screen.getByRole("button", { name: "Create account" }));
     await screen.findByRole("heading", { level: 1, name: "My activities" });
-    expect(calls.find((c) => c.key === "POST /api/auth/teachers")!.body).toEqual({ username: "marie", displayName: "Marie Durand", password: "correct horse battery", locale: "en" });
+    expect(calls.find((c) => c.key === "POST /api/auth/teachers")!.body).toEqual({ username: "marie", displayName: "Marie Durand", password: "Tb9#kLm2-vq8Zr!xW", locale: "en" });
   });
 
   it("place l'erreur de mot de passe sur le champ, et celle de l'identifiant sur le sien", async () => {
@@ -217,7 +238,7 @@ describe("classes", () => {
 
 describe("page d'une classe", () => {
   const created = [
-    { id: "s1", username: "lina.a", displayName: "Lina Aubert", passphrase: "sucre-mutuel-debut-viande" },
+    { id: "s1", username: "lina.a", displayName: "Lina Aubert", passphrase: "sucre-mutuel-debut-viande-zebre-lampe" },
     { id: "s2", username: "hugo.m", displayName: "Hugo Martin", passphrase: "lampe-genou-ocean-tigre" },
   ];
   let roster: { id: string; username: string; displayName: string }[];
@@ -239,7 +260,7 @@ describe("page d'une classe", () => {
 
     const sheet = await screen.findByRole("region", { name: "Identifiants de connexion" });
     expect(calls.find((c) => c.key === "POST /api/classes/k1/students")!.body).toEqual({ names: ["Lina Aubert", "Hugo Martin"] }); // espaces et lignes vides retirés
-    expect(within(sheet).getByText("sucre-mutuel-debut-viande")).toBeInTheDocument();
+    expect(within(sheet).getByText("sucre-mutuel-debut-viande-zebre-lampe")).toBeInTheDocument();
     expect(within(sheet).getByText("lampe-genou-ocean-tigre")).toBeInTheDocument();
     expect(within(sheet).getByText("Affichées une seule fois")).toBeInTheDocument();
     await waitFor(() => expect(within(sheet).getAllByRole("img", { name: /QR code pour se connecter en tant que/ })).toHaveLength(2));
@@ -249,7 +270,7 @@ describe("page d'une classe", () => {
 
     await userEvent.click(within(sheet).getByRole("button", { name: "Terminé" }));
     expect(screen.queryByRole("region", { name: "Identifiants de connexion" })).toBeNull();
-    expect(screen.queryByText("sucre-mutuel-debut-viande")).toBeNull(); // plus aucune trace des phrases de passe dans la page
+    expect(screen.queryByText("sucre-mutuel-debut-viande-zebre-lampe")).toBeNull(); // plus aucune trace des phrases de passe dans la page
     expect(screen.getByText("Lina Aubert")).toBeInTheDocument(); // l'élève est dans la liste, sans secret
   });
 
@@ -257,7 +278,7 @@ describe("page d'une classe", () => {
     const { quickLoginUrl } = await import("./components/CredentialsSheet");
     const u = new URL(quickLoginUrl("https://toccata.example", created[0]!));
     expect(u.search).toBe(""); // rien dans la requête : le fragment n'est jamais envoyé au serveur
-    expect(u.hash).toContain("p=sucre-mutuel-debut-viande");
+    expect(u.hash).toContain("p=sucre-mutuel-debut-viande-zebre-lampe");
   });
 
   it("réinitialise une phrase de passe et la montre une fois", async () => {

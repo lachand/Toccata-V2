@@ -1,4 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { LoginGuard } from "../../src/loginguard";
 import { RateLimiter } from "../../src/ratelimit";
 import { bootstrap, rolesOf, type Ctx } from "./helpers";
 
@@ -89,9 +90,45 @@ describe("connexion : pas de fuite d'information", () => {
   });
 });
 
-describe("limitation de débit", () => {
-  it("bloque les rafales par adresse et par identifiant", async () => {
-    const c = await bootstrap({}, { limits: { login: new RateLimiter(100, 60_000), loginUser: new RateLimiter(3, 60_000), signup: new RateLimiter(2, 60_000), refresh: new RateLimiter(100, 60_000) } });
+describe("limitation de débit : classes derrière une même adresse, attaques horizontales", () => {
+  it("toute une classe qui se connecte en même temps depuis la même adresse ne se bloque pas", async () => {
+    const c = await bootstrap();
+    try {
+      const t = await c.signupTeacher("nat.teacher");
+      const names = Array.from({ length: 35 }, (_, i) => `Eleve Numero${String.fromCharCode(97 + (i % 26))}${i}`);
+      const { students } = await c.makeClass(t.token, names);
+      expect(students).toHaveLength(35);
+      for (const s of students) expect((await c.login(s.username, s.passphrase)).status, s.username).toBe(200); // 35 succès, même adresse
+      // et 35 fautes de frappe d'élèves différents ne bloquent pas non plus la 36e personne
+      for (const s of students) expect((await c.login(s.username, "faute de frappe")).status).toBe(401);
+      expect((await c.login(students[0]!.username, students[0]!.passphrase)).status).toBe(200);
+    } finally { await c.cleanup(); }
+  }, 120_000);
+
+  it("une attaque horizontale (même mot de passe sur beaucoup de comptes) est stoppée net, par adresse", async () => {
+    const c = await bootstrap();
+    try {
+      const codes: number[] = [];
+      for (let i = 0; i < 45; i++) codes.push((await c.login(`victime.${i}`, "motdepasse-courant")).status);
+      expect(codes.slice(0, 40).every((x) => x === 401)).toBe(true);
+      expect(codes.slice(40).every((x) => x === 429)).toBe(true); // à partir du 41e identifiant distinct
+      const r = await c.login("victime.50", "x");
+      expect(r.json).toMatchObject({ error: "rate_limited", retryAfterSeconds: expect.any(Number) });
+    } finally { await c.cleanup(); }
+  }, 120_000);
+
+  it("refuse les mots de passe d'enseignant courants, avec la raison", async () => {
+    for (const weak of ["azertyuiop123", "motdepasse2024!!", "Bonjour123456"]) {
+      const r = await ctx.call("POST", "/auth/teachers", { body: { username: "weak.pw", displayName: "Marie Durand", password: weak } });
+      expect(r.status, weak).toBe(400);
+      expect(r.json, weak).toEqual({ error: "weak_password", reason: "too_common" });
+    }
+    const named = await ctx.call("POST", "/auth/teachers", { body: { username: "weak.pw", displayName: "Marie Durand", password: "Durand-2024-xk!q9Z" } });
+    expect(named.json).toEqual({ error: "weak_password", reason: "contains_username" });
+  });
+
+  it("bloque les rafales par identifiant", async () => {
+    const c = await bootstrap({}, { limits: { guard: new LoginGuard({ userAttempts: 3 }), signup: new RateLimiter(2, 60_000), refresh: new RateLimiter(100, 60_000) } });
     try {
       for (let i = 0; i < 3; i++) expect((await c.login("someone", "x" + i)).status).toBe(401);
       const r = await c.login("someone", "x4");

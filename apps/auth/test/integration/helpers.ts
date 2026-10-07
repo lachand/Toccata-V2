@@ -3,6 +3,7 @@ import { createApp, type Deps } from "../../src/app";
 import { loadConfig, type Config } from "../../src/config";
 import { CouchAdmin } from "../../src/couch";
 import { Provisioner } from "../../src/provisioning";
+import { LoginGuard } from "../../src/loginguard";
 import { RateLimiter } from "../../src/ratelimit";
 
 export const COUCH_URL = process.env["COUCHDB_URL"] ?? "http://127.0.0.1:5984";
@@ -39,7 +40,7 @@ export async function bootstrap(overrides: Partial<Record<string, string>> = {},
   const clock = () => Date.now() + offset;
   // limites larges par défaut : les tests de limitation en fournissent de plus étroites
   const open = (n = 10_000) => new RateLimiter(n, 60_000, clock);
-  const app = createApp({ config, accounts, provisioner, clock, limits: { login: open(), loginUser: open(), signup: open(), refresh: open() }, ...deps });
+  const app = createApp({ config, accounts, provisioner, clock, limits: { guard: new LoginGuard({ now: clock }), signup: open(), refresh: open() }, ...deps });
   const created: string[] = [];
 
   async function call(method: string, path: string, o: { body?: unknown; token?: string; cookie?: string; headers?: Record<string, string> } = {}) {
@@ -61,7 +62,7 @@ export async function bootstrap(overrides: Partial<Record<string, string>> = {},
   }
 
   const refreshHeaders = { "x-requested-with": "toccata" };
-  const PASSWORD = "correct horse battery staple";
+  const PASSWORD = "Tb9#kLm2-vq8Zr!xW";
 
   async function signupTeacher(username: string, locale: "fr" | "en" = "fr") {
     const r = await call("POST", "/auth/teachers", { body: { username, displayName: `Prof ${username}`, password: PASSWORD, locale } });

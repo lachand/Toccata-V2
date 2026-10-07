@@ -4,7 +4,7 @@ import { expect, test, type Browser, type Page } from "@playwright/test";
 test.describe.configure({ mode: "serial" });
 test.use({ locale: "fr-FR" });
 
-const PASSWORD = "correct horse battery staple";
+const PASSWORD = "Tb9#kLm2-vq8Zr!xW";
 const unique = Date.now().toString(36);
 const teacherName = `prof.${unique}`;
 
@@ -54,7 +54,7 @@ test("un enseignant s'inscrit, retrouve sa session après rechargement, crée un
     const name = i === 0 ? "Lina Aubert" : "Hugo Martin";
     const username = /Identifiant\s+(\S+)/.exec(text)![1]!;
     const passphrase = /Phrase de passe\s+(\S+)/.exec(text)![1]!;
-    expect(passphrase).toMatch(/^[a-z]+(-[a-z]+){3}$/);
+    expect(passphrase).toMatch(/^[a-z]+(-[a-z]+){5}$/);
     students.push({ name, username, passphrase });
   }
   expect(students.map((s) => s.username)).toEqual(["lina.a", "hugo.m"]);

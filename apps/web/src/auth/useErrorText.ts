@@ -25,7 +25,8 @@ export function useErrorText() {
       case "weak_password": {
         const reason = (e as ApiError).details["reason"];
         if (reason === "too_short") return t`The password must have at least 12 characters.`;
-        if (reason === "contains_username") return t`The password must not contain the username.`;
+        if (reason === "contains_username") return t`The password must not contain the username or the displayed name.`;
+        if (reason === "too_common") return t`This password is too common or easy to guess.`;
         return t`The password is too simple.`;
       }
       case "invalid_input":

@@ -38,6 +38,10 @@ Toutes les routes sont servies sous `BASE_PATH` (défaut `/api`) : `POST /api/au
 | `POST /activities/:id/instances` | enseignant | crée une instance (base `inst_<id>`) |
 | `PUT /instances/:id/members` | enseignant | inscrit des élèves ; effet à leur prochain rafraîchissement de jeton |
 
+Limites de connexion (`LoginGuard`, voir ADR 0009) : par identifiant, par adresse (dont identifiants
+distincts en échec), et globale avec mode « sous attaque ». Mots de passe d'enseignant : zxcvbn-ts
+score 4 ; phrases d'élève : 6 mots.
+
 Codes d'erreur : `invalid_input`, `invalid_credentials`, `rate_limited`, `locked`, `weak_password`,
 `username_taken`, `unauthorized`, `forbidden`, `not_found`, `invalid_refresh`, `refresh_reused`,
 `signup_closed`, `conflict`, `internal`.

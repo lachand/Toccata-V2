@@ -2,6 +2,7 @@ import { SignJWT } from "jose";
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config";
 import { baseUsername, foldPassphrase, generatePassphrase, PASSPHRASE_BITS } from "../src/passphrase";
+import { LoginGuard } from "../src/loginguard";
 import { hashPassword, passwordProblem, verifyPassword } from "../src/passwords";
 import { RateLimiter } from "../src/ratelimit";
 import { rolesFor } from "../src/roles";
@@ -70,19 +71,24 @@ describe("mots de passe", () => {
     expect(passwordProblem("aaaaaaaaaaaaaaaa", "marie")).toBe("too_simple");
     expect(passwordProblem("xx-marie-durand-xx", "marie")).toBe("contains_username");
     expect(passwordProblem("une phrase assez longue", "marie")).toBeNull();
+    // mots de passe courants : refusés même s'ils ont 12 caractères ou plus (attaque « horizontale »)
+    for (const weak of ["azertyuiop123", "Bonjour123456", "lundi mardi mercredi jeudi", "123456789012", "passwordpassword", "motdepasse2024!!", "Azerty123456!"]) expect(passwordProblem(weak, "marie"), weak).toBe("too_common");
+    expect(passwordProblem("Marie2024-Durand!", "zoe", ["Marie Durand"])).toBe("contains_username"); // bâti sur le nom affiché
+    expect(passwordProblem("xx-DÉBORAH-xx-2024-q", "zoe", ["Déborah Lenoir"])).toBe("contains_username"); // accents et casse ignorés
+    expect(passwordProblem("Tb9#kLm2-vq8Zr!xW", "marie")).toBeNull();
     expect(passwordProblem("😀😁😂😃😄😅😆😇😈😉😊😋", "x")).toBeNull(); // 12 caractères (points de code), pas 12 octets
     expect(passwordProblem("😀😁😂😃😄", "x")).toBe("too_short");
   });
 });
 
 describe("phrases de passe et identifiants élèves", () => {
-  it("tire 4 mots de la liste de la langue demandée", () => {
+  it("tire 6 mots de la liste de la langue demandée", () => {
     for (const lang of ["fr", "en"] as const) {
       const p = generatePassphrase(lang);
-      expect(p.split("-")).toHaveLength(4);
-      expect(p).toMatch(/^[a-z]+(-[a-z]+){3}$/); // ASCII : rien de plus facile à taper sur une tablette
+      expect(p.split("-")).toHaveLength(6);
+      expect(p).toMatch(/^[a-z]+(-[a-z]+){5}$/); // ASCII : rien de plus facile à taper sur une tablette
     }
-    expect(PASSPHRASE_BITS()).toBe(44);
+    expect(PASSPHRASE_BITS()).toBe(66); // 4 mots ne donnaient que 44 bits
   });
   it("accepte à la saisie toute graphie : accents, majuscules, espaces", () => {
     expect(foldPassphrase("Sucre-Mutuel-Débattre-Viande")).toBe("sucre-mutuel-debattre-viande");
@@ -97,6 +103,16 @@ describe("phrases de passe et identifiants élèves", () => {
   });
   it("ne répète pas : 5 000 phrases toutes différentes", () => {
     expect(new Set(Array.from({ length: 5000 }, () => generatePassphrase("fr"))).size).toBe(5000);
+  });
+  it("n'introduit AUCUN biais de modulo : 65 536 est un multiple exact de 2 048, chaque mot a la même probabilité", () => {
+    // On rejoue chaque valeur possible de 16 bits comme « tirage » : chaque mot doit sortir exactement 32 fois.
+    const counts = new Map<string, number>();
+    for (let v = 0; v < 65_536; v++) {
+      const word = generatePassphrase("en", () => Uint8Array.from([v >> 8, v & 255]), 1);
+      counts.set(word, (counts.get(word) ?? 0) + 1);
+    }
+    expect(counts.size).toBe(2048);
+    expect(new Set(counts.values())).toEqual(new Set([32]));
   });
   it("utilise tous les mots de la liste de façon à peu près uniforme (pas de biais de modulo)", () => {
     const counts = new Map<string, number>();
@@ -226,5 +242,89 @@ describe("limiteur de débit", () => {
     expect(l.hit("k")).toBeGreaterThan(0);
     l.reset("k");
     expect(l.hit("k")).toBe(0);
+  });
+});
+
+describe("garde de connexion (4 axes)", () => {
+  const rate = (f: () => void) => { try { f(); return "ok"; } catch (e) { return (e as { code?: string }).code ?? "erreur"; } };
+  let t = 1_000_000;
+  const guard = (o = {}) => new LoginGuard({ now: () => t, ...o });
+
+  it("laisse toute une classe derrière la même adresse se connecter en même temps (les succès ne comptent pas)", () => {
+    t = 1_000_000;
+    const g = guard();
+    for (let i = 0; i < 100; i++) {
+      const user = `eleve${i}`;
+      expect(rate(() => g.check("10.0.0.1", user)), user).toBe("ok");
+      g.recordSuccess("10.0.0.1", user);
+    }
+  });
+
+  it("une classe où chacun se trompe une fois de frappe ne se bloque pas non plus", () => {
+    t = 1_000_000;
+    const g = guard();
+    for (let i = 0; i < 30; i++) {
+      expect(rate(() => g.check("10.0.0.1", `eleve${i}`))).toBe("ok");
+      g.recordFailure("10.0.0.1", `eleve${i}`);
+    }
+    expect(rate(() => g.check("10.0.0.1", "eleve0"))).toBe("ok"); // chacun peut réessayer
+  });
+
+  it("attaque horizontale : un même mot de passe essayé sur des dizaines d'identifiants depuis une adresse est stoppé", () => {
+    t = 1_000_000;
+    const g = guard();
+    let blockedAt = -1;
+    for (let i = 0; i < 200; i++) {
+      if (rate(() => g.check("203.0.113.9", `victime${i}`)) !== "ok") { blockedAt = i; break; }
+      g.recordFailure("203.0.113.9", `victime${i}`);
+    }
+    expect(blockedAt).toBe(40); // le 41e identifiant distinct est refusé
+    expect(rate(() => g.check("203.0.113.9", "victime0"))).toBe("ok"); // un compte déjà vu peut encore réessayer
+    expect(rate(() => g.check("198.51.100.2", "victime41"))).toBe("ok"); // une autre adresse n'est pas touchée
+  });
+
+  it("attaque verticale : trop d'échecs depuis une adresse la bloquent, puis elle est libérée", () => {
+    t = 1_000_000;
+    const g = guard({ ipDistinct: 1000 });
+    const targets = ["cible1", "cible2", "cible3"]; // 3 comptes × 20 essais : sous le plafond par identifiant, au plafond de l'adresse
+    for (let i = 0; i < 60; i++) { const u = targets[i % 3]!; expect(rate(() => g.check("203.0.113.9", u)), `essai ${i}`).toBe("ok"); g.recordFailure("203.0.113.9", u); t += 100; }
+    expect(rate(() => g.check("203.0.113.9", "cible1"))).toBe("rate_limited"); // 61e échec refusé : plafond de l'adresse
+    expect(rate(() => g.check("198.51.100.5", "autre.compte"))).toBe("ok");
+    t += 16 * 60_000;
+    expect(rate(() => g.check("203.0.113.9", "cible1"))).toBe("ok"); // fenêtre écoulée : libérée
+  });
+
+  it("limite les tentatives sur un même identifiant venant d'adresses différentes", () => {
+    t = 1_000_000;
+    const g = guard({ userAttempts: 5 });
+    const codes = Array.from({ length: 8 }, (_, i) => rate(() => g.check(`198.51.100.${i}`, "compte.vise")));
+    expect(codes).toEqual(["ok", "ok", "ok", "ok", "ok", "rate_limited", "rate_limited", "rate_limited"]);
+  });
+
+  it("renvoie un délai d'attente exploitable", () => {
+    t = 1_000_000;
+    const g = guard({ userAttempts: 1 });
+    g.check("1.1.1.1", "a");
+    try { g.check("1.1.1.1", "a"); } catch (e) { expect((e as { details: { retryAfterSeconds: number } }).details.retryAfterSeconds).toBeGreaterThan(0); return; }
+    throw new Error("devait lever");
+  });
+
+  it("force brute distribuée : le seuil global déclenche le mode « sous attaque » qui resserre les seuils par adresse, puis le lève", () => {
+    t = 1_000_000;
+    const alerts: number[] = [];
+    const g = guard({ globalFailuresPerMinute: 50, onAttack: (i: { failuresPerMinute: number }) => alerts.push(i.failuresPerMinute) });
+    // 50 échecs en une minute depuis 50 adresses différentes, sans qu'aucune ne dépasse les seuils normaux
+    for (let i = 0; i < 50; i++) { g.check(`192.0.2.${i}`, `u${i}`); g.recordFailure(`192.0.2.${i}`, `u${i}`); t += 500; }
+    expect(g.underAttack).toBe(true);
+    expect(alerts).toEqual([50]); // alerte émise une seule fois
+    // sous attaque, une adresse qui a déjà 10 échecs est refusée (au lieu de 60) ...
+    const ip = "198.51.100.77";
+    for (let i = 0; i < 10; i++) { g.check(ip, `c${i % 5}`); g.recordFailure(ip, `c${i % 5}`); }
+    expect(rate(() => g.check(ip, "c0"))).toBe("rate_limited");
+    // ... mais un visiteur sans échec récent continue de se connecter : le service n'est pas coupé
+    expect(rate(() => g.check("203.0.113.200", "eleve.normal"))).toBe("ok");
+    t += 11 * 60_000;
+    expect(g.underAttack).toBe(false);
+    expect(rate(() => g.check(ip, "c0"))).toBe("ok");
   });
 });
