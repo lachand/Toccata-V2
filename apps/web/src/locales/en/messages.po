@@ -7,6 +7,23 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
 
+#. placeholder {0}: label(active.id)
+#. placeholder {1}: ids.indexOf(String(over.id)) + 1
+#: src/components/SortableTimeline.tsx
+msgid "“{0}” dropped at position {1}."
+msgstr "“{0}” dropped at position {1}."
+
+#. placeholder {0}: label(active.id)
+#: src/components/SortableTimeline.tsx
+msgid "“{0}” dropped."
+msgstr "“{0}” dropped."
+
+#. placeholder {0}: label(active.id)
+#. placeholder {1}: ids.indexOf(String(over.id)) + 1
+#: src/components/SortableTimeline.tsx
+msgid "“{0}” is now at position {1}."
+msgstr "“{0}” is now at position {1}."
+
 #: src/pages/Classes.tsx
 msgid "{count, plural, one {# student} other {# students}}"
 msgstr "{count, plural, one {# student} other {# students}}"
@@ -59,6 +76,10 @@ msgstr "Activity title"
 msgid "Add"
 msgstr "Add"
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Add a link"
+msgstr "Add a link"
+
 #: src/pages/Gallery.tsx
 msgid "Add a resource"
 msgstr "Add a resource"
@@ -84,6 +105,10 @@ msgstr "Add the first step"
 msgid "Already have an account? Sign in"
 msgstr "Already have an account? Sign in"
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Apply"
+msgstr "Apply"
+
 #: src/pages/Signup.tsx
 msgid "At least 12 characters."
 msgstr "At least 12 characters."
@@ -96,6 +121,10 @@ msgstr "Back to activities"
 msgid "Backlog"
 msgstr "Backlog"
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Bold"
+msgstr "Bold"
+
 #: src/pages/Gallery.tsx
 msgid "Bonus"
 msgstr "Bonus"
@@ -103,6 +132,10 @@ msgstr "Bonus"
 #: src/pages/Gallery.tsx
 msgid "Build"
 msgstr "Build"
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Bulleted list"
+msgstr "Bulleted list"
 
 #: src/pages/Gallery.tsx
 msgid "Buttons"
@@ -140,6 +173,7 @@ msgstr "Classes"
 #: src/pages/ClassDetail.tsx
 #: src/pages/Classes.tsx
 #: src/pages/Gallery.tsx
+#: src/richtext/RichEditorImpl.tsx
 msgid "Close"
 msgstr "Close"
 
@@ -219,6 +253,10 @@ msgstr "Done"
 msgid "Draft"
 msgstr "Draft"
 
+#: src/components/SortableTimeline.tsx
+msgid "Drag to reorder"
+msgstr "Drag to reorder"
+
 #: src/pages/Activities.tsx
 msgid "Edit"
 msgstr "Edit"
@@ -231,6 +269,10 @@ msgstr "Edited {0}"
 #: src/pages/Gallery.tsx
 msgid "Embedded"
 msgstr "Embedded"
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Enter an address starting with https://"
+msgstr "Enter an address starting with https://"
 
 #: src/pages/Gallery.tsx
 msgid "Estimate"
@@ -251,6 +293,10 @@ msgstr "Form controls"
 #: src/pages/Gallery.tsx
 msgid "Hand out"
 msgstr "Hand out"
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Heading"
+msgstr "Heading"
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
@@ -289,11 +335,16 @@ msgstr "Invitation code"
 msgid "It will appear as soon as the connection allows it to sync."
 msgstr "It will appear as soon as the connection allows it to sync."
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Italic"
+msgstr "Italic"
+
 #: src/components/LocaleSwitcher.tsx
 msgid "Language"
 msgstr "Language"
 
 #: src/pages/Gallery.tsx
+#: src/richtext/RichEditorImpl.tsx
 msgid "Link"
 msgstr "Link"
 
@@ -325,6 +376,15 @@ msgstr "Move earlier"
 #: src/pages/ActivityEditor.tsx
 msgid "Move later"
 msgstr "Move later"
+
+#. placeholder {0}: label(active.id)
+#: src/components/SortableTimeline.tsx
+msgid "Move of “{0}” cancelled."
+msgstr "Move of “{0}” cancelled."
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Must start with https://"
+msgstr "Must start with https://"
 
 #: src/components/Layout.tsx
 #: src/pages/Activities.tsx
@@ -383,6 +443,10 @@ msgstr "No student yet."
 msgid "Not found."
 msgstr "Not found."
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Numbered list"
+msgstr "Numbered list"
+
 #: src/components/Layout.tsx
 #: src/pages/Gallery.tsx
 msgid "Offline, your changes are kept"
@@ -422,6 +486,11 @@ msgstr "Password"
 msgid "People"
 msgstr "People"
 
+#. placeholder {0}: label(active.id)
+#: src/components/SortableTimeline.tsx
+msgid "Picked up “{0}”."
+msgstr "Picked up “{0}”."
+
 #: src/components/CredentialsSheet.tsx
 msgid "Print"
 msgstr "Print"
@@ -437,6 +506,10 @@ msgstr "Provided by your school, if one is required."
 #: src/components/CredentialsSheet.tsx
 msgid "QR code to sign in as {name}"
 msgstr "QR code to sign in as {name}"
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Quote"
+msgstr "Quote"
 
 #: src/UpdatePrompt.tsx
 msgid "Ready to work offline."
@@ -547,6 +620,10 @@ msgstr "Syncing"
 msgid "Templates"
 msgstr "Templates"
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Text formatting"
+msgstr "Text formatting"
+
 #: src/pages/ClassDetail.tsx
 msgid "The account and its sessions will be deleted. This cannot be undone."
 msgstr "The account and its sessions will be deleted. This cannot be undone."
@@ -606,6 +683,10 @@ msgstr "Time left"
 msgid "Title"
 msgstr "Title"
 
+#: src/components/SortableTimeline.tsx
+msgid "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
+msgstr "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
+
 #: src/auth/useErrorText.ts
 msgid "Too many requests. Try again in a moment."
 msgstr "Too many requests. Try again in a moment."
@@ -632,6 +713,10 @@ msgstr "Visible to students"
 #: src/pages/Activities.tsx
 msgid "Waiting for sync"
 msgstr "Waiting for sync"
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Web address"
+msgstr "Web address"
 
 #: src/pages/Activities.tsx
 msgid "Your teacher will share activities here."

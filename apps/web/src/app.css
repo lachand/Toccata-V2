@@ -10,3 +10,16 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
   .no-print { display: none !important; }
   .cred-card { break-inside: avoid; box-shadow: none; border: 1px solid #000; }
 }
+
+/* Texte riche (consignes) */
+.tc-richbox { border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); }
+.tc-richbar { display: flex; flex-wrap: wrap; gap: var(--space-1); padding: var(--space-2); border-block-end: 1px solid var(--line); }
+.tc-richbar button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); }
+.tc-rich { overflow-wrap: anywhere; line-height: 1.55; }
+.tc-rich--edit { min-block-size: 9rem; padding: var(--space-3) var(--space-4); }
+.tc-rich--edit:focus-visible { outline: none; box-shadow: var(--focus); border-radius: var(--radius); }
+.tc-rich h2, .tc-rich h3 { font-family: var(--font-display); margin-block: var(--space-3) var(--space-2); }
+.tc-rich p { margin-block: 0 var(--space-2); }
+.tc-rich ul, .tc-rich ol { margin-block: 0 var(--space-2); padding-inline-start: var(--space-5); }
+.tc-rich blockquote { margin-inline: 0; padding-inline-start: var(--space-3); border-inline-start: 3px solid var(--accent); color: var(--muted); }
+.tc-rich a { color: var(--accent-ink); }

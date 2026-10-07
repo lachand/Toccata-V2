@@ -119,6 +119,9 @@
   .tc-step__eye { display: inline-grid; place-items: center; inline-size: 32px; block-size: 32px; margin-inline-end: var(--space-1); border: 0; border-radius: 50%; background: color-mix(in srgb, currentColor 12%, transparent); color: inherit; cursor: pointer; }
   .tc-step__eye::before { content: ""; position: absolute; inset: -6px; } /* zone tactile de 44 px */
   .tc-step__eye { position: relative; }
+  .tc-step__handle { display: inline-grid; place-items: center; inline-size: 32px; block-size: var(--hit); border: 0; background: transparent; color: var(--muted); cursor: grab; touch-action: none; position: relative; }
+  .tc-step__handle:focus-visible { box-shadow: var(--focus); border-radius: var(--radius-pill); outline: none; }
+  .tc-step[data-dragging="true"] { box-shadow: var(--shadow-2); z-index: 2; position: relative; }
   .tc-step--add { border-style: dashed; border-color: var(--accent); }
   .tc-step--add .tc-step__main { color: var(--accent-ink); padding-inline: var(--space-3); }
 

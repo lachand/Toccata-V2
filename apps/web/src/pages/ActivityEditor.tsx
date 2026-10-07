@@ -1,8 +1,10 @@
 import { useLingui } from "@lingui/react/macro";
-import { Button, Card, Content, Dialog, EmptyState, Field, IconButton, StepTimeline, Switch, TextArea, TextInput, TopBar, type StepItem } from "@toccata/ui";
+import { Button, Card, Content, Dialog, EmptyState, Field, IconButton, Switch, TextArea, TextInput, TopBar, type StepItem } from "@toccata/ui";
 import { ArrowLeft, ArrowRight, ListPlus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
+import { RichEditor } from "../richtext/RichEditor";
+import { SortableTimeline } from "../components/SortableTimeline";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
 import { useContent } from "../data/hooks";
@@ -61,7 +63,8 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
           </Field>
         </Card>
 
-        <StepTimeline
+        <SortableTimeline
+          onMove={(stepId, to) => void ws.moveStep(id, stepId, to)}
           steps={items}
           labels={{
             list: t`Steps`,
@@ -85,7 +88,7 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
               <TextInput defaultValue={current.title} maxLength={200} onBlur={(e) => void ws.patchStep(id, current.id, { title: e.currentTarget.value.trim() })} />
             </Field>
             <Field label={t`Instructions`} hint={t`Shown to students at the top of the step.`}>
-              <TextArea defaultValue={current.instructions} rows={6} maxLength={50_000} onBlur={(e) => void ws.patchStep(id, current.id, { instructions: e.currentTarget.value })} />
+              <RichEditor label={t`Instructions`} value={current.instructions} onCommit={(html) => html !== current.instructions && void ws.patchStep(id, current.id, { instructions: html })} />
             </Field>
             <Switch label={t`Visible to students`} checked={!current.hidden} onCheckedChange={(v) => void ws.patchStep(id, current.id, { hidden: !v })} />
             <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>

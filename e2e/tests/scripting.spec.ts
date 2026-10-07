@@ -82,3 +82,37 @@ test("une modification faite hors ligne est conservée puis synchronisée au ret
   await a.context.close();
   await b.context.close();
 });
+
+test("réordonner au clavier (glisser-déposer accessible) et écrire une consigne en texte riche", async ({ browser }) => {
+  const a = await device(browser);
+  await signIn(a.page);
+  await a.page.getByRole("article", { name: "Atelier Agile" }).getByRole("link", { name: "Modifier" }).click();
+  const items = a.page.getByRole("list", { name: "Étapes" }).getByRole("listitem");
+  await expect(items.nth(2)).toContainText("Rétrospective");
+
+  // poignée de la 3e étape : espace pour saisir, flèche gauche, espace pour déposer
+  const handle = items.nth(2).getByRole("button", { name: "Glisser pour réordonner" });
+  await handle.focus();
+  await a.page.keyboard.press("Space");
+  await a.page.waitForTimeout(250); // dnd-kit installe ses écouteurs à l'image suivante
+  await a.page.keyboard.press("ArrowLeft");
+  await a.page.waitForTimeout(250);
+  await a.page.keyboard.press("Space");
+  await expect(items.nth(1)).toContainText("Rétrospective");
+
+  await a.page.getByRole("button", { name: "Rétrospective", exact: true }).click();
+  const editor = a.page.getByRole("textbox", { name: "Consigne" });
+  await editor.click();
+  await a.page.getByRole("button", { name: "Gras" }).click();
+  await a.page.keyboard.type("Important");
+  await a.page.getByRole("button", { name: "Gras" }).click();
+  await a.page.keyboard.type(" : lisez <script>alert(1)</script> bien.");
+  await a.page.getByLabel("Titre de l’étape").click(); // sortie du champ : enregistrement
+  await a.page.reload();
+  await a.page.getByRole("button", { name: "Rétrospective", exact: true }).click();
+  const again = a.page.getByRole("textbox", { name: "Consigne" });
+  await expect(again.locator("strong")).toHaveText("Important");
+  await expect(again).toContainText("lisez");
+  expect(await again.locator("script").count()).toBe(0);
+  await a.context.close();
+});

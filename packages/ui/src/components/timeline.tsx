@@ -1,5 +1,5 @@
 import { Check, Eye, EyeOff, Lock, Plus } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactNode } from "react";
 
 export type StepState = "todo" | "active" | "done" | "locked";
 export type StepItem = { id: string; label: string; state: StepState; hidden?: boolean };
@@ -23,7 +23,11 @@ export type StepTimelineLabels = {
  * - L'œil est un vrai bouton frère du bouton d'étape (pas d'interactif imbriqué).
  * - Étape verrouillée : reste focalisable (`aria-disabled`) mais ne se sélectionne pas.
  */
-export function StepTimeline({ steps, labels, onSelect, onToggleHidden, onAdd, dragHandle }: {
+export type StepItemProps = { id: string; className: string; "data-state": StepState; "data-hidden": "true" | "false"; children: ReactNode };
+
+const DefaultItem: ComponentType<StepItemProps> = ({ children, id: _id, ...rest }) => <li {...rest}>{children}</li>;
+
+export function StepTimeline({ steps, labels, onSelect, onToggleHidden, onAdd, dragHandle, itemAs }: {
   steps: readonly StepItem[];
   labels: StepTimelineLabels;
   onSelect?: (id: string) => void;
@@ -31,13 +35,16 @@ export function StepTimeline({ steps, labels, onSelect, onToggleHidden, onAdd, d
   onAdd?: () => void;
   /** Emplacement de la poignée de glisser-déposer (branchée en Phase 3). */
   dragHandle?: (id: string) => ReactNode;
+  /** Remplace le `<li>` de chaque étape (l'application y branche le tri par glisser-déposer ; ce paquet n'en dépend pas). */
+  itemAs?: ComponentType<StepItemProps>;
 }) {
+  const Item = itemAs ?? DefaultItem;
   return (
     <ol className="tc-steps" aria-label={labels.list}>
       {steps.map((s, i) => {
         const locked = s.state === "locked";
         return (
-          <li key={s.id} className="tc-step" data-state={s.state} data-hidden={s.hidden ? "true" : "false"}>
+          <Item key={s.id} id={s.id} className="tc-step" data-state={s.state} data-hidden={s.hidden ? "true" : "false"}>
             {dragHandle?.(s.id)}
             <button
               type="button"
@@ -74,7 +81,7 @@ export function StepTimeline({ steps, labels, onSelect, onToggleHidden, onAdd, d
                 {s.hidden ? <EyeOff size={16} aria-hidden="true" /> : <Eye size={16} aria-hidden="true" />}
               </button>
             ) : null}
-          </li>
+          </Item>
         );
       })}
       {onAdd ? (

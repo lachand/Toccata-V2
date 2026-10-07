@@ -7,6 +7,23 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: pseudo\n"
 
+#. placeholder {0}: label(active.id)
+#. placeholder {1}: ids.indexOf(String(over.id)) + 1
+#: src/components/SortableTimeline.tsx
+msgid "“{0}” dropped at position {1}."
+msgstr ""
+
+#. placeholder {0}: label(active.id)
+#: src/components/SortableTimeline.tsx
+msgid "“{0}” dropped."
+msgstr ""
+
+#. placeholder {0}: label(active.id)
+#. placeholder {1}: ids.indexOf(String(over.id)) + 1
+#: src/components/SortableTimeline.tsx
+msgid "“{0}” is now at position {1}."
+msgstr ""
+
 #: src/pages/Classes.tsx
 msgid "{count, plural, one {# student} other {# students}}"
 msgstr ""
@@ -59,6 +76,10 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Add a link"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Add a resource"
 msgstr ""
@@ -84,6 +105,10 @@ msgstr ""
 msgid "Already have an account? Sign in"
 msgstr ""
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Apply"
+msgstr ""
+
 #: src/pages/Signup.tsx
 msgid "At least 12 characters."
 msgstr ""
@@ -96,12 +121,20 @@ msgstr ""
 msgid "Backlog"
 msgstr ""
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Bold"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Bonus"
 msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Build"
+msgstr ""
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Bulleted list"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -140,6 +173,7 @@ msgstr ""
 #: src/pages/ClassDetail.tsx
 #: src/pages/Classes.tsx
 #: src/pages/Gallery.tsx
+#: src/richtext/RichEditorImpl.tsx
 msgid "Close"
 msgstr ""
 
@@ -219,6 +253,10 @@ msgstr ""
 msgid "Draft"
 msgstr ""
 
+#: src/components/SortableTimeline.tsx
+msgid "Drag to reorder"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "Edit"
 msgstr ""
@@ -230,6 +268,10 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Embedded"
+msgstr ""
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Enter an address starting with https://"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -250,6 +292,10 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Hand out"
+msgstr ""
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Heading"
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -289,11 +335,16 @@ msgstr ""
 msgid "It will appear as soon as the connection allows it to sync."
 msgstr ""
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Italic"
+msgstr ""
+
 #: src/components/LocaleSwitcher.tsx
 msgid "Language"
 msgstr ""
 
 #: src/pages/Gallery.tsx
+#: src/richtext/RichEditorImpl.tsx
 msgid "Link"
 msgstr ""
 
@@ -324,6 +375,15 @@ msgstr ""
 
 #: src/pages/ActivityEditor.tsx
 msgid "Move later"
+msgstr ""
+
+#. placeholder {0}: label(active.id)
+#: src/components/SortableTimeline.tsx
+msgid "Move of “{0}” cancelled."
+msgstr ""
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Must start with https://"
 msgstr ""
 
 #: src/components/Layout.tsx
@@ -383,6 +443,10 @@ msgstr ""
 msgid "Not found."
 msgstr ""
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Numbered list"
+msgstr ""
+
 #: src/components/Layout.tsx
 #: src/pages/Gallery.tsx
 msgid "Offline, your changes are kept"
@@ -422,6 +486,11 @@ msgstr ""
 msgid "People"
 msgstr ""
 
+#. placeholder {0}: label(active.id)
+#: src/components/SortableTimeline.tsx
+msgid "Picked up “{0}”."
+msgstr ""
+
 #: src/components/CredentialsSheet.tsx
 msgid "Print"
 msgstr ""
@@ -436,6 +505,10 @@ msgstr ""
 
 #: src/components/CredentialsSheet.tsx
 msgid "QR code to sign in as {name}"
+msgstr ""
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Quote"
 msgstr ""
 
 #: src/UpdatePrompt.tsx
@@ -547,6 +620,10 @@ msgstr ""
 msgid "Templates"
 msgstr ""
 
+#: src/richtext/RichEditorImpl.tsx
+msgid "Text formatting"
+msgstr ""
+
 #: src/pages/ClassDetail.tsx
 msgid "The account and its sessions will be deleted. This cannot be undone."
 msgstr ""
@@ -606,6 +683,10 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+#: src/components/SortableTimeline.tsx
+msgid "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
+msgstr ""
+
 #: src/auth/useErrorText.ts
 msgid "Too many requests. Try again in a moment."
 msgstr ""
@@ -631,6 +712,10 @@ msgstr ""
 
 #: src/pages/Activities.tsx
 msgid "Waiting for sync"
+msgstr ""
+
+#: src/richtext/RichEditorImpl.tsx
+msgid "Web address"
 msgstr ""
 
 #: src/pages/Activities.tsx
