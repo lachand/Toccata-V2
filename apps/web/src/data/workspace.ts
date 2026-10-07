@@ -4,7 +4,9 @@ import { BehaviorSubject, Observable, combineLatest, map, of, switchMap } from "
 import {
   assembleContent,
   collectionNameFor,
+  decodeInstanceDocs,
   decodeMasterDocs,
+  estimateClockOffset,
   envelopeSchema,
   masterDbName,
   newId,
@@ -16,6 +18,7 @@ import {
   type ResourceDoc,
   type StepDoc,
 } from "@toccata/schema";
+import type { InstanceStore, NewRuntimeDoc, RuntimeDoc, RuntimeKind, Viewer } from "@toccata/apps-sdk";
 import { memoryBlobStore, type BlobStore } from "./blobs";
 import { MAX_FILE_BYTES, downloadFile, sha256Hex, uploadFile } from "./files";
 
@@ -174,7 +177,7 @@ export class Workspace {
     return id;
   }
 
-  async patchStep(activityId: string, stepId: string, patch: Partial<Pick<StepDoc, "title" | "instructions" | "hidden" | "locked">>): Promise<void> {
+  async patchStep(activityId: string, stepId: string, patch: Partial<Pick<StepDoc, "title" | "instructions" | "hidden" | "locked" | "blockedByAppId">>): Promise<void> {
     await this.patch(activityId, stepId, patch);
   }
 
@@ -301,6 +304,85 @@ export class Workspace {
     return docs.filter((d): d is StepDoc => d.kind === "step").sort((a, b) => (a.order < b.order ? -1 : a.order > b.order ? 1 : a.id < b.id ? -1 : 1));
   }
 
+  /* ---------------------------------------------------------------- aperçu des applications */
+
+  private previews = new Map<string, Promise<Col>>();
+  private clockOffset = 0;
+
+  /** Heure serveur estimée : l'heure de l'appareil corrigée du décalage mesuré à la synchronisation. */
+  serverNow = (): number => Math.round(this.now() + this.clockOffset); // entier : les horodatages du schéma le sont
+
+  /** Mesure le décalage d'horloge avec le serveur (en-tête `Date` de CouchDB, plusieurs échantillons, le plus court l'emporte). */
+  async calibrateClock(): Promise<void> {
+    const o = this.syncOptions;
+    if (!o) return;
+    const samples = [];
+    for (let i = 0; i < 3; i++) {
+      const sentAtMs = Date.now();
+      try {
+        const r = await o.fetch(`${o.baseUrl}/`, { method: "HEAD" });
+        const d = r.headers.get("date");
+        if (d) samples.push({ sentAtMs, receivedAtMs: Date.now(), serverMs: Date.parse(d) });
+      } catch {
+        return;
+      }
+    }
+    const off = estimateClockOffset(samples);
+    if (off !== null && Number.isFinite(off)) this.clockOffset = off;
+  }
+
+  private preview(activityId: string): Promise<Col> {
+    const name = collectionNameFor(`preview_${activityId}`);
+    let c = this.previews.get(name);
+    if (!c) {
+      c = this.db.addCollections({ [name]: { schema: envelopeSchema as never } }).then((r) => r[name] as unknown as Col);
+      this.previews.set(name, c);
+    }
+    return c;
+  }
+
+  /**
+   * Données d'exécution de l'aperçu de l'enseignant : une instance LOCALE, jamais répliquée. L'éditeur et la séance
+   * utilisent ainsi les mêmes composants (une instance réelle fournira un magasin identique, dans `inst_<id>`).
+   */
+  previewStore(activityId: string, viewer: Viewer): InstanceStore & { clear(appId: string): Promise<void> } {
+    const col = this.preview(activityId);
+    const decode = (rows: { toJSON(): unknown }[]) => decodeInstanceDocs(rows.map((r) => r.toJSON())).docs;
+    return {
+      viewer,
+      serverNow: this.serverNow,
+      watch<K extends RuntimeKind>(kind: K, appId: string, cb: (docs: RuntimeDoc<K>[]) => void) {
+        let stop = () => {};
+        let gone = false;
+        void col.then((c) => {
+          if (gone) return;
+          const sub = c.find({ selector: { kind } }).$.subscribe((rows) => cb(decode(rows).filter((d) => d.kind === kind && (d as { appId?: string }).appId === appId) as RuntimeDoc<K>[]));
+          stop = () => sub.unsubscribe();
+        });
+        return () => {
+          gone = true;
+          stop();
+        };
+      },
+      put: async <K extends RuntimeKind>(doc: NewRuntimeDoc<K>) => {
+        const c = await col;
+        const t = this.now();
+        const id = doc.id ?? newId(t);
+        const previous = await c.findOne(id).exec();
+        const createdAt = (previous?.toJSON() as { createdAt?: number } | undefined)?.createdAt ?? t;
+        await c.upsert({ ...doc, id, authorId: viewer.id, createdAt, updatedAt: t } as unknown as Record<string, unknown>);
+        return id;
+      },
+      remove: async (id) => {
+        await (await (await col).findOne(id).exec())?.remove();
+      },
+      clear: async (appId) => {
+        const rows = await (await col).find().exec();
+        await Promise.all(rows.filter((r) => (r.toJSON() as { appId?: string }).appId === appId).map((r) => r.remove()));
+      },
+    };
+  }
+
   /* ---------------------------------------------------------------- synchronisation */
 
   private replicate(name: string, col: Col): void {
@@ -325,6 +407,7 @@ export class Workspace {
     this.syncState$.next({ running: true, failing: false });
     for (const [name, c] of this.cols) this.replicate(name, await c);
     void this.flushUploads();
+    void this.calibrateClock();
   }
 
   async stopSync(): Promise<void> {

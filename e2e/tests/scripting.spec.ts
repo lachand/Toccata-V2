@@ -101,6 +101,7 @@ test("réordonner au clavier (glisser-déposer accessible) et écrire une consig
   await expect(items.nth(1)).toContainText("Rétrospective");
 
   await a.page.getByRole("button", { name: "Rétrospective", exact: true }).click();
+  await a.page.getByRole("toolbar", { name: "Mise en forme du texte" }).first().waitFor(); // TipTap est chargé à la demande
   const editor = a.page.getByRole("textbox", { name: "Consigne" });
   await editor.click();
   await a.page.keyboard.press("Control+b");
@@ -108,8 +109,10 @@ test("réordonner au clavier (glisser-déposer accessible) et écrire une consig
   await a.page.keyboard.press("Control+b");
   await a.page.keyboard.type(" : lisez <script>alert(1)</script> bien.");
   await a.page.getByLabel("Titre de l’étape").click(); // sortie du champ : enregistrement
+  await a.page.waitForTimeout(800); // l'écriture locale est asynchrone : on laisse IndexedDB la terminer avant de recharger
   await a.page.reload();
   await a.page.getByRole("button", { name: "Rétrospective", exact: true }).click();
+  await a.page.getByRole("toolbar", { name: "Mise en forme du texte" }).first().waitFor();
   const again = a.page.getByRole("textbox", { name: "Consigne" });
   await expect(again.locator("strong")).toHaveText("Important");
   await expect(again).toContainText("lisez");
@@ -160,6 +163,70 @@ test("ressources : un lien, un fichier image et une application web ; le fichier
   const img = panelB.getByRole("img", { name: "pixel.png" });
   await expect(img).toBeVisible({ timeout: 30_000 });
   expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(1);
+  await a.context.close();
+  await b.context.close();
+});
+
+test("applications : chrono, kanban, texte partagé et questionnaire s'ajoutent, se configurent et s'essaient dans l'aperçu", async ({ browser }) => {
+  const a = await device(browser);
+  await signIn(a.page);
+  await a.page.getByRole("article", { name: "Atelier Agile" }).getByRole("link", { name: "Modifier" }).click();
+  await a.page.getByRole("button", { name: "Remue-méninges", exact: true }).click();
+  const panel = a.page.getByRole("region", { name: "Ressources et applications de cette étape" });
+  const addApp = async (type: RegExp) => {
+    await panel.getByRole("button", { name: "Ajouter", exact: true }).click();
+    const d = a.page.getByRole("dialog");
+    await d.getByRole("button", { name: type }).click();
+    await d.getByRole("button", { name: "Ajouter", exact: true }).click();
+  };
+
+  await addApp(/Minuteur/);
+  await panel.getByRole("button", { name: "Afficher Minuteur" }).click();
+  await expect(panel.getByRole("time")).toContainText("05:00");
+  await panel.getByRole("button", { name: "Démarrer" }).click();
+  await expect(panel.getByRole("button", { name: "Pause" })).toBeVisible();
+  await a.page.waitForTimeout(1300);
+  await expect(panel.getByRole("time")).not.toContainText("05:00");
+  await panel.getByRole("button", { name: "Pause" }).click();
+  await panel.getByRole("button", { name: "Masquer Minuteur" }).click();
+
+  await addApp(/Tableau kanban/);
+  await panel.getByRole("button", { name: "Afficher Tableau kanban" }).click();
+  const todo = panel.getByRole("region", { name: "À faire" });
+  await todo.getByRole("textbox", { name: /Nouvelle carte dans/ }).fill("Écrire le plan");
+  await todo.getByRole("textbox", { name: /Nouvelle carte dans/ }).press("Enter");
+  await expect(todo.locator('input[value="Écrire le plan"]')).toBeVisible();
+  await todo.getByRole("combobox", { name: /Déplacer/ }).selectOption({ label: "Terminé" });
+  await expect(panel.getByRole("region", { name: "Terminé" }).locator('input[value="Écrire le plan"]')).toBeVisible();
+  await panel.getByRole("button", { name: "Masquer Tableau kanban" }).click();
+
+  await addApp(/Texte partagé/);
+  await panel.getByRole("button", { name: "Afficher Texte partagé" }).click();
+  const shared = panel.getByRole("textbox", { name: "Texte partagé" });
+  await shared.click();
+  await a.page.keyboard.type("Notes de groupe");
+  await expect(shared).toContainText("Notes de groupe");
+  await panel.getByRole("button", { name: "Masquer Texte partagé" }).click();
+
+  await addApp(/Questionnaire/);
+  await panel.getByRole("button", { name: "Afficher Questionnaire" }).click();
+  await panel.getByRole("button", { name: "Ajouter une question" }).click();
+  await panel.getByLabel("Question", { exact: true }).fill("Qu’as-tu retenu ?");
+  await expect(panel.getByRole("textbox", { name: /Qu’as-tu retenu/ })).toBeVisible();
+  await panel.getByRole("button", { name: "Envoyer" }).click();
+  await expect(panel.getByText("Réponses envoyées.")).toBeVisible();
+
+  // l'étape peut être bloquée par le questionnaire
+  await a.page.getByLabel("Étape bloquée jusqu’à l’envoi d’un questionnaire").selectOption({ label: "Questionnaire" });
+
+  // autre appareil : les applications (leur configuration) sont répliquées ; les données d'aperçu restent locales
+  const b = await device(browser);
+  await signIn(b.page);
+  await b.page.getByRole("article", { name: "Atelier Agile" }).getByRole("link", { name: "Modifier" }).click();
+  await b.page.getByRole("button", { name: "Remue-méninges", exact: true }).click();
+  const pb = b.page.getByRole("region", { name: "Ressources et applications de cette étape" });
+  for (const n of ["Minuteur", "Tableau kanban", "Texte partagé", "Questionnaire"]) await expect(pb.locator(`input[value="${n}"]`)).toBeVisible({ timeout: 30_000 });
+  await expect(b.page.getByLabel("Étape bloquée jusqu’à l’envoi d’un questionnaire")).toHaveValue(/.+/, { timeout: 30_000 });
   await a.context.close();
   await b.context.close();
 });

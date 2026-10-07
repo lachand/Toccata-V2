@@ -56,6 +56,14 @@ msgstr "200 caractères au plus"
 msgid "25 MB at most."
 msgstr "25 Mo au maximum."
 
+#: src/apps/timer.tsx
+msgid "A countdown shared by everyone, green then orange then red as time runs out."
+msgstr "Un compte à rebours partagé par tous, vert puis orange puis rouge à mesure que le temps s’écoule."
+
+#: src/apps/text.tsx
+msgid "A document everyone writes in together, at the same time."
+msgstr "Un document dans lequel tout le monde écrit ensemble, en même temps."
+
 #: src/UpdatePrompt.tsx
 msgid "A new version is available."
 msgstr "Une nouvelle version est disponible."
@@ -90,9 +98,22 @@ msgstr "Titre de l’activité"
 msgid "Add"
 msgstr "Ajouter"
 
-#: src/richtext/RichEditorImpl.tsx
+#. placeholder {0}: column.title
+#: src/apps/kanban.tsx
+msgid "Add a card to “{0}”"
+msgstr "Ajouter une carte à « {0} »"
+
+#: src/apps/kanban.tsx
+msgid "Add a column"
+msgstr "Ajouter une colonne"
+
+#: src/richtext/RichToolbar.tsx
 msgid "Add a link"
 msgstr "Ajouter un lien"
+
+#: src/apps/form.tsx
+msgid "Add a question"
+msgstr "Ajouter une question"
 
 #: src/pages/Gallery.tsx
 msgid "Add a resource"
@@ -136,7 +157,15 @@ msgstr "Déjà un compte ? Se connecter"
 msgid "An image, a PDF, an audio or video file, a document."
 msgstr "Une image, un PDF, un fichier audio ou vidéo, un document."
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/apps/form.tsx
+msgid "Answer type"
+msgstr "Type de réponse"
+
+#: src/apps/form.tsx
+msgid "Answers submitted."
+msgstr "Réponses envoyées."
+
+#: src/richtext/RichToolbar.tsx
 msgid "Apply"
 msgstr "Appliquer"
 
@@ -156,7 +185,11 @@ msgstr "Retour aux activités"
 msgid "Backlog"
 msgstr "Backlog"
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/apps/form.tsx
+msgid "Block the step until the questionnaire is submitted"
+msgstr "Bloquer l’étape tant que le questionnaire n’est pas envoyé"
+
+#: src/richtext/RichToolbar.tsx
 msgid "Bold"
 msgstr "Gras"
 
@@ -168,7 +201,7 @@ msgstr "Bonus"
 msgid "Build"
 msgstr "Construire"
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Bulleted list"
 msgstr "Liste à puces"
 
@@ -182,6 +215,10 @@ msgstr "Boutons"
 #: src/pages/Gallery.tsx
 msgid "Cancel"
 msgstr "Annuler"
+
+#: src/apps/kanban.tsx
+msgid "Card title"
+msgstr "Titre de la carte"
 
 #: src/auth/useErrorText.ts
 msgid "Check the fields and try again."
@@ -215,9 +252,13 @@ msgstr "Classes"
 #: src/pages/ClassDetail.tsx
 #: src/pages/Classes.tsx
 #: src/pages/Gallery.tsx
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Close"
 msgstr "Fermer"
+
+#: src/apps/kanban.tsx
+msgid "Columns"
+msgstr "Colonnes"
 
 #: src/components/Layout.tsx
 #: src/pages/Gallery.tsx
@@ -264,6 +305,16 @@ msgstr "Supprimer"
 msgid "Delete {0}"
 msgstr "Supprimer {0}"
 
+#. placeholder {0}: card.title
+#: src/apps/kanban.tsx
+msgid "Delete card “{0}”"
+msgstr "Supprimer la carte « {0} »"
+
+#. placeholder {0}: i + 1
+#: src/apps/form.tsx
+msgid "Delete question {0}"
+msgstr "Supprimer la question {0}"
+
 #: src/pages/ActivityEditor.tsx
 msgid "Delete step"
 msgstr "Supprimer l’étape"
@@ -297,6 +348,7 @@ msgstr "Mode d'affichage"
 msgid "done"
 msgstr "terminée"
 
+#: src/apps/kanban.tsx
 #: src/components/CredentialsSheet.tsx
 msgid "Done"
 msgstr "Terminé"
@@ -308,6 +360,11 @@ msgstr "Télécharger"
 #: src/pages/Activities.tsx
 msgid "Draft"
 msgstr "Brouillon"
+
+#. placeholder {0}: card.title
+#: src/apps/kanban.tsx
+msgid "Drag card “{0}”"
+msgstr "Faire glisser la carte « {0} »"
 
 #: src/components/SortableTimeline.tsx
 msgid "Drag to reorder"
@@ -328,7 +385,7 @@ msgid "Embedded"
 msgstr "Intégré"
 
 #: src/content/AddContentDialog.tsx
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Enter an address starting with https://"
 msgstr "Saisissez une adresse commençant par https://"
 
@@ -339,6 +396,10 @@ msgstr "Estimer"
 #: src/content/AddContentDialog.tsx
 msgid "File"
 msgstr "Fichier"
+
+#: src/apps/form.tsx
+msgid "File answers are not available yet."
+msgstr "Les réponses par fichier ne sont pas encore disponibles."
 
 #: src/pages/Classes.tsx
 msgid "For example: 4th grade B"
@@ -356,7 +417,7 @@ msgstr "Champs de formulaire"
 msgid "Hand out"
 msgstr "Distribuer"
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Heading"
 msgstr "Titre"
 
@@ -390,6 +451,7 @@ msgstr "J'ai terminé l'étape"
 msgid "If the page stays blank, the site does not allow being embedded."
 msgstr "Si la page reste vide, le site n’autorise pas son intégration."
 
+#: src/apps/kanban.tsx
 #: src/pages/Gallery.tsx
 msgid "In progress"
 msgstr "En cours"
@@ -414,16 +476,25 @@ msgstr "Il est supprimé pour tout le monde. Cette action est irréversible."
 msgid "It will appear as soon as the connection allows it to sync."
 msgstr "Elle apparaîtra dès que la connexion permettra de la synchroniser."
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Italic"
 msgstr "Italique"
+
+#: src/apps/kanban.tsx
+msgid "Kanban board"
+msgstr "Tableau kanban"
+
+#. placeholder {0}: app.name
+#: src/apps/kanban.tsx
+msgid "Kanban board “{0}”"
+msgstr "Tableau kanban « {0} »"
 
 #: src/components/LocaleSwitcher.tsx
 msgid "Language"
 msgstr "Langue"
 
 #: src/pages/Gallery.tsx
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Link"
 msgstr "Lien"
 
@@ -449,9 +520,22 @@ msgstr "verrouillée"
 msgid "Login details"
 msgstr "Identifiants de connexion"
 
+#: src/apps/form.tsx
+msgid "Long text"
+msgstr "Texte long"
+
 #: src/components/Layout.tsx
 msgid "Main navigation"
 msgstr "Navigation principale"
+
+#: src/apps/timer.tsx
+msgid "Minutes"
+msgstr "Minutes"
+
+#. placeholder {0}: card.title
+#: src/apps/kanban.tsx
+msgid "Move “{0}” to"
+msgstr "Déplacer « {0} » vers"
 
 #: src/pages/ActivityEditor.tsx
 msgid "Move earlier"
@@ -466,9 +550,23 @@ msgstr "Déplacer après"
 msgid "Move of “{0}” cancelled."
 msgstr "Déplacement de « {0} » annulé."
 
+#. placeholder {0}: i + 1
+#: src/apps/form.tsx
+msgid "Move question {0} down"
+msgstr "Descendre la question {0}"
+
+#. placeholder {0}: i + 1
+#: src/apps/form.tsx
+msgid "Move question {0} up"
+msgstr "Monter la question {0}"
+
+#: src/apps/form.tsx
+msgid "Multiple choice"
+msgstr "Choix multiple"
+
 #: src/apps/external.tsx
 #: src/content/AddContentDialog.tsx
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Must start with https://"
 msgstr "Doit commencer par https://"
 
@@ -482,6 +580,11 @@ msgstr "Mes activités"
 msgid "Name"
 msgstr "Nom"
 
+#. placeholder {0}: i + 1
+#: src/apps/kanban.tsx
+msgid "Name of column {0}"
+msgstr "Nom de la colonne {0}"
+
 #: src/pages/Signup.tsx
 msgid "Name shown to students"
 msgstr "Nom affiché aux élèves"
@@ -494,9 +597,22 @@ msgstr "Demande de l'aide"
 msgid "New activity"
 msgstr "Nouvelle activité"
 
+#: src/apps/kanban.tsx
+msgid "New card"
+msgstr "Nouvelle carte"
+
+#. placeholder {0}: column.title
+#: src/apps/kanban.tsx
+msgid "New card in “{0}”"
+msgstr "Nouvelle carte dans « {0} »"
+
 #: src/pages/Classes.tsx
 msgid "New class"
 msgstr "Nouvelle classe"
+
+#: src/apps/kanban.tsx
+msgid "New column"
+msgstr "Nouvelle colonne"
 
 #: src/pages/ClassDetail.tsx
 msgid "New passphrase"
@@ -522,6 +638,10 @@ msgstr "Aucune activité ici pour l'instant"
 msgid "No class yet"
 msgstr "Aucune classe pour l'instant"
 
+#: src/pages/ActivityEditor.tsx
+msgid "No lock"
+msgstr "Aucun blocage"
+
 #: src/pages/Gallery.tsx
 msgid "No resource yet"
 msgstr "Aucune ressource pour l'instant"
@@ -542,7 +662,7 @@ msgstr "Introuvable."
 msgid "Nothing here yet."
 msgstr "Rien ici pour l’instant."
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Numbered list"
 msgstr "Liste numérotée"
 
@@ -558,6 +678,10 @@ msgstr "Dans les temps"
 #: src/pages/ClassDetail.tsx
 msgid "One name per line, 60 at most. Each student gets a username and a passphrase."
 msgstr "Un nom par ligne, 60 au plus. Chaque élève reçoit un identifiant et une phrase de passe."
+
+#: src/apps/form.tsx
+msgid "One per line."
+msgstr "Une par ligne."
 
 #: src/pages/Gallery.tsx
 msgid "One step behind"
@@ -584,6 +708,18 @@ msgstr "Ouvrir dans une nouvelle fenêtre"
 msgid "Open the PDF"
 msgstr "Ouvrir le PDF"
 
+#: src/apps/form.tsx
+msgid "Option 1"
+msgstr "Option 1"
+
+#: src/apps/form.tsx
+msgid "Option 2"
+msgstr "Option 2"
+
+#: src/apps/form.tsx
+msgid "Options"
+msgstr "Options"
+
 #: src/components/CredentialsSheet.tsx
 msgid "Passphrase"
 msgstr "Phrase de passe"
@@ -593,6 +729,10 @@ msgstr "Phrase de passe"
 msgid "Password"
 msgstr "Mot de passe"
 
+#: src/apps/timer.tsx
+msgid "Pause"
+msgstr "Pause"
+
 #: src/pages/Gallery.tsx
 msgid "People"
 msgstr "Personnes"
@@ -601,6 +741,10 @@ msgstr "Personnes"
 #: src/components/SortableTimeline.tsx
 msgid "Picked up “{0}”."
 msgstr "« {0} » saisie."
+
+#: src/apps/kanban.tsx
+msgid "Points"
+msgstr "Points"
 
 #: src/components/CredentialsSheet.tsx
 msgid "Print"
@@ -618,7 +762,24 @@ msgstr "Fourni par votre établissement, s'il en exige un."
 msgid "QR code to sign in as {name}"
 msgstr "QR code pour se connecter en tant que {name}"
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/apps/form.tsx
+msgid "Question"
+msgstr "Question"
+
+#. placeholder {0}: i + 1
+#: src/apps/form.tsx
+msgid "Question {0}"
+msgstr "Question {0}"
+
+#: src/apps/form.tsx
+msgid "Questionnaire"
+msgstr "Questionnaire"
+
+#: src/apps/form.tsx
+msgid "Questions students answer; the step can stay locked until they submit."
+msgstr "Des questions auxquelles les élèves répondent ; l’étape peut rester bloquée jusqu’à l’envoi."
+
+#: src/richtext/RichToolbar.tsx
 msgid "Quote"
 msgstr "Citation"
 
@@ -638,9 +799,26 @@ msgstr "Retirer"
 msgid "Remove {name}"
 msgstr "Retirer {name}"
 
+#. placeholder {0}: i + 1
+#: src/apps/kanban.tsx
+msgid "Remove column {0}"
+msgstr "Retirer la colonne {0}"
+
 #: src/pages/ClassDetail.tsx
 msgid "Remove this student?"
 msgstr "Retirer cet élève ?"
+
+#: src/apps/form.tsx
+msgid "Required"
+msgstr "Obligatoire"
+
+#: src/apps/timer.tsx
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#: src/content/ContentPanel.tsx
+msgid "Reset preview data"
+msgstr "Réinitialiser les données de l’aperçu"
 
 #: src/pages/ActivityEditor.tsx
 msgid "Resources and apps for the whole activity"
@@ -650,6 +828,10 @@ msgstr "Ressources et applications de toute l’activité"
 msgid "Resources and apps for this step"
 msgstr "Ressources et applications de cette étape"
 
+#: src/apps/timer.tsx
+msgid "Resume"
+msgstr "Reprendre"
+
 #: src/pages/Classes.tsx
 msgid "Retry"
 msgstr "Réessayer"
@@ -658,6 +840,10 @@ msgstr "Réessayer"
 msgid "Saving"
 msgstr "Enregistrement"
 
+#: src/apps/timer.tsx
+msgid "Seconds"
+msgstr "Secondes"
+
 #: src/pages/ActivityEditor.tsx
 msgid "Selected step"
 msgstr "Étape sélectionnée"
@@ -665,6 +851,14 @@ msgstr "Étape sélectionnée"
 #: src/auth/useErrorText.ts
 msgid "Server unreachable. Check the connection."
 msgstr "Serveur injoignable. Connexion à vérifier."
+
+#: src/apps/text.tsx
+msgid "Shared text"
+msgstr "Texte partagé"
+
+#: src/apps/form.tsx
+msgid "Short text"
+msgstr "Texte court"
 
 #: src/pages/ActivityEditor.tsx
 msgid "Show “{label}” to students"
@@ -707,13 +901,25 @@ msgstr "Se déconnecter"
 msgid "Sign-ups are closed. An invitation code from your school may be required."
 msgstr "Les inscriptions sont fermées. Un code d'invitation de votre établissement peut être nécessaire."
 
+#: src/apps/form.tsx
+msgid "Single choice"
+msgstr "Choix unique"
+
 #: src/auth/useErrorText.ts
 msgid "Something went wrong. Try again."
 msgstr "Une erreur est survenue. Nouvel essai à tenter."
 
+#: src/apps/timer.tsx
+msgid "Start"
+msgstr "Démarrer"
+
 #: src/pages/Gallery.tsx
 msgid "Status"
 msgstr "États"
+
+#: src/pages/ActivityEditor.tsx
+msgid "Step locked until a questionnaire is submitted"
+msgstr "Étape bloquée jusqu’à l’envoi d’un questionnaire"
 
 #: src/pages/Gallery.tsx
 msgid "Step name"
@@ -728,6 +934,10 @@ msgstr "Titre de l’étape"
 msgid "Steps"
 msgstr "Étapes"
 
+#: src/apps/kanban.tsx
+msgid "Sticky notes moved between columns (to do, in progress, done…)."
+msgstr "Des post-it déplacés entre des colonnes (à faire, en cours, terminé…)."
+
 #: src/pages/ClassDetail.tsx
 msgid "Student names"
 msgstr "Noms des élèves"
@@ -740,6 +950,14 @@ msgstr "Aperçu élève"
 msgid "Students"
 msgstr "Élèves"
 
+#: src/pages/ActivityEditor.tsx
+msgid "Students stay on this step until they have submitted the chosen questionnaire."
+msgstr "Les élèves restent sur cette étape tant qu’ils n’ont pas envoyé le questionnaire choisi."
+
+#: src/apps/form.tsx
+msgid "Submit"
+msgstr "Envoyer"
+
 #: src/pages/Gallery.tsx
 msgid "Syncing"
 msgstr "Synchronisation"
@@ -748,7 +966,7 @@ msgstr "Synchronisation"
 msgid "Templates"
 msgstr "Modèles"
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Text formatting"
 msgstr "Mise en forme du texte"
 
@@ -811,6 +1029,14 @@ msgstr "Ce fichier est trop gros (25 Mo au maximum)."
 msgid "This password is too common or easy to guess."
 msgstr "Ce mot de passe est trop courant ou facile à deviner."
 
+#: src/apps/form.tsx
+msgid "This question is required."
+msgstr "Cette question est obligatoire."
+
+#: src/apps/form.tsx
+msgid "This questionnaire has no question yet."
+msgstr "Ce questionnaire n’a pas encore de question."
+
 #: src/content/ContentPanel.tsx
 msgid "This type of app is not available in this version."
 msgstr "Ce type d’application n’est pas disponible dans cette version."
@@ -819,13 +1045,25 @@ msgstr "Ce type d’application n’est pas disponible dans cette version."
 msgid "This username is already taken."
 msgstr "Cet identifiant est déjà pris."
 
+#: src/apps/timer.tsx
+msgid "Time is up."
+msgstr "Le temps est écoulé."
+
 #: src/pages/Gallery.tsx
 msgid "Time left"
 msgstr "Temps restant"
 
+#: src/apps/timer.tsx
+msgid "Timer"
+msgstr "Minuteur"
+
 #: src/pages/Activities.tsx
 msgid "Title"
 msgstr "Titre"
+
+#: src/apps/kanban.tsx
+msgid "To do"
+msgstr "À faire"
 
 #: src/components/SortableTimeline.tsx
 msgid "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
@@ -838,6 +1076,10 @@ msgstr "Trop de requêtes. Nouvel essai possible dans un instant."
 #: src/pages/Gallery.tsx
 msgid "Unavailable"
 msgstr "Indisponible"
+
+#: src/apps/form.tsx
+msgid "Untitled question"
+msgstr "Question sans titre"
 
 #: src/pages/ActivityEditor.tsx
 msgid "Untitled step"
@@ -858,7 +1100,7 @@ msgstr "Visible par les élèves"
 msgid "Waiting for sync"
 msgstr "En attente de synchronisation"
 
-#: src/richtext/RichEditorImpl.tsx
+#: src/richtext/RichToolbar.tsx
 msgid "Web address"
 msgstr "Adresse web"
 

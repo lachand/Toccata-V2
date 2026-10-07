@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSession } from "../auth/session";
 import type { MasterContent } from "@toccata/schema";
 import { useWorkspace } from "./provider";
 import type { ActivityRow, SyncState } from "./workspace";
@@ -37,4 +38,11 @@ export function useSyncState(): SyncState {
     return () => s.unsubscribe();
   }, [ws]);
   return state;
+}
+
+/** Données d'exécution de l'aperçu d'une activité (instance locale, non répliquée). */
+export function usePreviewStore(activityId: string) {
+  const ws = useWorkspace();
+  const { user } = useSession();
+  return useMemo(() => (ws && user ? ws.previewStore(activityId, { id: user.id, role: user.role }) : null), [ws, user, activityId]);
 }

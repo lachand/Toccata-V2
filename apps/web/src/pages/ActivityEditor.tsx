@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { useSession } from "../auth/session";
-import { Button, Card, Content, Dialog, EmptyState, Field, IconButton, Switch, TextArea, TextInput, TopBar, type StepItem } from "@toccata/ui";
+import { Button, Card, Content, Dialog, EmptyState, Field, IconButton, NativeSelect, Switch, TextArea, TextInput, TopBar, type StepItem } from "@toccata/ui";
 import { ArrowLeft, ArrowRight, ListPlus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -10,7 +10,7 @@ import { RichEditor } from "../richtext/RichEditor";
 import { SortableTimeline } from "../components/SortableTimeline";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
-import { useContent } from "../data/hooks";
+import { useContent, usePreviewStore } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
 import type { Locale } from "../i18n";
 
@@ -23,7 +23,8 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { user } = useSession();
-  const store = useMemo(() => inertStore({ id: user?.id ?? "", role: "teacher" }), [user?.id]);
+  const preview = usePreviewStore(id);
+  const store = useMemo(() => preview ?? inertStore({ id: user?.id ?? "", role: "teacher" }), [preview, user?.id]);
 
   const steps = useMemo(() => [...(content?.steps ?? [])].sort((a, b) => (a.order < b.order ? -1 : a.order > b.order ? 1 : a.id < b.id ? -1 : 1)), [content]);
   const current = steps.find((s) => s.id === selected) ?? steps[0] ?? null;
@@ -97,6 +98,14 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
               <RichEditor label={t`Instructions`} value={current.instructions} onCommit={(html) => html !== current.instructions && void ws.patchStep(id, current.id, { instructions: html })} />
             </Field>
             <ContentPanel ws={ws} activityId={id} content={content} scope={{ type: "step", stepId: current.id }} heading={t`Resources and apps for this step`} store={store} />
+            {content.apps.some((a) => a.type === "form" && a.scope.type === "step" && a.scope.stepId === current.id) ? (
+              <Field label={t`Step locked until a questionnaire is submitted`} hint={t`Students stay on this step until they have submitted the chosen questionnaire.`}>
+                <NativeSelect value={current.blockedByAppId ?? ""} onChange={(e) => void ws.patchStep(id, current.id, { blockedByAppId: e.currentTarget.value || null })}>
+                  <option value="">{t`No lock`}</option>
+                  {content.apps.filter((a) => a.type === "form" && a.scope.type === "step" && a.scope.stepId === current.id).map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+                </NativeSelect>
+              </Field>
+            ) : null}
             <Switch label={t`Visible to students`} checked={!current.hidden} onCheckedChange={(v) => void ws.patchStep(id, current.id, { hidden: !v })} />
             <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
               <IconButton label={t`Move earlier`} disabled={index <= 0} onClick={() => void ws.moveStep(id, current.id, index - 1)}><ArrowLeft size={18} /></IconButton>

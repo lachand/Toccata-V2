@@ -118,4 +118,29 @@ describe("Workspace (RxDB hors ligne)", () => {
     const big = { size: 26 * 1024 * 1024, type: "video/mp4", arrayBuffer: async () => new ArrayBuffer(0) } as unknown as Blob;
     await expect(w.attachFile(id, big, "x.mp4", { type: "activity" })).rejects.toThrow("file_too_large");
   });
+
+  it("l'aperçu d'application écrit et relit des documents d'exécution locaux, puis les efface", async () => {
+    const { w, id, owner } = await make();
+    const store = w.previewStore(id, { id: owner, role: "teacher" });
+    const appId = newId();
+    const seen: number[] = [];
+    const stop = store.watch("kanbancard", appId, (docs) => seen.push(docs.length));
+    await store.put({ kind: "kanbancard", appId, columnId: "todo", title: "Carte", order: "a0" });
+    await store.put({ kind: "kanbancard", appId: newId(), columnId: "todo", title: "Autre app", order: "a0" });
+    await new Promise((r) => setTimeout(r, 50));
+    expect(seen.at(-1)).toBe(1); // seule la carte de cette application
+    await store.clear(appId);
+    await new Promise((r) => setTimeout(r, 50));
+    expect(seen.at(-1)).toBe(0);
+    stop();
+  });
+
+  it("corrige l'heure par le décalage mesuré avec le serveur", async () => {
+    const { w } = await make();
+    const skewed = Date.now() + 60_000;
+    const f = (async () => new Response(null, { status: 200, headers: { date: new Date(skewed).toUTCString() } })) as unknown as typeof fetch;
+    await w.startSync({ fetch: f, baseUrl: "/couch", replicateData: false });
+    await new Promise((r) => setTimeout(r, 30));
+    expect(Math.abs(w.serverNow() - skewed)).toBeLessThan(2_500);
+  });
 });

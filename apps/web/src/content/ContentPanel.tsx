@@ -2,7 +2,7 @@ import { useLingui } from "@lingui/react/macro";
 import type { AppDoc, MasterContent, ResourceDoc } from "@toccata/schema";
 import type { AppModule, AppType, InstanceStore } from "@toccata/apps-sdk";
 import { Button, IconButton, TextInput } from "@toccata/ui";
-import { ChevronDown, ChevronUp, FileText, Globe, Image as ImageIcon, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, FileText, Globe, Image as ImageIcon, Plus, RotateCcw, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { registry } from "../apps/registry";
 import { ConfirmDialog } from "../components/ConfirmDialog";
@@ -48,6 +48,11 @@ function AppBody({ app, ws, activityId, store }: { app: AppDoc; ws: Workspace; a
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
       {Editor ? <Editor app={app} onChange={save} /> : null}
       <Runtime app={app} store={store} />
+      {"clear" in store ? (
+        <div>
+          <Button variant="ghost" icon={<RotateCcw size={16} />} onClick={() => void (store as unknown as { clear(id: string): Promise<void> }).clear(app.id)}>{t`Reset preview data`}</Button>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -19,9 +19,11 @@
     "@lingui/core": "^6.9.0",
     "@lingui/react": "^6.9.0",
     "@scure/bip39": "^2.4.0",
+    "@tiptap/extension-collaboration": "^3.31.4",
     "@tiptap/pm": "^3.31.4",
     "@tiptap/react": "^3.31.4",
     "@tiptap/starter-kit": "^3.31.4",
+    "@tiptap/y-tiptap": "^3.0.9",
     "@toccata/apps-sdk": "workspace:*",
     "@toccata/schema": "workspace:*",
     "@toccata/ui": "workspace:*",
@@ -33,7 +35,8 @@
     "react-dom": "^19.3.0",
     "react-router": "^8.4.0",
     "rxdb": "^17.6.0",
-    "rxjs": "^7.8.2"
+    "rxjs": "^7.8.2",
+    "yjs": "^13.6.33"
   },
   "devDependencies": {
     "@babel/core": "^8.0.6",
