@@ -11,7 +11,7 @@ export const envelopeSchema = {
   primaryKey: "id",
   type: "object",
   properties: {
-    id: { type: "string", maxLength: 40 },
+    id: { type: "string", maxLength: 128 },
     kind: { type: "string", maxLength: 20 },
     updatedAt: { type: "number", minimum: 0, maximum: 1e15, multipleOf: 1 },
   },

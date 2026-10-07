@@ -52,12 +52,24 @@ msgstr ""
 msgid "200 characters at most"
 msgstr ""
 
+#: src/content/AddContentDialog.tsx
+msgid "25 MB at most."
+msgstr ""
+
 #: src/UpdatePrompt.tsx
 msgid "A new version is available."
 msgstr ""
 
+#: src/content/AddContentDialog.tsx
+msgid "A page to read or a video to watch."
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 msgid "A script is a sequence of steps. Add the first one."
+msgstr ""
+
+#: src/apps/external.tsx
+msgid "A web page or tool (collaborative document, simulator…) shown inside the activity."
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -72,6 +84,8 @@ msgstr ""
 msgid "Activity title"
 msgstr ""
 
+#: src/content/AddContentDialog.tsx
+#: src/content/ContentPanel.tsx
 #: src/pages/Gallery.tsx
 msgid "Add"
 msgstr ""
@@ -101,8 +115,25 @@ msgstr ""
 msgid "Add the first step"
 msgstr ""
 
+#: src/content/AddContentDialog.tsx
+msgid "Add to the whole activity"
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "Add to this step"
+msgstr ""
+
+#: src/apps/external.tsx
+#: src/content/AddContentDialog.tsx
+msgid "Address"
+msgstr ""
+
 #: src/pages/Signup.tsx
 msgid "Already have an account? Sign in"
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "An image, a PDF, an audio or video file, a document."
 msgstr ""
 
 #: src/richtext/RichEditorImpl.tsx
@@ -111,6 +142,10 @@ msgstr ""
 
 #: src/pages/Signup.tsx
 msgid "At least 12 characters."
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "Back"
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -141,6 +176,7 @@ msgstr ""
 msgid "Buttons"
 msgstr ""
 
+#: src/components/ConfirmDialog.tsx
 #: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
 #: src/pages/Gallery.tsx
@@ -153,6 +189,10 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Choose a file or paste a link."
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "Choose a file."
 msgstr ""
 
 #: src/pages/ClassDetail.tsx
@@ -168,6 +208,8 @@ msgstr ""
 msgid "Classes"
 msgstr ""
 
+#: src/components/ConfirmDialog.tsx
+#: src/content/AddContentDialog.tsx
 #: src/pages/Activities.tsx
 #: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
@@ -211,13 +253,23 @@ msgstr ""
 msgid "Create your first activity to get started."
 msgstr ""
 
+#: src/content/ContentPanel.tsx
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "Delete"
 msgstr ""
 
+#. placeholder {0}: item.doc.name
+#: src/content/ContentPanel.tsx
+msgid "Delete {0}"
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 msgid "Delete step"
+msgstr ""
+
+#: src/content/ContentPanel.tsx
+msgid "Delete this item?"
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -249,6 +301,10 @@ msgstr ""
 msgid "Done"
 msgstr ""
 
+#: src/content/ResourceView.tsx
+msgid "Download"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "Draft"
 msgstr ""
@@ -266,16 +322,22 @@ msgstr ""
 msgid "Edited {0}"
 msgstr ""
 
+#: src/apps/DisplayModeField.tsx
 #: src/pages/Gallery.tsx
 msgid "Embedded"
 msgstr ""
 
+#: src/content/AddContentDialog.tsx
 #: src/richtext/RichEditorImpl.tsx
 msgid "Enter an address starting with https://"
 msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Estimate"
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "File"
 msgstr ""
 
 #: src/pages/Classes.tsx
@@ -307,12 +369,25 @@ msgstr ""
 msgid "Hide “{label}” from students"
 msgstr ""
 
+#. placeholder {0}: item.doc.name
+#: src/content/ContentPanel.tsx
+msgid "Hide {0}"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Hide step {s}"
 msgstr ""
 
+#: src/apps/DisplayModeField.tsx
+msgid "How it opens"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "I've finished the step"
+msgstr ""
+
+#: src/apps/ExternalFrame.tsx
+msgid "If the page stays blank, the site does not allow being embedded."
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -329,6 +404,10 @@ msgstr ""
 
 #: src/pages/Signup.tsx
 msgid "Invitation code"
+msgstr ""
+
+#: src/content/ContentPanel.tsx
+msgid "It is removed for everyone. This cannot be undone."
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -348,10 +427,15 @@ msgstr ""
 msgid "Link"
 msgstr ""
 
+#: src/apps/DisplayModeField.tsx
+msgid "Link only"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Linked window"
 msgstr ""
 
+#: src/content/ResourceView.tsx
 #: src/pages/Activities.tsx
 msgid "Loading…"
 msgstr ""
@@ -382,6 +466,8 @@ msgstr ""
 msgid "Move of “{0}” cancelled."
 msgstr ""
 
+#: src/apps/external.tsx
+#: src/content/AddContentDialog.tsx
 #: src/richtext/RichEditorImpl.tsx
 msgid "Must start with https://"
 msgstr ""
@@ -389,6 +475,11 @@ msgstr ""
 #: src/components/Layout.tsx
 #: src/pages/Activities.tsx
 msgid "My activities"
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+#: src/content/ContentPanel.tsx
+msgid "Name"
 msgstr ""
 
 #: src/pages/Signup.tsx
@@ -419,6 +510,10 @@ msgstr ""
 msgid "New step"
 msgstr ""
 
+#: src/apps/DisplayModeField.tsx
+msgid "New window"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "No activity here yet"
 msgstr ""
@@ -441,6 +536,10 @@ msgstr ""
 
 #: src/auth/useErrorText.ts
 msgid "Not found."
+msgstr ""
+
+#: src/content/ContentPanel.tsx
+msgid "Nothing here yet."
 msgstr ""
 
 #: src/richtext/RichEditorImpl.tsx
@@ -471,6 +570,18 @@ msgstr ""
 
 #: src/pages/Classes.tsx
 msgid "Open"
+msgstr ""
+
+#: src/apps/ExternalFrame.tsx
+msgid "Open in a new tab"
+msgstr ""
+
+#: src/apps/ExternalFrame.tsx
+msgid "Open in a new window"
+msgstr ""
+
+#: src/content/ResourceView.tsx
+msgid "Open the PDF"
 msgstr ""
 
 #: src/components/CredentialsSheet.tsx
@@ -531,6 +642,14 @@ msgstr ""
 msgid "Remove this student?"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "Resources and apps for the whole activity"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Resources and apps for this step"
+msgstr ""
+
 #: src/pages/Classes.tsx
 msgid "Retry"
 msgstr ""
@@ -551,6 +670,11 @@ msgstr ""
 msgid "Show “{label}” to students"
 msgstr ""
 
+#. placeholder {0}: item.doc.name
+#: src/content/ContentPanel.tsx
+msgid "Show {0}"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Show step {s}"
 msgstr ""
@@ -565,6 +689,10 @@ msgstr ""
 
 #: src/pages/ActivityEditor.tsx
 msgid "Shown to students at the top of the step."
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "Shown to students. Optional."
 msgstr ""
 
 #: src/pages/Login.tsx
@@ -667,8 +795,24 @@ msgstr ""
 msgid "This activity is not on this device yet"
 msgstr ""
 
+#: src/apps/ExternalFrame.tsx
+msgid "This address is not valid. Only https:// addresses are allowed."
+msgstr ""
+
+#: src/content/ResourceView.tsx
+msgid "This file is not available offline yet. Open it once while connected."
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "This file is too large (25 MB at most)."
+msgstr ""
+
 #: src/auth/useErrorText.ts
 msgid "This password is too common or easy to guess."
+msgstr ""
+
+#: src/content/ContentPanel.tsx
+msgid "This type of app is not available in this version."
 msgstr ""
 
 #: src/auth/useErrorText.ts
@@ -716,6 +860,18 @@ msgstr ""
 
 #: src/richtext/RichEditorImpl.tsx
 msgid "Web address"
+msgstr ""
+
+#: src/apps/external.tsx
+msgid "Web app"
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "Web link"
+msgstr ""
+
+#: src/content/AddContentDialog.tsx
+msgid "What to add"
 msgstr ""
 
 #: src/pages/Activities.tsx

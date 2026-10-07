@@ -90,7 +90,19 @@ export const appDocSchema = z.discriminatedUnion("type", [
   z.object({ ...appBase, type: z.literal("external"), config: z.object({ url: httpsUrlSchema, display: displayModeSchema }) }),
 ]);
 
-export const masterDocSchema = z.union([activityDocSchema, stepDocSchema, resourceDocSchema, appDocSchema]);
+/** Enveloppe d'un fichier : le contenu est la pièce jointe native `blob` du même document (ADR 0004). */
+export const fileIdSchema = z.string().regex(/^file_[0-9a-f]{64}$/);
+export const fileDocSchema = z.object({
+  id: fileIdSchema,
+  kind: z.literal("file"),
+  authorId: idSchema,
+  mime: z.string().max(127),
+  size: z.number().int().nonnegative(),
+  createdAt: epoch,
+  updatedAt: epoch,
+});
+
+export const masterDocSchema = z.union([activityDocSchema, stepDocSchema, resourceDocSchema, appDocSchema, fileDocSchema]);
 
 /* ------------------------------------------------------------------ surcharges d'une instance */
 
@@ -244,6 +256,7 @@ export type ActivityDoc = z.infer<typeof activityDocSchema>;
 export type StepDoc = z.infer<typeof stepDocSchema>;
 export type ResourceDoc = z.infer<typeof resourceDocSchema>;
 export type AppDoc = z.infer<typeof appDocSchema>;
+export type FileDoc = z.infer<typeof fileDocSchema>;
 export type MasterDoc = z.infer<typeof masterDocSchema>;
 export type StepPatch = z.infer<typeof stepPatchSchema>;
 export type Overrides = z.infer<typeof overridesSchema>;

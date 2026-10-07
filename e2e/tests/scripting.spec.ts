@@ -103,9 +103,9 @@ test("réordonner au clavier (glisser-déposer accessible) et écrire une consig
   await a.page.getByRole("button", { name: "Rétrospective", exact: true }).click();
   const editor = a.page.getByRole("textbox", { name: "Consigne" });
   await editor.click();
-  await a.page.getByRole("button", { name: "Gras" }).click();
+  await a.page.keyboard.press("Control+b");
   await a.page.keyboard.type("Important");
-  await a.page.getByRole("button", { name: "Gras" }).click();
+  await a.page.keyboard.press("Control+b");
   await a.page.keyboard.type(" : lisez <script>alert(1)</script> bien.");
   await a.page.getByLabel("Titre de l’étape").click(); // sortie du champ : enregistrement
   await a.page.reload();
@@ -115,4 +115,51 @@ test("réordonner au clavier (glisser-déposer accessible) et écrire une consig
   await expect(again).toContainText("lisez");
   expect(await again.locator("script").count()).toBe(0);
   await a.context.close();
+});
+
+// Un petit PNG de 1×1 pixel (fichier réel, envoyé à CouchDB en pièce jointe native).
+const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+
+test("ressources : un lien, un fichier image et une application web ; le fichier arrive sur un autre appareil", async ({ browser }) => {
+  const a = await device(browser);
+  await signIn(a.page);
+  await a.page.getByRole("article", { name: "Atelier Agile" }).getByRole("link", { name: "Modifier" }).click();
+  const panel = a.page.getByRole("region", { name: "Ressources et applications de toute l’activité" });
+
+  await panel.getByRole("button", { name: "Ajouter", exact: true }).click();
+  let dialog = a.page.getByRole("dialog");
+  await dialog.getByRole("button", { name: /Lien web/ }).click();
+  await dialog.getByLabel("Adresse").fill("https://fr.wikipedia.org/wiki/Accueil");
+  await dialog.getByLabel("Nom").fill("Wikipédia");
+  await dialog.getByRole("button", { name: "Ajouter", exact: true }).click();
+  await expect(panel.locator('input[value="Wikipédia"]')).toBeVisible();
+
+  await panel.getByRole("button", { name: "Ajouter", exact: true }).click();
+  dialog = a.page.getByRole("dialog");
+  await dialog.getByRole("button", { name: /Fichier/ }).click();
+  await dialog.locator('input[type="file"]').setInputFiles({ name: "pixel.png", mimeType: "image/png", buffer: PNG });
+  await dialog.getByRole("button", { name: "Ajouter", exact: true }).click();
+  await expect(panel.locator('input[value="pixel.png"]')).toBeVisible();
+  await panel.getByRole("button", { name: "Afficher pixel.png" }).click();
+  await expect(panel.getByRole("img", { name: "pixel.png" })).toBeVisible();
+
+  await panel.getByRole("button", { name: "Ajouter", exact: true }).click();
+  dialog = a.page.getByRole("dialog");
+  await dialog.getByRole("button", { name: /Application web/ }).click();
+  await dialog.getByLabel("Adresse").fill("https://framacalc.org/abc");
+  await dialog.getByRole("button", { name: "Ajouter", exact: true }).click();
+  await expect(panel.locator('input[value="Application web"]')).toBeVisible();
+
+  // autre appareil : le document de ressource arrive par la réplication, le contenu du fichier par la pièce jointe CouchDB
+  const b = await device(browser);
+  await signIn(b.page);
+  await b.page.getByRole("article", { name: "Atelier Agile" }).getByRole("link", { name: "Modifier" }).click();
+  const panelB = b.page.getByRole("region", { name: "Ressources et applications de toute l’activité" });
+  await expect(panelB.locator('input[value="pixel.png"]')).toBeVisible({ timeout: 30_000 });
+  await panelB.getByRole("button", { name: "Afficher pixel.png" }).click();
+  const img = panelB.getByRole("img", { name: "pixel.png" });
+  await expect(img).toBeVisible({ timeout: 30_000 });
+  expect(await img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBe(1);
+  await a.context.close();
+  await b.context.close();
 });

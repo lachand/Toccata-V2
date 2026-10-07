@@ -10,10 +10,14 @@ import {
   newId,
   orderBetween,
   type ActivityDoc,
+  type AppDoc,
   type MasterContent,
   type MasterDoc,
+  type ResourceDoc,
   type StepDoc,
 } from "@toccata/schema";
+import { memoryBlobStore, type BlobStore } from "./blobs";
+import { MAX_FILE_BYTES, downloadFile, sha256Hex, uploadFile } from "./files";
 
 type Col = RxCollection<Record<string, unknown>>;
 type Replication = { cancel: () => Promise<unknown>; error$: Observable<unknown> };
@@ -23,6 +27,8 @@ export type SyncOptions = {
   fetch: typeof fetch;
   /** Adresse de CouchDB vue du navigateur, sans barre finale (ex. `/couch`). */
   baseUrl: string;
+  /** `false` : n'envoyer que les fichiers en file, sans répliquer les documents (tests). */
+  replicateData?: boolean;
 };
 
 export type SyncState = { running: boolean; failing: boolean };
@@ -30,9 +36,21 @@ export type SyncState = { running: boolean; failing: boolean };
 /** Une ligne de la liste « Mes activités ». `title` est `null` tant que le document d'activité n'est pas arrivé. */
 export type ActivityRow = { id: string; title: string | null; description: string; stepCount: number; hiddenCount: number; updatedAt: number };
 
-export type WorkspaceOptions = { userId: string; storage: RxStorage<unknown, unknown>; multiInstance?: boolean; now?: () => number };
+export type WorkspaceOptions = { userId: string; storage: RxStorage<unknown, unknown>; multiInstance?: boolean; now?: () => number; blobs?: BlobStore };
+
+/** Un document sans les champs que `Workspace` renseigne lui-même. */
+type Fresh<T> = T extends unknown ? Omit<T, "id" | "kind" | "createdAt" | "updatedAt"> : never;
+export type NewResource = Fresh<ResourceDoc>;
+export type NewApp = Fresh<AppDoc>;
+
+export class FileTooLargeError extends Error {
+  constructor() {
+    super("file_too_large");
+  }
+}
 
 const REGISTRY = "registry";
+const UPLOADS = "uploads";
 const gates = new Map<string, Promise<unknown>>();
 
 /**
@@ -46,12 +64,13 @@ export class Workspace {
   private replications = new Map<string, Replication>();
   private syncOptions: SyncOptions | null = null;
 
-  private constructor(private db: RxDatabase, private registry: Col, private now: () => number) {}
+  private constructor(private db: RxDatabase, private registry: Col, private uploads: Col, private now: () => number, private blobs: BlobStore, private userId: string) {}
+  private urls = new Map<string, string>();
 
   static async open(o: WorkspaceOptions): Promise<Workspace> {
     const db = await createRxDatabase({ name: `toccata_${o.userId}`.toLowerCase(), storage: o.storage as RxStorage<never, never>, multiInstance: o.multiInstance ?? true });
-    const cols = await db.addCollections({ [REGISTRY]: { schema: envelopeSchema as never } });
-    return new Workspace(db, cols[REGISTRY] as unknown as Col, o.now ?? Date.now);
+    const cols = await db.addCollections({ [REGISTRY]: { schema: envelopeSchema as never }, [UPLOADS]: { schema: envelopeSchema as never } });
+    return new Workspace(db, cols[REGISTRY] as unknown as Col, cols[UPLOADS] as unknown as Col, o.now ?? Date.now, o.blobs ?? memoryBlobStore(), o.userId);
   }
 
   /**
@@ -65,6 +84,8 @@ export class Workspace {
   }
 
   async close(): Promise<void> {
+    for (const u of this.urls.values()) URL.revokeObjectURL(u);
+    this.urls.clear();
     await this.stopSync();
     await this.db.close();
   }
@@ -164,9 +185,109 @@ export class Workspace {
     await this.patch(activityId, stepId, { order: orderBetween(others[i - 1]?.order ?? null, others[i]?.order ?? null) });
   }
 
+  /** Supprime l'étape et ce qui ne vit que par elle (ressources et applications à sa portée). */
   async removeStep(activityId: string, stepId: string): Promise<void> {
-    const doc = await (await this.master(activityId)).findOne(stepId).exec();
-    await doc?.remove();
+    const col = await this.master(activityId);
+    const rows = await col.find().exec();
+    const doomed = rows.filter((r) => {
+      const d = r.toJSON() as { id: string; scope?: { type?: string; stepId?: string } };
+      return d.id === stepId || (d.scope?.type === "step" && d.scope.stepId === stepId);
+    });
+    await Promise.all(doomed.map((r) => r.remove()));
+  }
+
+  /* ---------------------------------------------------------------- ressources et applications */
+
+  async addResource(activityId: string, input: NewResource): Promise<string> {
+    const t = this.now();
+    const id = newId(t);
+    await (await this.master(activityId)).insert({ ...input, id, kind: "resource", createdAt: t, updatedAt: t } as unknown as Record<string, unknown>);
+    return id;
+  }
+
+  async removeResource(activityId: string, resourceId: string): Promise<void> {
+    await (await (await this.master(activityId)).findOne(resourceId).exec())?.remove();
+  }
+
+  async renameResource(activityId: string, resourceId: string, name: string): Promise<void> {
+    await this.patch(activityId, resourceId, { name });
+  }
+
+  async addApp(activityId: string, input: NewApp): Promise<string> {
+    const t = this.now();
+    const id = newId(t);
+    await (await this.master(activityId)).insert({ ...input, id, kind: "app", createdAt: t, updatedAt: t } as unknown as Record<string, unknown>);
+    return id;
+  }
+
+  async removeApp(activityId: string, appId: string): Promise<void> {
+    await (await (await this.master(activityId)).findOne(appId).exec())?.remove();
+  }
+
+  /** `config` remplace la configuration entière (c'est l'éditeur de l'application qui la produit, déjà complète). */
+  async patchApp(activityId: string, appId: string, patch: { name?: string; config?: AppDoc["config"] }): Promise<void> {
+    await this.patch(activityId, appId, patch);
+  }
+
+  /* ---------------------------------------------------------------- fichiers */
+
+  /**
+   * Ajoute un fichier à l'activité : le contenu est gardé localement tout de suite (hors ligne possible) et mis en
+   * file d'envoi ; la ressource est écrite avec son empreinte. L'envoi se fait dès qu'on est synchronisé.
+   */
+  async attachFile(activityId: string, file: Blob, name: string, scope: ResourceDoc["scope"]): Promise<string> {
+    if (file.size > MAX_FILE_BYTES) throw new FileTooLargeError();
+    const fileId = `file_${await sha256Hex(file)}`;
+    await this.blobs.put(fileId, file);
+    await this.uploads.upsert({ id: `${activityId}:${fileId}`, kind: "upload", updatedAt: this.now(), activityId, fileId });
+    const resourceId = await this.addResource(activityId, { scope, name, source: { type: "file", fileId, mime: file.type || "application/octet-stream", size: file.size } } as NewResource);
+    void this.flushUploads();
+    return resourceId;
+  }
+
+  /** Envoie les fichiers en attente (appelé après un ajout et à chaque début de synchronisation). Les échecs sont réessayés plus tard. */
+  flushUploads(): Promise<void> {
+    // à vol unique : deux déclencheurs rapprochés (ajout, début de synchronisation) n'envoient pas deux fois le même fichier
+    this.flushing = this.flushing.then(() => this.flushOnce());
+    return this.flushing;
+  }
+  private flushing: Promise<void> = Promise.resolve();
+  private async flushOnce(): Promise<void> {
+    const o = this.syncOptions;
+    if (!o) return;
+    for (const row of await this.uploads.find().exec()) {
+      const u = row.toJSON() as unknown as { activityId: string; fileId: string };
+      const blob = await this.blobs.get(u.fileId);
+      try {
+        if (blob) await uploadFile(o.fetch, o.baseUrl, masterDbName(u.activityId), u.fileId, blob, this.userId, this.now());
+        await row.remove();
+      } catch {
+        /* réseau ou droits : le fichier reste en file */
+      }
+    }
+  }
+
+  pendingUploads$(): Observable<number> {
+    return this.uploads.find().$.pipe(map((r) => r.length));
+  }
+
+  /** Adresse locale (`blob:`) d'un fichier ; le télécharge d'abord si on ne l'a pas encore. `null` : indisponible (hors ligne et jamais ouvert). */
+  async fileUrl(activityId: string, fileId: string): Promise<string | null> {
+    const known = this.urls.get(fileId);
+    if (known) return known;
+    let blob = await this.blobs.get(fileId);
+    if (!blob && this.syncOptions) {
+      try {
+        blob = await downloadFile(this.syncOptions.fetch, this.syncOptions.baseUrl, masterDbName(activityId), fileId);
+        await this.blobs.put(fileId, blob);
+      } catch {
+        return null;
+      }
+    }
+    if (!blob) return null;
+    const url = URL.createObjectURL(blob);
+    this.urls.set(fileId, url);
+    return url;
   }
 
   private async patch(activityId: string, id: string, patch: Record<string, unknown>): Promise<void> {
@@ -184,7 +305,7 @@ export class Workspace {
 
   private replicate(name: string, col: Col): void {
     const o = this.syncOptions;
-    if (!o || this.replications.has(name)) return;
+    if (!o || o.replicateData === false || this.replications.has(name)) return;
     const r = replicateCouchDB({
       replicationIdentifier: `toccata-${name}`,
       collection: col as never,
@@ -203,6 +324,7 @@ export class Workspace {
     this.syncOptions = o;
     this.syncState$.next({ running: true, failing: false });
     for (const [name, c] of this.cols) this.replicate(name, await c);
+    void this.flushUploads();
   }
 
   async stopSync(): Promise<void> {

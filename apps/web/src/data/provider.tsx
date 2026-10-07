@@ -23,7 +23,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    const { ready, release } = Workspace.acquire({ userId, storage: dataConfig.storage(), multiInstance: dataConfig.multiInstance });
+    const { ready, release } = Workspace.acquire({ userId, storage: dataConfig.storage(), multiInstance: dataConfig.multiInstance, blobs: dataConfig.blobs() });
     void ready.then(async (w) => {
       await w.openKnown();
       if (!cancelled) setWs(w);

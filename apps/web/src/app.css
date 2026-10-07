@@ -23,3 +23,13 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
 .tc-rich ul, .tc-rich ol { margin-block: 0 var(--space-2); padding-inline-start: var(--space-5); }
 .tc-rich blockquote { margin-inline: 0; padding-inline-start: var(--space-3); border-inline-start: 3px solid var(--accent); color: var(--muted); }
 .tc-rich a { color: var(--accent-ink); }
+
+/* Assistant d'ajout */
+.tc-tiles { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-2); }
+.tc-tile { display: flex; align-items: center; gap: var(--space-3); inline-size: 100%; min-block-size: var(--hit); padding: var(--space-3) var(--space-4); border: 1px solid var(--line-strong); border-radius: var(--radius); background: var(--surface); color: inherit; font: inherit; cursor: pointer; }
+.tc-tile:hover { border-color: var(--accent); }
+.tc-tile:focus-visible { outline: none; box-shadow: var(--focus); }
+.tc-tile__icon { display: inline-grid; place-items: center; inline-size: 40px; block-size: 40px; border-radius: var(--radius-sm); background: var(--accent-soft); color: var(--accent-ink); flex: none; }
+.tc-item { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-3) var(--space-4); border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.tc-item__head { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.tc-item__head .tc-input { flex: 1 1 12rem; min-inline-size: 0; }

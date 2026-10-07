@@ -1,8 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
+import { useSession } from "../auth/session";
 import { Button, Card, Content, Dialog, EmptyState, Field, IconButton, Switch, TextArea, TextInput, TopBar, type StepItem } from "@toccata/ui";
 import { ArrowLeft, ArrowRight, ListPlus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
+import { inertStore } from "../apps/inertStore";
+import { ContentPanel } from "../content/ContentPanel";
 import { RichEditor } from "../richtext/RichEditor";
 import { SortableTimeline } from "../components/SortableTimeline";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
@@ -19,6 +22,8 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
   const content = useContent(id);
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const { user } = useSession();
+  const store = useMemo(() => inertStore({ id: user?.id ?? "", role: "teacher" }), [user?.id]);
 
   const steps = useMemo(() => [...(content?.steps ?? [])].sort((a, b) => (a.order < b.order ? -1 : a.order > b.order ? 1 : a.id < b.id ? -1 : 1)), [content]);
   const current = steps.find((s) => s.id === selected) ?? steps[0] ?? null;
@@ -61,6 +66,7 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
           <Field label={t`Description`}>
             <TextArea key={`desc-${id}`} defaultValue={content.activity.description} rows={3} maxLength={10_000} onBlur={(e) => void ws.patchActivity(id, { description: e.currentTarget.value })} />
           </Field>
+          <ContentPanel ws={ws} activityId={id} content={content} scope={{ type: "activity" }} heading={t`Resources and apps for the whole activity`} store={store} />
         </Card>
 
         <SortableTimeline
@@ -90,6 +96,7 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
             <Field label={t`Instructions`} hint={t`Shown to students at the top of the step.`}>
               <RichEditor label={t`Instructions`} value={current.instructions} onCommit={(html) => html !== current.instructions && void ws.patchStep(id, current.id, { instructions: html })} />
             </Field>
+            <ContentPanel ws={ws} activityId={id} content={content} scope={{ type: "step", stepId: current.id }} heading={t`Resources and apps for this step`} store={store} />
             <Switch label={t`Visible to students`} checked={!current.hidden} onCheckedChange={(v) => void ws.patchStep(id, current.id, { hidden: !v })} />
             <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
               <IconButton label={t`Move earlier`} disabled={index <= 0} onClick={() => void ws.moveStep(id, current.id, index - 1)}><ArrowLeft size={18} /></IconButton>
