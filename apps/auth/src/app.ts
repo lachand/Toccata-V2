@@ -250,6 +250,12 @@ export function createApp(deps: Deps) {
     return c.body(null, 204);
   });
 
+  /** Les activités auxquelles la personne est inscrite (élève) : relu à chaque appel, donc à jour après un ajout ou un retrait. */
+  app.get("/me/memberships", async (c) => {
+    const user = await authenticate(c);
+    return c.json(user.memberships.map((m) => ({ activityId: m.activityId, instanceId: m.instanceId })));
+  });
+
   app.get("/auth/me", async (c) => c.json(publicUser(await authenticate(c))));
 
   /* ------------------------------------------------------------------ classes (enseignant) */
@@ -358,7 +364,14 @@ export function createApp(deps: Deps) {
   app.get("/activities", async (c) => {
     const teacher = await authenticate(c, "teacher");
     const list = await accounts.listActivities(teacher.id);
-    return c.json(list.map((a) => ({ id: a.id, instanceIds: a.instanceIds })));
+    const withInstances = await Promise.all(
+      list.map(async (a) => ({
+        id: a.id,
+        instanceIds: a.instanceIds,
+        instances: (await Promise.all(a.instanceIds.map((id) => accounts.getInstance(id)))).filter((i): i is NonNullable<typeof i> => !!i).map((i) => ({ id: i.id, memberIds: i.memberIds })),
+      })),
+    );
+    return c.json(withInstances);
   });
 
   const ownActivity = async (teacher: UserDoc, id: string) => {

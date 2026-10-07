@@ -187,7 +187,7 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     expect(ok.status).toBe(201);
     ctx.track(ok.json.dbName);
     expect((await ctx.call("PUT", `/instances/${ok.json.id}/members`, { token: b.token, body: { memberIds: [] } })).status).toBe(404);
-    expect((await ctx.call("GET", "/activities", { token: a.token })).json).toEqual([{ id: act.id, instanceIds: [ok.json.id] }]);
+    expect((await ctx.call("GET", "/activities", { token: a.token })).json).toEqual([{ id: act.id, instanceIds: [ok.json.id], instances: [{ id: ok.json.id, memberIds: [mine!.id] }] }]);
     expect((await ctx.call("GET", "/activities", { token: b.token })).json).toEqual([]);
   });
 
@@ -227,5 +227,35 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     // un compte créé avant l'existence de la base la reçoit à la connexion (idempotent)
     expect((await ctx.login("access.notes.a", "Tb9#kLm2-vq8Zr!xW")).status).toBe(200);
     expect((await A(`${db}/n1`)).status).toBe(200);
+  });
+
+  it("un élève voit ses inscriptions, mais ne peut ni réécrire la définition de l'instance ni usurper un état de participant", async () => {
+    const a = await ctx.signupTeacher("access.inst");
+    const { students: [s1, s2] } = await ctx.makeClass(a.token, ["Alice Inst", "Bob Inst"]);
+    const act = (await ctx.call("POST", "/activities", { token: a.token })).json;
+    ctx.track(act.dbName);
+    const inst = (await ctx.call("POST", `/activities/${act.id}/instances`, { token: a.token, body: { memberIds: [s1!.id, s2!.id] } })).json;
+    ctx.track(inst.dbName);
+    const tok1 = (await ctx.login(s1!.username, s1!.passphrase)).json.accessToken as string;
+    const tok2 = (await ctx.login(s2!.username, s2!.passphrase)).json.accessToken as string;
+
+    expect((await ctx.call("GET", "/me/memberships", { token: tok1 })).json).toEqual([{ activityId: act.id, instanceId: inst.id }]);
+    expect((await ctx.call("GET", "/me/memberships", { token: a.token })).json).toEqual([]);
+    expect((await ctx.call("GET", "/me/memberships")).status).toBe(401);
+
+    const [T, S1, S2] = [asUser(a.token), asUser(tok1), asUser(tok2)];
+    const put = (u: typeof T, id: string, doc: object) => u(`${inst.dbName}/${id}`, { method: "PUT", body: JSON.stringify(doc) });
+    const def = { kind: "instance", authorId: a.id, masterId: act.id, name: "Groupe", memberIds: [s1!.id, s2!.id], linked: true, overrides: {} };
+    expect((await put(T, "def", def)).status).toBe(201);
+    // l'élève ne peut ni créer une fausse définition (même signée de son nom), ni modifier ou supprimer la vraie
+    expect((await put(S1, "fake", { ...def, authorId: s1!.id, linked: false })).status).toBe(403);
+    const rev = ((await (await S1(`${inst.dbName}/def`)).json()) as { _rev: string })._rev;
+    expect((await put(S1, "def", { ...def, _rev: rev, name: "Piraté" })).status).toBe(403);
+    expect((await S1(`${inst.dbName}/def?rev=${rev}`, { method: "DELETE" })).status).toBe(403);
+
+    // état de participant : à son propre nom seulement
+    expect((await put(S2, s1!.id, { kind: "participant", authorId: s2!.id, userId: s1!.id })).status).toBe(403); // place déjà « réservée » à s1
+    expect((await put(S1, s1!.id, { kind: "participant", authorId: s1!.id, userId: s1!.id })).status).toBe(201);
+    expect((await put(S1, s2!.id, { kind: "participant", authorId: s1!.id, userId: s2!.id })).status).toBe(403);
   });
 });
