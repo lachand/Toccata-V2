@@ -61,8 +61,8 @@ export function stubApi(routes: Record<string, Handler>) {
   return calls;
 }
 
-export const teacher = { id: "t1", role: "teacher" as const, username: "marie", displayName: "Marie Durand", locale: "fr" as const };
-export const student = { id: "s1", role: "student" as const, username: "lina.a", displayName: "Lina Aubert", locale: "fr" as const };
+export const teacher = { id: "0t0t0t0t0t0t0t0t0t0t0t", role: "teacher" as const, username: "marie", displayName: "Marie Durand", locale: "fr" as const };
+export const student = { id: "0s0s0s0s0s0s0s0s0s0s0s", role: "student" as const, username: "lina.a", displayName: "Lina Aubert", locale: "fr" as const };
 export const tokenFor = (user: typeof teacher | typeof student) => ({ status: 200, json: { accessToken: `tok-${user.id}`, expiresIn: 900, user } });
 
 import { session } from "./auth/session";

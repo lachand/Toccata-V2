@@ -53,3 +53,6 @@ export function findInstanceDoc(docs: readonly InstanceScopedDoc[]): InstanceDoc
   const all = docs.filter((d): d is InstanceDoc => instanceDocSchema.safeParse(d).success);
   return all.sort((a, b) => b.updatedAt - a.updatedAt || (a.id < b.id ? -1 : 1))[0] ?? null;
 }
+
+/** Clé d'ordre entre deux voisines (`null` = bord de la liste). Insertion sans renumérotation (indexation fractionnaire). */
+export { generateKeyBetween as orderBetween } from "fractional-indexing";

@@ -216,7 +216,7 @@ describe("classes", () => {
     await userEvent.click(screen.getByRole("button", { name: "Create class" }));
     expect(await screen.findByRole("heading", { level: 1, name: "4e B" })).toBeInTheDocument();
     expect(calls.find((c) => c.key === "POST /api/classes")!.body).toEqual({ name: "4e B" });
-    expect(calls.find((c) => c.key === "POST /api/classes")!.headers.get("authorization")).toBe("Bearer tok-t1");
+    expect(calls.find((c) => c.key === "POST /api/classes")!.headers.get("authorization")).toBe("Bearer tok-0t0t0t0t0t0t0t0t0t0t0t");
   });
 
   it("propose de réessayer quand le serveur est injoignable", async () => {

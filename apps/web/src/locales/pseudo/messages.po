@@ -15,21 +15,20 @@ msgstr ""
 msgid "{hidden, plural, one {# other person} other {# other people}}"
 msgstr ""
 
+#: src/pages/Activities.tsx
+msgid "{hiddenCount, plural, one {# hidden} other {# hidden}}"
+msgstr ""
+
 #: src/auth/useErrorText.ts
 msgid "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
 msgstr ""
 
-#: src/pages/Activities.tsx
 #: src/pages/Gallery.tsx
 msgid "{pendingCount, plural, one {# change waiting to sync} other {# changes waiting to sync}}"
 msgstr ""
 
 #: src/pages/Activities.tsx
 msgid "{stepCount, plural, one {# step} other {# steps}}"
-msgstr ""
-
-#: src/pages/Activities.tsx
-msgid "{studentCount, plural, one {# student} other {# students}}"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -40,8 +39,20 @@ msgstr ""
 msgid "A new version is available."
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "A script is a sequence of steps. Add the first one."
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Activity"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "Activity name"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Activity title"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -52,6 +63,7 @@ msgstr ""
 msgid "Add a resource"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "Add a step"
 msgstr ""
@@ -64,8 +76,8 @@ msgstr ""
 msgid "Add students"
 msgstr ""
 
-#: src/pages/Activities.tsx
-msgid "All"
+#: src/pages/ActivityEditor.tsx
+msgid "Add the first step"
 msgstr ""
 
 #: src/pages/Signup.tsx
@@ -74,6 +86,10 @@ msgstr ""
 
 #: src/pages/Signup.tsx
 msgid "At least 12 characters."
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Back to activities"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -92,6 +108,7 @@ msgstr ""
 msgid "Buttons"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
 #: src/pages/Gallery.tsx
 msgid "Cancel"
@@ -118,6 +135,8 @@ msgstr ""
 msgid "Classes"
 msgstr ""
 
+#: src/pages/Activities.tsx
+#: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
 #: src/pages/Classes.tsx
 #: src/pages/Gallery.tsx
@@ -130,7 +149,7 @@ msgid "Components"
 msgstr ""
 
 #: src/pages/Activities.tsx
-msgid "Copy to my activities"
+msgid "Create"
 msgstr ""
 
 #: src/pages/Classes.tsx
@@ -158,8 +177,21 @@ msgstr ""
 msgid "Create your first activity to get started."
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "Delete"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Delete step"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Delete this step?"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Description"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -174,6 +206,7 @@ msgstr ""
 msgid "Display mode"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "done"
 msgstr ""
@@ -187,11 +220,12 @@ msgid "Draft"
 msgstr ""
 
 #: src/pages/Activities.tsx
-msgid "Drafts"
+msgid "Edit"
 msgstr ""
 
+#. placeholder {0}: i18n.date(new Date(a.updatedAt), { dateStyle: "medium", timeStyle: "short" })
 #: src/pages/Activities.tsx
-msgid "Edit"
+msgid "Edited {0}"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -200,14 +234,6 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Estimate"
-msgstr ""
-
-#: src/pages/Activities.tsx
-msgid "Example data"
-msgstr ""
-
-#: src/pages/Activities.tsx
-msgid "Filter activities"
 msgstr ""
 
 #: src/pages/Classes.tsx
@@ -226,8 +252,13 @@ msgstr ""
 msgid "Hand out"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "hidden from students"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Hide “{label}” from students"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -238,29 +269,28 @@ msgstr ""
 msgid "I've finished the step"
 msgstr ""
 
-#: src/pages/Activities.tsx
 #: src/pages/Gallery.tsx
 msgid "In progress"
-msgstr ""
-
-#: src/pages/Activities.tsx
-msgid "In progress · step {current} of {total}"
 msgstr ""
 
 #: src/auth/useErrorText.ts
 msgid "Incorrect username or password."
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "Instructions"
+msgstr ""
+
 #: src/pages/Signup.tsx
 msgid "Invitation code"
 msgstr ""
 
-#: src/components/LocaleSwitcher.tsx
-msgid "Language"
+#: src/pages/ActivityEditor.tsx
+msgid "It will appear as soon as the connection allows it to sync."
 msgstr ""
 
-#: src/pages/Activities.tsx
-msgid "Last session: <0>{when}</0>"
+#: src/components/LocaleSwitcher.tsx
+msgid "Language"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -271,6 +301,11 @@ msgstr ""
 msgid "Linked window"
 msgstr ""
 
+#: src/pages/Activities.tsx
+msgid "Loading…"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "locked"
 msgstr ""
@@ -281,6 +316,14 @@ msgstr ""
 
 #: src/components/Layout.tsx
 msgid "Main navigation"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Move earlier"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Move later"
 msgstr ""
 
 #: src/components/Layout.tsx
@@ -312,6 +355,10 @@ msgstr ""
 msgid "New passphrase for {name}"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "New step"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "No activity here yet"
 msgstr ""
@@ -322,6 +369,10 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "No resource yet"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "No step yet"
 msgstr ""
 
 #: src/pages/ClassDetail.tsx
@@ -407,10 +458,6 @@ msgstr ""
 msgid "Remove this student?"
 msgstr ""
 
-#: src/pages/Activities.tsx
-msgid "Resume"
-msgstr ""
-
 #: src/pages/Classes.tsx
 msgid "Retry"
 msgstr ""
@@ -419,12 +466,16 @@ msgstr ""
 msgid "Saving"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "Selected step"
+msgstr ""
+
 #: src/auth/useErrorText.ts
 msgid "Server unreachable. Check the connection."
 msgstr ""
 
-#: src/pages/Activities.tsx
-msgid "Shared templates"
+#: src/pages/ActivityEditor.tsx
+msgid "Show “{label}” to students"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -437,6 +488,10 @@ msgstr ""
 
 #: src/components/CredentialsSheet.tsx
 msgid "Shown only once"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Shown to students at the top of the step."
 msgstr ""
 
 #: src/pages/Login.tsx
@@ -463,6 +518,11 @@ msgstr ""
 msgid "Step name"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "Step title"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "Steps"
 msgstr ""
@@ -481,10 +541,6 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Syncing"
-msgstr ""
-
-#: src/pages/Activities.tsx
-msgid "Template"
 msgstr ""
 
 #: src/components/Layout.tsx
@@ -511,6 +567,10 @@ msgstr ""
 msgid "The password must not contain the username or the displayed name."
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "The step and its content are removed for everyone. This cannot be undone."
+msgstr ""
+
 #. placeholder {0}: hint.typed
 #: src/pages/Login.tsx
 msgid "The word “{0}” is not in the list. Check it, then sign in again."
@@ -526,6 +586,10 @@ msgstr ""
 msgid "This action is not allowed."
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "This activity is not on this device yet"
+msgstr ""
+
 #: src/auth/useErrorText.ts
 msgid "This password is too common or easy to guess."
 msgstr ""
@@ -538,6 +602,10 @@ msgstr ""
 msgid "Time left"
 msgstr ""
 
+#: src/pages/Activities.tsx
+msgid "Title"
+msgstr ""
+
 #: src/auth/useErrorText.ts
 msgid "Too many requests. Try again in a moment."
 msgstr ""
@@ -546,12 +614,25 @@ msgstr ""
 msgid "Unavailable"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "Untitled step"
+msgstr ""
+
 #: src/components/CredentialsSheet.tsx
 #: src/pages/Login.tsx
 #: src/pages/Signup.tsx
 msgid "Username"
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 msgid "Visible to students"
+msgstr ""
+
+#: src/pages/Activities.tsx
+msgid "Waiting for sync"
+msgstr ""
+
+#: src/pages/Activities.tsx
+msgid "Your teacher will share activities here."
 msgstr ""

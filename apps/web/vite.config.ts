@@ -6,7 +6,11 @@ import { defineConfig } from "vitest/config";
 
 // L'API (service apps/auth) est servie sous /api : le proxy évite toute requête inter-origines (donc tout CORS) et
 // laisse le cookie de rafraîchissement sur la même origine que l'interface.
-const api = { "/api": { target: process.env["AUTH_URL"] ?? "http://127.0.0.1:8787", changeOrigin: false } };
+const api = {
+  "/api": { target: process.env["AUTH_URL"] ?? "http://127.0.0.1:8787", changeOrigin: false },
+  // CouchDB (réplication RxDB) : même origine que l'interface, donc pas de CORS ; le préfixe /couch est retiré.
+  "/couch": { target: process.env["COUCHDB_URL"] ?? "http://127.0.0.1:5984", changeOrigin: true, rewrite: (p: string) => p.replace(/^\/couch/, "") },
+};
 
 export default defineConfig({
   server: { proxy: api },
@@ -38,7 +42,7 @@ export default defineConfig({
         // Coque, polices et catalogues de langues (chunks `messages-*.js`) : tout est précaché, donc disponible hors ligne.
         globPatterns: ["**/*.{js,css,html,svg,png,woff2,webmanifest}"],
         navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/couch\//],
         cleanupOutdatedCaches: true,
       },
     }),

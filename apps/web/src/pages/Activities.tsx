@@ -1,84 +1,86 @@
 import { plural } from "@lingui/core/macro";
-import { Trans, useLingui } from "@lingui/react/macro";
-import { Button, Card, Content, EmptyState, Pill, Segmented, TopBar } from "@toccata/ui";
+import { useLingui } from "@lingui/react/macro";
+import { Button, Card, Content, Dialog, EmptyState, Field, Pill, TextInput, TopBar } from "@toccata/ui";
 import { BookPlus, Plus } from "lucide-react";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
+import { Link, useNavigate } from "react-router";
+import { activitiesApi } from "../auth/api";
+import { session, useSession } from "../auth/session";
+import { useErrorText } from "../auth/useErrorText";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
+import { useActivities } from "../data/hooks";
+import { useWorkspace } from "../data/provider";
 import type { Locale } from "../i18n";
-
-type Kind = "running" | "draft" | "template";
-type Sample = { id: string; title: string; kind: Kind; steps: number; current?: number; students: number; lastSession?: Date; pendingChanges?: number };
-
-// DONNÉES D'EXEMPLE (la couche données arrive en Phase 2). Les titres sont du contenu saisi par des enseignants :
-// ils ne sont jamais traduits.
-const SAMPLE: Sample[] = [
-  { id: "a", title: "Atelier Agile : la ville en Lego", kind: "running", steps: 4, current: 2, students: 20, lastSession: new Date("2026-10-05T16:05:00") },
-  { id: "b", title: "Vérifier l'information", kind: "running", steps: 3, current: 2, students: 11, lastSession: new Date("2026-10-06T10:00:00") },
-  { id: "c", title: "Catalogue de plantes", kind: "draft", steps: 3, students: 0, pendingChanges: 3 },
-  { id: "d", title: "Débat mouvant, 4e", kind: "template", steps: 2, students: 0 },
-  { id: "e", title: "Revue de fin de chapitre", kind: "draft", steps: 1, students: 0 },
-];
-
-type Filter = "all" | Kind;
 
 export function Activities({ locale }: { locale: Locale }) {
   const { t, i18n } = useLingui();
-  const [filter, setFilter] = useState<Filter>("all");
-  const shown = SAMPLE.filter((a) => filter === "all" || a.kind === filter);
+  const errorText = useErrorText();
+  const navigate = useNavigate();
+  const ws = useWorkspace();
+  const { user } = useSession();
+  const rows = useActivities();
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+  const teacher = user?.role === "teacher";
+
+  async function create(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const title = String(new FormData(e.currentTarget).get("title") ?? "").trim();
+    if (!title || !ws || !user) return;
+    setBusy(true);
+    setError(null);
+    try {
+      // le serveur approvisionne la base et les droits ; le contenu est écrit localement puis synchronisé
+      const { id } = await activitiesApi(session.authorizedFetch, () => session.getAccessToken()).create();
+      await ws.createActivity(id, user.id, title, locale);
+      navigate(`/activities/${id}`);
+    } catch (err) {
+      setError(err);
+      setBusy(false);
+    }
+  }
+
+  const newButton = <Button variant="primary" icon={<Plus size={18} />} onClick={() => setOpen(true)}>{t`New activity`}</Button>;
 
   return (
     <>
       <TopBar title={t`My activities`}>
-        <Pill tone="neutral">{t`Example data`}</Pill>
         <OnlineStatus />
         <LocaleSwitcher current={locale} />
-        <Button variant="primary" icon={<Plus size={18} />}>{t`New activity`}</Button>
+        {teacher ? newButton : null}
       </TopBar>
       <Content>
-        <Segmented
-          label={t`Filter activities`}
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: "all", label: t`All` },
-            { value: "running", label: t`In progress` },
-            { value: "draft", label: t`Drafts` },
-            { value: "template", label: t`Shared templates` },
-          ]}
-        />
-        {shown.length === 0 ? (
-          <EmptyState icon={<BookPlus size={32} />} title={t`No activity here yet`} description={t`Create your first activity to get started.`} action={<Button variant="primary">{t`New activity`}</Button>} />
+        {rows === null ? null : rows.length === 0 ? (
+          <EmptyState
+            icon={<BookPlus size={32} />}
+            title={t`No activity here yet`}
+            description={teacher ? t`Create your first activity to get started.` : t`Your teacher will share activities here.`}
+            action={teacher ? <Button variant="primary" onClick={() => setOpen(true)}>{t`New activity`}</Button> : undefined}
+          />
         ) : (
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "var(--space-4)", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
-            {shown.map((a) => {
-              const current = a.current ?? 0;
-              const total = a.steps;
-              const stepCount = a.steps;
-              const studentCount = a.students;
-              const pendingCount = a.pendingChanges ?? 0;
-              const when = a.lastSession ? i18n.date(a.lastSession, { dateStyle: "medium", timeStyle: "short" }) : null;
+            {rows.map((a) => {
+              const stepCount = a.stepCount;
+              const hiddenCount = a.hiddenCount;
               return (
                 <li key={a.id} style={{ display: "contents" }}>
                   <Card as="article" aria-labelledby={`t-${a.id}`} style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                     <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
-                      {a.kind === "running" ? <Pill tone="accent">{t`In progress · step ${current} of ${total}`}</Pill> : null}
-                      {a.kind === "draft" ? <Pill>{t`Draft`}</Pill> : null}
-                      {a.kind === "template" ? <Pill>{t`Template`}</Pill> : null}
-                      {a.pendingChanges ? <Pill tone="warn">{plural(pendingCount, { one: "# change waiting to sync", other: "# changes waiting to sync" })}</Pill> : null}
+                      <Pill>{t`Draft`}</Pill>
+                      {a.title === null ? <Pill tone="warn">{t`Waiting for sync`}</Pill> : null}
                     </div>
-                    <h2 className="tc-h" id={`t-${a.id}`} style={{ fontSize: "var(--text-lg)" }}>{a.title}</h2>
+                    <h2 className="tc-h" id={`t-${a.id}`} style={{ fontSize: "var(--text-lg)" }}>{a.title ?? t`Loading…`}</h2>
                     <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>
                       {plural(stepCount, { one: "# step", other: "# steps" })}
-                      {a.students > 0 ? <> · {plural(studentCount, { one: "# student", other: "# students" })}</> : null}
+                      {hiddenCount > 0 ? <> · {plural(hiddenCount, { one: "# hidden", other: "# hidden" })}</> : null}
                     </p>
-                    {when ? (
-                      <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>
-                        <Trans>Last session: <strong>{when}</strong></Trans>
-                      </p>
+                    {a.updatedAt > 0 ? (
+                      <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>{t`Edited ${i18n.date(new Date(a.updatedAt), { dateStyle: "medium", timeStyle: "short" })}`}</p>
                     ) : null}
                     <div style={{ marginBlockStart: "auto" }}>
-                      <Button>{a.kind === "running" ? t`Resume` : a.kind === "template" ? t`Copy to my activities` : t`Edit`}</Button>
+                      {teacher && a.title !== null ? <Link className="tc-btn tc-btn--primary" to={`/activities/${a.id}`}>{t`Edit`}</Link> : null}
                     </div>
                   </Card>
                 </li>
@@ -87,6 +89,15 @@ export function Activities({ locale }: { locale: Locale }) {
           </ul>
         )}
       </Content>
+      <Dialog open={open} onOpenChange={setOpen} title={t`New activity`} closeLabel={t`Close`}>
+        <form onSubmit={create} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          {error ? <p role="alert" className="tc-field__error" style={{ margin: 0 }}>{errorText(error)}</p> : null}
+          <Field label={t`Title`}>
+            <TextInput name="title" required maxLength={200} autoFocus />
+          </Field>
+          <Button type="submit" variant="primary" loading={busy}>{t`Create`}</Button>
+        </form>
+      </Dialog>
     </>
   );
 }

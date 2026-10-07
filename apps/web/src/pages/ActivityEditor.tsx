@@ -1,0 +1,123 @@
+import { useLingui } from "@lingui/react/macro";
+import { Button, Card, Content, Dialog, EmptyState, Field, IconButton, StepTimeline, Switch, TextArea, TextInput, TopBar, type StepItem } from "@toccata/ui";
+import { ArrowLeft, ArrowRight, ListPlus, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link, useParams } from "react-router";
+import { LocaleSwitcher } from "../components/LocaleSwitcher";
+import { OnlineStatus } from "../components/Layout";
+import { useContent } from "../data/hooks";
+import { useWorkspace } from "../data/provider";
+import type { Locale } from "../i18n";
+
+/** Éditeur de script (primo-scripting, D4) : l'activité et ses étapes. Les ressources et applications arrivent ensuite. */
+export function ActivityEditor({ locale }: { locale: Locale }) {
+  const { t } = useLingui();
+  const { id = "" } = useParams();
+  const ws = useWorkspace();
+  const content = useContent(id);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  const steps = useMemo(() => [...(content?.steps ?? [])].sort((a, b) => (a.order < b.order ? -1 : a.order > b.order ? 1 : a.id < b.id ? -1 : 1)), [content]);
+  const current = steps.find((s) => s.id === selected) ?? steps[0] ?? null;
+  const index = current ? steps.findIndex((s) => s.id === current.id) : -1;
+
+  const top = (
+    <TopBar title={content?.activity.title ?? t`Activity`}>
+      <OnlineStatus />
+      <LocaleSwitcher current={locale} />
+    </TopBar>
+  );
+
+  if (content === undefined || !ws) return top;
+  if (content === null)
+    return (
+      <>
+        {top}
+        <Content>
+          <EmptyState title={t`This activity is not on this device yet`} description={t`It will appear as soon as the connection allows it to sync.`} action={<Link className="tc-btn" to="/">{t`Back to activities`}</Link>} />
+        </Content>
+      </>
+    );
+
+  const items: StepItem[] = steps.map((s) => ({ id: s.id, label: s.title || t`Untitled step`, state: s.id === current?.id ? "active" : "todo", hidden: s.hidden }));
+
+  async function add() {
+    const stepId = await ws!.addStep(id, t`New step`, current?.id);
+    setSelected(stepId);
+  }
+
+  return (
+    <>
+      {top}
+      <Content>
+        <Link to="/" style={{ alignSelf: "flex-start" }}>{t`Back to activities`}</Link>
+        <Card style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>
+          <Field label={t`Activity title`}>
+            <TextInput key={`title-${id}`} defaultValue={content.activity.title} maxLength={200} onBlur={(e) => void ws.patchActivity(id, { title: e.currentTarget.value.trim() || content.activity.title })} />
+          </Field>
+          <Field label={t`Description`}>
+            <TextArea key={`desc-${id}`} defaultValue={content.activity.description} rows={3} maxLength={10_000} onBlur={(e) => void ws.patchActivity(id, { description: e.currentTarget.value })} />
+          </Field>
+        </Card>
+
+        <StepTimeline
+          steps={items}
+          labels={{
+            list: t`Steps`,
+            stateDone: t`done`,
+            stateLocked: t`locked`,
+            stateHidden: t`hidden from students`,
+            hide: (label) => t`Hide “${label}” from students`,
+            show: (label) => t`Show “${label}” to students`,
+            add: t`Add a step`,
+          }}
+          onSelect={setSelected}
+          onToggleHidden={(stepId, hidden) => void ws.patchStep(id, stepId, { hidden })}
+          onAdd={() => void add()}
+        />
+
+        {!current ? (
+          <EmptyState icon={<ListPlus size={32} />} title={t`No step yet`} description={t`A script is a sequence of steps. Add the first one.`} action={<Button variant="primary" onClick={() => void add()}>{t`Add the first step`}</Button>} />
+        ) : (
+          <Card as="section" aria-label={t`Selected step`} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }} key={current.id}>
+            <Field label={t`Step title`}>
+              <TextInput defaultValue={current.title} maxLength={200} onBlur={(e) => void ws.patchStep(id, current.id, { title: e.currentTarget.value.trim() })} />
+            </Field>
+            <Field label={t`Instructions`} hint={t`Shown to students at the top of the step.`}>
+              <TextArea defaultValue={current.instructions} rows={6} maxLength={50_000} onBlur={(e) => void ws.patchStep(id, current.id, { instructions: e.currentTarget.value })} />
+            </Field>
+            <Switch label={t`Visible to students`} checked={!current.hidden} onCheckedChange={(v) => void ws.patchStep(id, current.id, { hidden: !v })} />
+            <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
+              <IconButton label={t`Move earlier`} disabled={index <= 0} onClick={() => void ws.moveStep(id, current.id, index - 1)}><ArrowLeft size={18} /></IconButton>
+              <IconButton label={t`Move later`} disabled={index >= steps.length - 1} onClick={() => void ws.moveStep(id, current.id, index + 1)}><ArrowRight size={18} /></IconButton>
+              <Button variant="ghost" icon={<Trash2 size={16} />} onClick={() => setConfirmDelete(true)}>{t`Delete step`}</Button>
+            </div>
+          </Card>
+        )}
+      </Content>
+      <Dialog
+        open={confirmDelete}
+        onOpenChange={setConfirmDelete}
+        title={t`Delete this step?`}
+        description={t`The step and its content are removed for everyone. This cannot be undone.`}
+        closeLabel={t`Close`}
+        footer={
+          <>
+            <Button onClick={() => setConfirmDelete(false)}>{t`Cancel`}</Button>
+            <Button
+              variant="primary"
+              onClick={() => {
+                if (current) void ws.removeStep(id, current.id);
+                setSelected(null);
+                setConfirmDelete(false);
+              }}
+            >
+              {t`Delete`}
+            </Button>
+          </>
+        }
+      />
+    </>
+  );
+}

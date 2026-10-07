@@ -71,3 +71,11 @@ export const classesApi = (f: Fetcher, token: () => Promise<string>) => ({
   resetPassword: async (id: string, sid: string) => request<{ id: string; username: string; passphrase: string }>(f, "POST", `/api/classes/${encodeURIComponent(id)}/students/${encodeURIComponent(sid)}/reset-password`, { token: await token() }),
   removeStudent: async (id: string, sid: string) => request<void>(f, "DELETE", `/api/classes/${encodeURIComponent(id)}/students/${encodeURIComponent(sid)}`, { token: await token() }),
 });
+
+export type ActivityRef = { id: string; instanceIds: string[] };
+
+export const activitiesApi = (f: Fetcher, token: () => Promise<string>) => ({
+  list: async () => request<ActivityRef[]>(f, "GET", "/api/activities", { token: await token() }),
+  /** Approvisionne la base `master_<id>` (droits, règles d'écriture) ; le contenu est ensuite écrit par le client. */
+  create: async () => request<{ id: string; dbName: string }>(f, "POST", "/api/activities", { token: await token() }),
+});
