@@ -24,6 +24,16 @@ msgstr ""
 msgid "“{0}” is now at position {1}."
 msgstr ""
 
+#. placeholder {0}: r.shadowed.length
+#: src/content/TargetPicker.tsx
+msgid "{0, plural, one {# group keeps its own version of this.} other {# groups keep their own version of this.}}"
+msgstr ""
+
+#. placeholder {0}: r.unreached.length
+#: src/content/TargetPicker.tsx
+msgid "{0, plural, one {# group no longer follows the script and was not changed. } other {# groups no longer follow the script and were not changed. }}"
+msgstr ""
+
 #. placeholder {0}: plan.length
 #: src/pages/Distribute.tsx
 msgid "{0, plural, one {# group will be created.} other {# groups will be created.}}"
@@ -192,6 +202,10 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
+#: src/content/TargetPicker.tsx
+msgid "Apply changes to"
+msgstr ""
+
 #: src/pages/Signup.tsx
 msgid "At least 12 characters."
 msgstr ""
@@ -267,6 +281,14 @@ msgstr ""
 
 #: src/content/AddContentDialog.tsx
 msgid "Choose a file."
+msgstr ""
+
+#: src/content/TargetPicker.tsx
+msgid "Choose at least one group, otherwise nothing changes."
+msgstr ""
+
+#: src/content/TargetPicker.tsx
+msgid "Chosen groups"
 msgstr ""
 
 #: src/pages/ClassDetail.tsx
@@ -443,6 +465,10 @@ msgstr ""
 msgid "Estimate"
 msgstr ""
 
+#: src/content/TargetPicker.tsx
+msgid "Everyone"
+msgstr ""
+
 #: src/content/AddContentDialog.tsx
 msgid "File"
 msgstr ""
@@ -453,6 +479,10 @@ msgstr ""
 
 #: src/content/NotesPanel.tsx
 msgid "Flag"
+msgstr ""
+
+#: src/pages/Distribute.tsx
+msgid "Follows the script"
 msgstr ""
 
 #: src/pages/Classes.tsx
@@ -485,6 +515,7 @@ msgstr ""
 msgid "Group of {0}"
 msgstr ""
 
+#: src/content/TargetPicker.tsx
 #: src/pages/Distribute.tsx
 msgid "Groups"
 msgstr ""
@@ -596,6 +627,7 @@ msgid "Linked window"
 msgstr ""
 
 #: src/content/ResourceView.tsx
+#: src/content/TargetPicker.tsx
 #: src/pages/Activities.tsx
 msgid "Loading…"
 msgstr ""
@@ -604,6 +636,10 @@ msgstr ""
 #: src/pages/Gallery.tsx
 #: src/pages/Run.tsx
 msgid "locked"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Locked for students"
 msgstr ""
 
 #: src/components/CredentialsSheet.tsx
@@ -1152,6 +1188,10 @@ msgstr ""
 msgid "The password must not contain the username or the displayed name."
 msgstr ""
 
+#: src/content/TargetPicker.tsx
+msgid "The script below shows the common version. Changes made now only create a variant for the chosen groups."
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 msgid "The step and its content are removed for everyone. This cannot be undone."
 msgstr ""
@@ -1282,6 +1322,10 @@ msgstr ""
 
 #: src/content/AddContentDialog.tsx
 msgid "What to add"
+msgstr ""
+
+#: src/content/TargetPicker.tsx
+msgid "Who receives your changes"
 msgstr ""
 
 #: src/pages/Distribute.tsx

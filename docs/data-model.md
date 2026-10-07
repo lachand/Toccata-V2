@@ -99,3 +99,11 @@ non synchronisées.
 | `teacher_<id>` | notes privées de l'enseignant (`tnote` : activité ou étape, texte, drapeau) ; propriétaire seul, lecture et écriture |
 | local seulement | `registry` (activités connues), `uploads` (fichiers à envoyer), `preview_<id>` (données d'exécution de l'aperçu) |
 
+## Ajouts de la Phase 4
+
+| Élément | Règle |
+|---|---|
+| `instance` (`inst_<id>`) | définition du groupe, identifiant = celui de l'instance ; **écriture réservée aux propriétaires** (CouchDB) et lecture limitée au document de leur auteur |
+| `participant` (`inst_<id>`) | un document par personne, `_id` = identifiant de la personne ; étape en cours, élément ouvert, appareil |
+| local seulement | `registry` : références d'activités (`ref`) et d'instances (`iref`) |
+

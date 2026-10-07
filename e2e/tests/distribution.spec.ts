@@ -143,3 +143,40 @@ test("un élève joue dans son groupe : kanban, questionnaire bloquant, puis rep
   await b.context.close();
   await c.context.close();
 });
+
+test("modification en direct ciblée : masquer une étape pour un seul groupe, pendant que son élève a la séance ouverte", async ({ browser }) => {
+  const [lina, hugo] = students as [typeof students[0], typeof students[0]];
+  const openRun = async (who: typeof lina) => {
+    const d = await device(browser);
+    await d.page.goto("/login");
+    await d.page.getByLabel("Identifiant").fill(who.username);
+    await d.page.getByLabel("Mot de passe").fill(who.passphrase);
+    await d.page.getByRole("button", { name: "Se connecter" }).click();
+    await d.page.getByRole("article", { name: "Atelier distribué" }).getByRole("link", { name: "Ouvrir" }).click({ timeout: 45_000 });
+    await expect(d.page.getByRole("heading", { level: 2, name: "Réfléchir" })).toBeVisible({ timeout: 45_000 });
+    return d;
+  };
+  const steps = (p: Page) => p.getByRole("list", { name: "Étapes" }).getByRole("listitem");
+
+  const h = await openRun(hugo);
+  const l = await openRun(lina);
+  await expect(steps(h.page)).toHaveCount(2);
+  await expect(steps(l.page)).toHaveCount(2);
+
+  const t = await device(browser);
+  await login(t.page, teacherName, PASSWORD);
+  await t.page.getByRole("article", { name: "Atelier distribué" }).getByRole("link", { name: "Modifier" }).click();
+  await t.page.getByRole("button", { name: "Conclure", exact: true }).click();
+  const target = t.page.getByRole("region", { name: "Qui reçoit vos modifications" });
+  await target.getByRole("radio", { name: "Groupes choisis" }).check();
+  await target.getByRole("checkbox", { name: "Hugo Martin" }).check({ timeout: 30_000 });
+  await t.page.getByRole("switch", { name: "Visible par les élèves" }).click();
+
+  // seul le groupe de Hugo perd l'étape, en direct, sans recharger
+  await expect(steps(h.page)).toHaveCount(1, { timeout: 45_000 });
+  await expect(steps(l.page)).toHaveCount(2);
+
+  // le script commun n'a pas bougé : l'étape y est toujours visible pour les élèves
+  await expect(t.page.getByRole("switch", { name: "Visible par les élèves" })).toBeChecked();
+  for (const d of [h, l, t]) await d.context.close();
+});

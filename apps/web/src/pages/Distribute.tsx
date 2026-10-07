@@ -1,6 +1,7 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
-import { Button, Card, Content, Dialog, EmptyState, Field, NativeSelect, Segmented, TextInput, TopBar } from "@toccata/ui";
+import { relinkInstance, unlinkInstance } from "@toccata/schema";
+import { Button, Card, Content, Dialog, EmptyState, Field, NativeSelect, Segmented, Switch, TextInput, TopBar } from "@toccata/ui";
 import { Users } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -119,6 +120,13 @@ export function Distribute({ locale }: { locale: Locale }) {
                       <TextInput aria-label={t`Group name`} defaultValue={g.def?.name ?? ""} maxLength={200} disabled={!g.def} onBlur={(e) => g.def && e.currentTarget.value.trim() && e.currentTarget.value.trim() !== g.def.name && void ws.updateInstanceDef(g.id, (d) => ({ ...d, name: e.currentTarget.value.trim() }))} />
                       <Button onClick={() => (setPicked(new Set(g.def?.memberIds ?? [])), setEditing(g.id))} disabled={!g.def}>{t`Members`}</Button>
                     </div>
+                    {g.def && content ? (
+                      <Switch
+                        label={t`Follows the script`}
+                        checked={g.def.linked}
+                        onCheckedChange={(on) => void ws.updateInstanceDef(g.id, (d) => (on ? relinkInstance(d) : unlinkInstance(d, content)))}
+                      />
+                    ) : null}
                     <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>
                       {plural(memberCount, { one: "# student", other: "# students" })}{names ? ` · ${names}` : ""}
                     </p>

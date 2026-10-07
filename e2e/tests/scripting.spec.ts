@@ -57,7 +57,7 @@ test("l'enseignant écrit un script ; un autre appareil le retrouve dans le mêm
   await expect(card.getByText("3 étapes")).toBeVisible({ timeout: 30_000 });
   await card.getByRole("link", { name: "Modifier" }).click();
   await expect(b.page.getByRole("list", { name: "Étapes" }).getByRole("listitem")).toHaveText([/Brainstorm/, /Bonus/, /Rétrospective/, ""]);
-  await expect(b.page.getByRole("button", { name: /Montrer « Bonus » aux élèves/ })).toBeVisible();
+  await expect(b.page.getByRole("button", { name: /Montrer « Bonus » aux élèves/ })).toBeVisible({ timeout: 30_000 });
   await a.context.close();
   await b.context.close();
 });

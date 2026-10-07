@@ -5,13 +5,15 @@ import { ArrowLeft, ArrowRight, ListPlus, Trash2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router";
 import { inertStore } from "../apps/inertStore";
+import { TargetPicker } from "../content/TargetPicker";
+import { useTargetedEdit } from "../content/useTargetedEdit";
 import { NotesPanel } from "../content/NotesPanel";
 import { ContentPanel } from "../content/ContentPanel";
 import { RichEditor } from "../richtext/RichEditor";
 import { SortableTimeline } from "../components/SortableTimeline";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
-import { useContent, useNotes, usePreviewStore } from "../data/hooks";
+import { useContent, useGroups, useNotes, usePreviewStore } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
 import type { Locale } from "../i18n";
 
@@ -21,6 +23,8 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
   const { id = "" } = useParams();
   const ws = useWorkspace();
   const content = useContent(id);
+  const groups = useGroups(id);
+  const target = useTargetedEdit(ws, id, content, groups);
   const notes = useNotes(id);
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -74,6 +78,8 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
           <NotesPanel ws={ws} activityId={id} stepId={null} note={notes.find((n) => n.stepId === null)} heading={t`Notes on the activity`} headingLevel={2} />
         </Card>
 
+        {target.hasGroups ? <TargetPicker target={target} groups={groups} /> : null}
+
         <SortableTimeline
           onMove={(stepId, to) => void ws.moveStep(id, stepId, to)}
           steps={items}
@@ -87,7 +93,7 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
             add: t`Add a step`,
           }}
           onSelect={setSelected}
-          onToggleHidden={(stepId, hidden) => void ws.patchStep(id, stepId, { hidden })}
+          onToggleHidden={(stepId, hidden) => void target.apply({ type: "setStepHidden", stepId, hidden })}
           onAdd={() => void add()}
         />
 
@@ -97,10 +103,10 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
           <Card as="section" aria-label={t`Selected step`} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }} key={current.id}>
             <h2 className="tc-h" style={{ fontSize: "var(--text-lg)" }}>{t`Step ${index + 1}`}</h2>
             <Field label={t`Step title`}>
-              <TextInput defaultValue={current.title} maxLength={200} onBlur={(e) => void ws.patchStep(id, current.id, { title: e.currentTarget.value.trim() })} />
+              <TextInput defaultValue={current.title} maxLength={200} onBlur={(e) => e.currentTarget.value.trim() !== current.title && void target.apply({ type: "patchStep", stepId: current.id, patch: { title: e.currentTarget.value.trim() } })} />
             </Field>
             <Field label={t`Instructions`} hint={t`Shown to students at the top of the step.`}>
-              <RichEditor label={t`Instructions`} value={current.instructions} onCommit={(html) => html !== current.instructions && void ws.patchStep(id, current.id, { instructions: html })} />
+              <RichEditor label={t`Instructions`} value={current.instructions} onCommit={(html) => html !== current.instructions && void target.apply({ type: "patchStep", stepId: current.id, patch: { instructions: html } })} />
             </Field>
             <ContentPanel ws={ws} activityId={id} content={content} scope={{ type: "step", stepId: current.id }} heading={t`Resources and apps for this step`} store={store} />
             {content.apps.some((a) => a.type === "form" && a.scope.type === "step" && a.scope.stepId === current.id) ? (
@@ -112,7 +118,8 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
               </Field>
             ) : null}
             <NotesPanel ws={ws} activityId={id} stepId={current.id} note={notes.find((n) => n.stepId === current.id)} heading={t`Notes on this step`} />
-            <Switch label={t`Visible to students`} checked={!current.hidden} onCheckedChange={(v) => void ws.patchStep(id, current.id, { hidden: !v })} />
+            <Switch label={t`Visible to students`} checked={!current.hidden} onCheckedChange={(v) => void target.apply({ type: "setStepHidden", stepId: current.id, hidden: !v })} />
+            <Switch label={t`Locked for students`} checked={current.locked} onCheckedChange={(v) => void target.apply({ type: "setStepLocked", stepId: current.id, locked: v })} />
             <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
               <IconButton label={t`Move earlier`} disabled={index <= 0} onClick={() => void ws.moveStep(id, current.id, index - 1)}><ArrowLeft size={18} /></IconButton>
               <IconButton label={t`Move later`} disabled={index >= steps.length - 1} onClick={() => void ws.moveStep(id, current.id, index + 1)}><ArrowRight size={18} /></IconButton>

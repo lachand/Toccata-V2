@@ -6,7 +6,7 @@
 | 1 | Fondations : monorepo, modèle de données (`packages/schema`), design system (`packages/ui`), coque PWA hors ligne et i18n fr/en (`apps/web`), tests e2e — **terminée** |
 | 2 | Auth, rôles, droits CouchDB — **terminée** : service (`apps/auth`), connexion/inscription/classes dans `apps/web`, session hors ligne ; testée de bout en bout (navigateur → interface → service → CouchDB) |
 | 3 | Scripting — **terminée** : liste d'activités et éditeur d'étapes (glisser-déposer, texte riche), ressources (liens, fichiers), assistant d'ajout unique, applications (minuteur, kanban, texte partagé, questionnaire, application web), notes privées ; ADR 0010–0012 |
-| 4 | Distribution et exécution : instances, état participant, reprise, propagation ciblée |
+| 4 | Distribution et exécution — **terminée** : groupes (instances), séance de l'élève (une étape et un élément à la fois), questionnaire bloquant, reprise entre appareils, modification en direct ciblée ; ADR 0013 |
 | 5 | Orchestration : monitoring, miroir, télécommande, micro-orchestration, retours |
 | 6 | Résilience réseau : serveur local, bascule d'endpoint |
 | 7 | Réutilisation et réflexion : modèles, import/export, « prévu vs réalisé » |

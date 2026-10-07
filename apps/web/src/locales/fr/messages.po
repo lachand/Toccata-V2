@@ -24,6 +24,16 @@ msgstr "« {0} » déposée."
 msgid "“{0}” is now at position {1}."
 msgstr "« {0} » est maintenant à la position {1}."
 
+#. placeholder {0}: r.shadowed.length
+#: src/content/TargetPicker.tsx
+msgid "{0, plural, one {# group keeps its own version of this.} other {# groups keep their own version of this.}}"
+msgstr "{0, plural, one {# groupe garde sa propre version.} other {# groupes gardent leur propre version.}}"
+
+#. placeholder {0}: r.unreached.length
+#: src/content/TargetPicker.tsx
+msgid "{0, plural, one {# group no longer follows the script and was not changed. } other {# groups no longer follow the script and were not changed. }}"
+msgstr "{0, plural, one {# groupe ne suit plus le script et n’a pas été modifié. } other {# groupes ne suivent plus le script et n’ont pas été modifiés. }}"
+
 #. placeholder {0}: plan.length
 #: src/pages/Distribute.tsx
 msgid "{0, plural, one {# group will be created.} other {# groups will be created.}}"
@@ -192,6 +202,10 @@ msgstr "Réponses envoyées."
 msgid "Apply"
 msgstr "Appliquer"
 
+#: src/content/TargetPicker.tsx
+msgid "Apply changes to"
+msgstr "Appliquer les modifications à"
+
 #: src/pages/Signup.tsx
 msgid "At least 12 characters."
 msgstr "12 caractères au minimum."
@@ -268,6 +282,14 @@ msgstr "Choisissez un fichier ou collez un lien."
 #: src/content/AddContentDialog.tsx
 msgid "Choose a file."
 msgstr "Choisissez un fichier."
+
+#: src/content/TargetPicker.tsx
+msgid "Choose at least one group, otherwise nothing changes."
+msgstr "Choisissez au moins un groupe, sinon rien ne change."
+
+#: src/content/TargetPicker.tsx
+msgid "Chosen groups"
+msgstr "Groupes choisis"
 
 #: src/pages/ClassDetail.tsx
 #: src/pages/Distribute.tsx
@@ -443,6 +465,10 @@ msgstr "Saisissez une adresse commençant par https://"
 msgid "Estimate"
 msgstr "Estimer"
 
+#: src/content/TargetPicker.tsx
+msgid "Everyone"
+msgstr "Tout le monde"
+
 #: src/content/AddContentDialog.tsx
 msgid "File"
 msgstr "Fichier"
@@ -454,6 +480,10 @@ msgstr "Les réponses par fichier ne sont pas encore disponibles."
 #: src/content/NotesPanel.tsx
 msgid "Flag"
 msgstr "Drapeau"
+
+#: src/pages/Distribute.tsx
+msgid "Follows the script"
+msgstr "Suit le script"
 
 #: src/pages/Classes.tsx
 msgid "For example: 4th grade B"
@@ -485,6 +515,7 @@ msgstr "Nom du groupe"
 msgid "Group of {0}"
 msgstr "Groupe de {0}"
 
+#: src/content/TargetPicker.tsx
 #: src/pages/Distribute.tsx
 msgid "Groups"
 msgstr "Groupes"
@@ -596,6 +627,7 @@ msgid "Linked window"
 msgstr "Fenêtre liée"
 
 #: src/content/ResourceView.tsx
+#: src/content/TargetPicker.tsx
 #: src/pages/Activities.tsx
 msgid "Loading…"
 msgstr "Chargement…"
@@ -605,6 +637,10 @@ msgstr "Chargement…"
 #: src/pages/Run.tsx
 msgid "locked"
 msgstr "verrouillée"
+
+#: src/pages/ActivityEditor.tsx
+msgid "Locked for students"
+msgstr "Verrouillée pour les élèves"
 
 #: src/components/CredentialsSheet.tsx
 msgid "Login details"
@@ -1152,6 +1188,10 @@ msgstr "Le mot de passe doit comporter au moins 12 caractères."
 msgid "The password must not contain the username or the displayed name."
 msgstr "Le mot de passe ne doit contenir ni l’identifiant ni le nom affiché."
 
+#: src/content/TargetPicker.tsx
+msgid "The script below shows the common version. Changes made now only create a variant for the chosen groups."
+msgstr "Le script ci-dessous montre la version commune. Les modifications faites maintenant créent seulement une variante pour les groupes choisis."
+
 #: src/pages/ActivityEditor.tsx
 msgid "The step and its content are removed for everyone. This cannot be undone."
 msgstr "L’étape et son contenu sont supprimés pour tout le monde. Cette action est irréversible."
@@ -1283,6 +1323,10 @@ msgstr "Lien web"
 #: src/content/AddContentDialog.tsx
 msgid "What to add"
 msgstr "Que souhaitez-vous ajouter ?"
+
+#: src/content/TargetPicker.tsx
+msgid "Who receives your changes"
+msgstr "Qui reçoit vos modifications"
 
 #: src/pages/Distribute.tsx
 msgid "Whole class"
