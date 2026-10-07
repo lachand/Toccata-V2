@@ -9,7 +9,7 @@ import { session, useSession } from "../auth/session";
 import { useErrorText } from "../auth/useErrorText";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
-import { useActivities } from "../data/hooks";
+import { useActivities, useRuns } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
 import type { Locale } from "../i18n";
 
@@ -19,11 +19,14 @@ export function Activities({ locale }: { locale: Locale }) {
   const navigate = useNavigate();
   const ws = useWorkspace();
   const { user } = useSession();
-  const rows = useActivities();
+  const teacher = user?.role === "teacher";
+  const teacherRows = useActivities();
+  const runs = useRuns();
+  // l'élève voit ses séances (une par inscription) ; l'enseignant ses activités
+  const rows = teacher ? teacherRows : runs === null ? null : [];
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
-  const teacher = user?.role === "teacher";
 
   async function create(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -52,7 +55,21 @@ export function Activities({ locale }: { locale: Locale }) {
         {teacher ? newButton : null}
       </TopBar>
       <Content>
-        {rows === null ? null : rows.length === 0 ? (
+        {!teacher && runs !== null && runs.length > 0 ? (
+          <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "var(--space-4)", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
+            {runs.map((r) => (
+              <li key={r.instanceId} style={{ display: "contents" }}>
+                <Card as="article" aria-labelledby={`r-${r.instanceId}`} style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
+                  <h2 className="tc-h" id={`r-${r.instanceId}`} style={{ fontSize: "var(--text-lg)" }}>{r.title ?? t`Loading…`}</h2>
+                  {r.title === null ? <Pill tone="warn">{t`Waiting for sync`}</Pill> : null}
+                  <div style={{ marginBlockStart: "auto" }}>
+                    <Link className="tc-btn tc-btn--primary" to={`/run/${r.instanceId}`}>{t`Open`}</Link>
+                  </div>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        ) : rows === null ? null : rows.length === 0 ? (
           <EmptyState
             icon={<BookPlus size={32} />}
             title={t`No activity here yet`}

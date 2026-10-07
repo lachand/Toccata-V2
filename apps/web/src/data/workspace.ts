@@ -7,6 +7,9 @@ import {
   decodeInstanceDocs,
   decodeMasterDocs,
   decodeTeacherDocs,
+  findInstanceDoc,
+  instanceDbName,
+  emptyOverrides,
   estimateClockOffset,
   envelopeSchema,
   masterDbName,
@@ -14,6 +17,9 @@ import {
   orderBetween,
   type ActivityDoc,
   type AppDoc,
+  type InstanceDoc,
+  type InstanceScopedDoc,
+  type ParticipantStateDoc,
   type MasterContent,
   type MasterDoc,
   type ResourceDoc,
@@ -127,7 +133,104 @@ export class Workspace {
   /** Ouvre toutes les activités du registre (au démarrage, avant la synchronisation). */
   async openKnown(): Promise<void> {
     const refs = await this.registry.find().exec();
-    await Promise.all(refs.map((r) => this.master(r.get("id") as string)));
+    await Promise.all(
+      refs.map(async (r) => {
+        if (r.get("kind") === "iref") await Promise.all([this.master(r.get("activityId") as string), this.instance(r.get("id") as string)]);
+        else await this.master(r.get("id") as string);
+      }),
+    );
+  }
+
+  /* ---------------------------------------------------------------- instances */
+
+  private instance(instanceId: string): Promise<Col> {
+    return this.named(collectionNameFor(instanceDbName(instanceId)));
+  }
+
+  /** Mémorise une instance (et ouvre son activité) : l'enseignant pour ses groupes, l'élève pour ses séances. */
+  async rememberInstance(activityId: string, instanceId: string): Promise<void> {
+    await this.registry.upsert({ id: instanceId, kind: "iref", activityId, updatedAt: this.now() });
+    await Promise.all([this.master(activityId), this.instance(instanceId)]);
+  }
+
+  /** Élève : aligne les séances locales sur les inscriptions du serveur (ajouts et retraits). */
+  async syncMemberships(refs: readonly { activityId: string; instanceId: string }[]): Promise<void> {
+    const want = new Set(refs.map((r) => r.instanceId));
+    for (const r of refs) await this.rememberInstance(r.activityId, r.instanceId);
+    for (const row of await this.registry.find({ selector: { kind: "iref" } }).exec()) if (!want.has(row.get("id") as string)) await row.remove();
+  }
+
+  private irefs$(): Observable<{ instanceId: string; activityId: string }[]> {
+    return this.registry.find({ selector: { kind: "iref" } }).$.pipe(map((rows) => rows.map((r) => ({ instanceId: r.get("id") as string, activityId: r.get("activityId") as string }))));
+  }
+
+  private instDocs$(instanceId: string): Observable<InstanceScopedDoc[]> {
+    return new Observable<Col>((s) => {
+      void this.instance(instanceId).then((c) => (s.next(c), s.complete()), (e) => s.error(e));
+    }).pipe(
+      switchMap((c) => c.find().$),
+      map((rows) => decodeInstanceDocs(rows.map((r) => r.toJSON())).docs),
+    );
+  }
+
+  /**
+   * Définition d'une instance : le document écrit par l'enseignant propriétaire. Les autres documents `instance`
+   * sont ignorés (défense en plus de la règle CouchDB) : un élève ne peut pas réécrire sa propre séance.
+   */
+  instance$(instanceId: string, ownerId: string): Observable<InstanceDoc | null> {
+    return this.instDocs$(instanceId).pipe(map((docs) => findInstanceDoc(docs.filter((d) => d.authorId === ownerId))));
+  }
+
+  /** Instances d'une activité (vue de l'enseignant), avec leur définition quand elle est arrivée. */
+  activityInstances$(activityId: string, ownerId: string): Observable<{ id: string; def: InstanceDoc | null }[]> {
+    return this.irefs$().pipe(
+      switchMap((refs) => {
+        const mine = refs.filter((r) => r.activityId === activityId);
+        return mine.length === 0 ? of([]) : combineLatest(mine.map((r) => this.instance$(r.instanceId, ownerId).pipe(map((def) => ({ id: r.instanceId, def })))));
+      }),
+      map((rows) => rows.sort((a, b) => (a.def?.name ?? "") .localeCompare(b.def?.name ?? "") || (a.id < b.id ? -1 : 1))),
+    );
+  }
+
+  /** Séances d'un élève : une ligne par inscription, avec le titre de l'activité quand elle est arrivée. */
+  runs$(): Observable<{ instanceId: string; activityId: string; title: string | null }[]> {
+    return this.irefs$().pipe(
+      switchMap((refs) => (refs.length === 0 ? of([]) : combineLatest(refs.map((r) => this.content$(r.activityId).pipe(map((c) => ({ ...r, title: c?.activity.title ?? null }))))))),
+      map((rows) => rows.sort((a, b) => (a.title ?? "").localeCompare(b.title ?? "") || (a.instanceId < b.instanceId ? -1 : 1))),
+    );
+  }
+
+  /** Écrit la définition d'une instance que le serveur vient d'approvisionner (le document porte l'identifiant de l'instance). */
+  async createInstanceDef(instanceId: string, activityId: string, ownerId: string, name: string, memberIds: string[]): Promise<void> {
+    await this.rememberInstance(activityId, instanceId);
+    const t = this.now();
+    const def: InstanceDoc = { id: instanceId, authorId: ownerId, kind: "instance", masterId: activityId, name, memberIds, linked: true, snapshot: null, overrides: emptyOverrides(), createdAt: t, updatedAt: t };
+    await (await this.instance(instanceId)).upsert(def as unknown as Record<string, unknown>);
+  }
+
+  async updateInstanceDef(instanceId: string, change: (d: InstanceDoc) => InstanceDoc): Promise<void> {
+    const row = await (await this.instance(instanceId)).findOne(instanceId).exec();
+    if (!row) return;
+    const next = change(row.toJSON() as unknown as InstanceDoc);
+    await row.incrementalPatch({ ...(next as unknown as Record<string, unknown>), updatedAt: this.now() });
+  }
+
+  /** État du participant (étape en cours, élément ouvert) : un document par personne, au nom de la personne (roaming d'appareil). */
+  participant$(instanceId: string, userId: string): Observable<ParticipantStateDoc | null> {
+    return this.instDocs$(instanceId).pipe(map((docs) => docs.find((d): d is ParticipantStateDoc => d.kind === "participant" && d.id === userId) ?? null));
+  }
+
+  async saveParticipant(instanceId: string, userId: string, patch: Pick<ParticipantStateDoc, "currentStepId" | "openElement">, deviceId: string): Promise<void> {
+    const col = await this.instance(instanceId);
+    const t = this.now();
+    const previous = await col.findOne(userId).exec();
+    const doc: ParticipantStateDoc = { id: userId, authorId: userId, kind: "participant", userId, instanceId, appViewState: {}, deviceId, createdAt: (previous?.toJSON() as { createdAt?: number } | undefined)?.createdAt ?? t, updatedAt: t, ...patch };
+    await col.upsert(doc as unknown as Record<string, unknown>);
+  }
+
+  /** Données d'exécution RÉELLES d'une instance (`inst_<id>`, répliquées) : même contrat que l'aperçu. */
+  instanceStore(instanceId: string, viewer: Viewer): InstanceStore {
+    return this.storeOver(this.instance(instanceId), viewer);
   }
 
   /* ---------------------------------------------------------------- lecture */
@@ -158,7 +261,7 @@ export class Workspace {
   }
 
   private registryIds(): Observable<string[]> {
-    return this.registry.find().$.pipe(map((rows) => rows.map((r) => r.get("id") as string)));
+    return this.registry.find({ selector: { kind: "ref" } }).$.pipe(map((rows) => rows.map((r) => r.get("id") as string)));
   }
 
   /* ---------------------------------------------------------------- notes privées de l'enseignant */
@@ -391,6 +494,17 @@ export class Workspace {
    */
   previewStore(activityId: string, viewer: Viewer): InstanceStore & { clear(appId: string): Promise<void> } {
     const col = this.preview(activityId);
+    return {
+      ...this.storeOver(col, viewer),
+      clear: async (appId) => {
+        const rows = await (await col).find().exec();
+        await Promise.all(rows.filter((r) => (r.toJSON() as { appId?: string }).appId === appId).map((r) => r.remove()));
+      },
+    };
+  }
+
+  /** `InstanceStore` au-dessus d'une collection de documents d'instance (aperçu local ou `inst_<id>`). */
+  private storeOver(col: Promise<Col>, viewer: Viewer): InstanceStore {
     const decode = (rows: { toJSON(): unknown }[]) => decodeInstanceDocs(rows.map((r) => r.toJSON())).docs;
     return {
       viewer,
@@ -412,17 +526,13 @@ export class Workspace {
         const c = await col;
         const t = this.now();
         const id = doc.id ?? newId(t);
-        const previous = await c.findOne(id).exec();
-        const createdAt = (previous?.toJSON() as { createdAt?: number } | undefined)?.createdAt ?? t;
-        await c.upsert({ ...doc, id, authorId: viewer.id, createdAt, updatedAt: t } as unknown as Record<string, unknown>);
+        const previous = (await c.findOne(id).exec())?.toJSON() as { createdAt?: number; authorId?: string } | undefined;
+        // un document garde son auteur d'origine (la règle CouchDB l'exige) ; un nouveau est au nom de l'écrivant
+        await c.upsert({ ...doc, id, authorId: previous?.authorId ?? viewer.id, createdAt: previous?.createdAt ?? t, updatedAt: t } as unknown as Record<string, unknown>);
         return id;
       },
       remove: async (id) => {
         await (await (await col).findOne(id).exec())?.remove();
-      },
-      clear: async (appId) => {
-        const rows = await (await col).find().exec();
-        await Promise.all(rows.filter((r) => (r.toJSON() as { appId?: string }).appId === appId).map((r) => r.remove()));
       },
     };
   }

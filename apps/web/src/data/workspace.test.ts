@@ -160,4 +160,60 @@ describe("Workspace (RxDB hors ligne)", () => {
     expect((await read()).find((n) => n.stepId === step)!.flag).toBeNull();
     expect(notes.find((n) => n.stepId === null)).toMatchObject({ body: "Penser aux ciseaux", flag: null });
   });
+
+  it("crée la définition d'un groupe, la relit pour l'activité, et ignore une définition qui n'est pas de l'enseignant", async () => {
+    const { w, id, owner } = await make();
+    const inst = newId();
+    const [m1, m2] = [newId(), newId()];
+    await w.createInstanceDef(inst, id, owner, "Groupe A", [m1, m2]);
+    const rows = await firstValueFrom(w.activityInstances$(id, owner));
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.def).toMatchObject({ id: inst, name: "Groupe A", memberIds: [m1, m2], linked: true });
+
+    // un élève (ou n'importe qui d'autre) écrit une fausse définition, plus récente : elle ne compte pas
+    const col = await (w as unknown as { instance(i: string): Promise<{ upsert(d: object): Promise<unknown> }> }).instance(inst);
+    await col.upsert({ ...rows[0]!.def, id: newId(), authorId: m1, name: "Piraté", linked: false, updatedAt: Date.now() + 10_000 });
+    expect((await firstValueFrom(w.instance$(inst, owner)))?.name).toBe("Groupe A");
+
+    await w.updateInstanceDef(inst, (d) => ({ ...d, name: "Groupe B" }));
+    expect((await firstValueFrom(w.instance$(inst, owner)))?.name).toBe("Groupe B");
+  });
+
+  it("l'élève aligne ses séances sur ses inscriptions : ajout, puis retrait", async () => {
+    const { w } = await make();
+    const [a1, i1, a2, i2] = [newId(), newId(), newId(), newId()];
+    await w.syncMemberships([{ activityId: a1, instanceId: i1 }, { activityId: a2, instanceId: i2 }]);
+    expect((await firstValueFrom(w.runs$())).map((r) => r.instanceId).sort()).toEqual([i1, i2].sort());
+    await w.syncMemberships([{ activityId: a1, instanceId: i1 }]);
+    expect((await firstValueFrom(w.runs$())).map((r) => r.instanceId)).toEqual([i1]);
+    await w.syncMemberships([]);
+    expect(await firstValueFrom(w.runs$())).toEqual([]);
+  });
+
+  it("garde l'état du participant (étape en cours) dans l'instance, un document par personne", async () => {
+    const { w } = await make();
+    const [inst, me, step] = [newId(), newId(), newId()];
+    await w.rememberInstance(newId(), inst);
+    expect(await firstValueFrom(w.participant$(inst, me))).toBeNull();
+    await w.saveParticipant(inst, me, { currentStepId: step, openElement: null }, "tablette");
+    await w.saveParticipant(inst, me, { currentStepId: null, openElement: null }, "tablette");
+    await w.saveParticipant(inst, me, { currentStepId: step, openElement: { type: "app", id: newId() } }, "pc");
+    const st = await firstValueFrom(w.participant$(inst, me));
+    expect(st).toMatchObject({ id: me, authorId: me, currentStepId: step, deviceId: "pc" });
+  });
+
+  it("les données d'exécution d'une instance sont partagées entre participants et gardent leur auteur", async () => {
+    const { w } = await make();
+    const [inst, alice, bob, app] = [newId(), newId(), newId(), newId()];
+    await w.rememberInstance(newId(), inst);
+    const sa = w.instanceStore(inst, { id: alice, role: "student" });
+    const sb = w.instanceStore(inst, { id: bob, role: "student" });
+    const id = await sa.put({ kind: "kanbancard", appId: app, columnId: "todo", title: "Carte", order: "a0" });
+    await sb.put({ kind: "kanbancard", id, appId: app, columnId: "done", title: "Carte", order: "a0" }); // bob déplace la carte d'alice
+    const seen: { authorId: string; columnId: string }[][] = [];
+    const stop = sb.watch("kanbancard", app, (d) => seen.push(d));
+    await new Promise((r) => setTimeout(r, 50));
+    expect(seen.at(-1)).toMatchObject([{ authorId: alice, columnId: "done" }]); // auteur d'origine conservé
+    stop();
+  });
 });

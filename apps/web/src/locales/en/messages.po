@@ -24,6 +24,11 @@ msgstr "“{0}” dropped."
 msgid "“{0}” is now at position {1}."
 msgstr "“{0}” is now at position {1}."
 
+#. placeholder {0}: plan.length
+#: src/pages/Distribute.tsx
+msgid "{0, plural, one {# group will be created.} other {# groups will be created.}}"
+msgstr "{0, plural, one {# group will be created.} other {# groups will be created.}}"
+
 #: src/pages/Activities.tsx
 msgid "{appCount, plural, one {# app} other {# apps}}"
 msgstr "{appCount, plural, one {# app} other {# apps}}"
@@ -39,6 +44,10 @@ msgstr "{hidden, plural, one {# other person} other {# other people}}"
 #: src/pages/Activities.tsx
 msgid "{hiddenCount, plural, one {# hidden} other {# hidden}}"
 msgstr "{hiddenCount, plural, one {# hidden} other {# hidden}}"
+
+#: src/pages/Distribute.tsx
+msgid "{memberCount, plural, one {# student} other {# students}}"
+msgstr "{memberCount, plural, one {# student} other {# students}}"
 
 #: src/auth/useErrorText.ts
 msgid "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
@@ -93,6 +102,8 @@ msgid "A web page or tool (collaborative document, simulator…) shown inside th
 msgstr "A web page or tool (collaborative document, simulator…) shown inside the activity."
 
 #: src/pages/ActivityEditor.tsx
+#: src/pages/Distribute.tsx
+#: src/pages/Run.tsx
 msgid "Activity"
 msgstr "Activity"
 
@@ -190,8 +201,13 @@ msgid "Back"
 msgstr "Back"
 
 #: src/pages/ActivityEditor.tsx
+#: src/pages/Run.tsx
 msgid "Back to activities"
 msgstr "Back to activities"
+
+#: src/pages/Distribute.tsx
+msgid "Back to the script"
+msgstr "Back to the script"
 
 #: src/pages/Gallery.tsx
 msgid "Backlog"
@@ -228,6 +244,7 @@ msgstr "Buttons"
 #: src/components/ConfirmDialog.tsx
 #: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
+#: src/pages/Distribute.tsx
 #: src/pages/Gallery.tsx
 msgid "Cancel"
 msgstr "Cancel"
@@ -240,6 +257,10 @@ msgstr "Card title"
 msgid "Check the fields and try again."
 msgstr "Check the fields and try again."
 
+#: src/pages/Distribute.tsx
+msgid "Choose a class above to list its students."
+msgstr "Choose a class above to list its students."
+
 #: src/pages/Gallery.tsx
 msgid "Choose a file or paste a link."
 msgstr "Choose a file or paste a link."
@@ -249,6 +270,7 @@ msgid "Choose a file."
 msgstr "Choose a file."
 
 #: src/pages/ClassDetail.tsx
+#: src/pages/Distribute.tsx
 msgid "Class"
 msgstr "Class"
 
@@ -258,6 +280,7 @@ msgstr "Class name"
 
 #: src/components/Layout.tsx
 #: src/pages/Classes.tsx
+#: src/pages/Distribute.tsx
 msgid "Classes"
 msgstr "Classes"
 
@@ -267,6 +290,7 @@ msgstr "Classes"
 #: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
 #: src/pages/Classes.tsx
+#: src/pages/Distribute.tsx
 #: src/pages/Gallery.tsx
 #: src/richtext/RichToolbar.tsx
 msgid "Close"
@@ -286,6 +310,7 @@ msgid "Create"
 msgstr "Create"
 
 #: src/pages/Classes.tsx
+#: src/pages/Distribute.tsx
 msgid "Create a class to add your students."
 msgstr "Create a class to add your students."
 
@@ -305,6 +330,10 @@ msgstr "Create accounts"
 #: src/pages/Classes.tsx
 msgid "Create class"
 msgstr "Create class"
+
+#: src/pages/Distribute.tsx
+msgid "Create groups"
+msgstr "Create groups"
 
 #: src/pages/Activities.tsx
 msgid "Create your first activity to get started."
@@ -360,7 +389,12 @@ msgid "Display mode"
 msgstr "Display mode"
 
 #: src/pages/ActivityEditor.tsx
+msgid "Distribute"
+msgstr "Distribute"
+
+#: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
+#: src/pages/Run.tsx
 msgid "done"
 msgstr "done"
 
@@ -433,6 +467,32 @@ msgstr "For example: Fact-checking"
 msgid "Form controls"
 msgstr "Form controls"
 
+#: src/pages/Run.tsx
+msgid "Getting your activity…"
+msgstr "Getting your activity…"
+
+#. placeholder {0}: g + 1
+#: src/pages/Distribute.tsx
+msgid "Group {0}"
+msgstr "Group {0}"
+
+#: src/pages/Distribute.tsx
+msgid "Group name"
+msgstr "Group name"
+
+#. placeholder {0}: s.displayName
+#: src/pages/Distribute.tsx
+msgid "Group of {0}"
+msgstr "Group of {0}"
+
+#: src/pages/Distribute.tsx
+msgid "Groups"
+msgstr "Groups"
+
+#: src/pages/Distribute.tsx
+msgid "Groups of this activity"
+msgstr "Groups of this activity"
+
 #: src/pages/Gallery.tsx
 msgid "Hand out"
 msgstr "Hand out"
@@ -443,6 +503,7 @@ msgstr "Heading"
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
+#: src/pages/Run.tsx
 msgid "hidden from students"
 msgstr "hidden from students"
 
@@ -462,6 +523,10 @@ msgstr "Hide step {s}"
 #: src/apps/DisplayModeField.tsx
 msgid "How it opens"
 msgstr "How it opens"
+
+#: src/pages/Distribute.tsx
+msgid "How to split the class"
+msgstr "How to split the class"
 
 #: src/pages/Gallery.tsx
 msgid "I've finished the step"
@@ -495,6 +560,10 @@ msgstr "It is removed for everyone. This cannot be undone."
 #: src/pages/ActivityEditor.tsx
 msgid "It will appear as soon as the connection allows it to sync."
 msgstr "It will appear as soon as the connection allows it to sync."
+
+#: src/pages/Run.tsx
+msgid "It will appear here as soon as it has been received. You can keep this page open."
+msgstr "It will appear here as soon as it has been received. You can keep this page open."
 
 #: src/richtext/RichToolbar.tsx
 msgid "Italic"
@@ -533,6 +602,7 @@ msgstr "Loading…"
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
+#: src/pages/Run.tsx
 msgid "locked"
 msgstr "locked"
 
@@ -547,6 +617,10 @@ msgstr "Long text"
 #: src/components/Layout.tsx
 msgid "Main navigation"
 msgstr "Main navigation"
+
+#: src/pages/Distribute.tsx
+msgid "Members"
+msgstr "Members"
 
 #: src/apps/timer.tsx
 msgid "Minutes"
@@ -650,13 +724,22 @@ msgstr "New step"
 msgid "New window"
 msgstr "New window"
 
+#: src/pages/Run.tsx
+msgid "Next step"
+msgstr "Next step"
+
 #: src/pages/Activities.tsx
 msgid "No activity here yet"
 msgstr "No activity here yet"
 
 #: src/pages/Classes.tsx
+#: src/pages/Distribute.tsx
 msgid "No class yet"
 msgstr "No class yet"
+
+#: src/pages/Distribute.tsx
+msgid "No group yet. Create them below."
+msgstr "No group yet. Create them below."
 
 #: src/pages/ActivityEditor.tsx
 msgid "No lock"
@@ -690,6 +773,14 @@ msgstr "Notes on this step"
 msgid "Nothing here yet."
 msgstr "Nothing here yet."
 
+#: src/pages/Run.tsx
+msgid "Nothing to do yet"
+msgstr "Nothing to do yet"
+
+#: src/pages/Distribute.tsx
+msgid "Number of groups"
+msgstr "Number of groups"
+
 #: src/richtext/RichToolbar.tsx
 msgid "Numbered list"
 msgstr "Numbered list"
@@ -711,6 +802,10 @@ msgstr "One name per line, 60 at most. Each student gets a username and a passph
 msgid "One per line."
 msgstr "One per line."
 
+#: src/pages/Distribute.tsx
+msgid "One per student"
+msgstr "One per student"
+
 #: src/pages/Gallery.tsx
 msgid "One step behind"
 msgstr "One step behind"
@@ -724,9 +819,14 @@ msgstr "Online"
 msgid "Only you can see these notes."
 msgstr "Only you can see these notes."
 
+#: src/pages/Activities.tsx
 #: src/pages/Classes.tsx
 msgid "Open"
 msgstr "Open"
+
+#: src/pages/Run.tsx
+msgid "Open an item"
+msgstr "Open an item"
 
 #: src/apps/ExternalFrame.tsx
 msgid "Open in a new tab"
@@ -777,6 +877,10 @@ msgstr "Picked up “{0}”."
 #: src/apps/kanban.tsx
 msgid "Points"
 msgstr "Points"
+
+#: src/pages/Run.tsx
+msgid "Previous step"
+msgstr "Previous step"
 
 #: src/components/CredentialsSheet.tsx
 msgid "Print"
@@ -871,6 +975,10 @@ msgstr "Resume"
 #: src/pages/Classes.tsx
 msgid "Retry"
 msgstr "Retry"
+
+#: src/pages/Distribute.tsx
+msgid "Save"
+msgstr "Save"
 
 #: src/pages/Gallery.tsx
 msgid "Saving"
@@ -972,6 +1080,7 @@ msgstr "Step title"
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
+#: src/pages/Run.tsx
 msgid "Steps"
 msgstr "Steps"
 
@@ -999,6 +1108,10 @@ msgstr "Students stay on this step until they have submitted the chosen question
 msgid "Submit"
 msgstr "Submit"
 
+#: src/pages/Run.tsx
+msgid "Submit the questionnaire to move on."
+msgstr "Submit the questionnaire to move on."
+
 #: src/components/Layout.tsx
 msgid "Sync problem, retrying"
 msgstr "Sync problem, retrying"
@@ -1022,6 +1135,10 @@ msgstr "The account and its sessions will be deleted. This cannot be undone."
 #: src/pages/Gallery.tsx
 msgid "The name is required"
 msgstr "The name is required"
+
+#: src/pages/Run.tsx
+msgid "The next step is not open yet."
+msgstr "The next step is not open yet."
 
 #: src/auth/useErrorText.ts
 msgid "The password is too simple."
@@ -1083,6 +1200,7 @@ msgid "This questionnaire has no question yet."
 msgstr "This questionnaire has no question yet."
 
 #: src/content/ContentPanel.tsx
+#: src/pages/Run.tsx
 msgid "This type of app is not available in this version."
 msgstr "This type of app is not available in this version."
 
@@ -1131,6 +1249,7 @@ msgid "Untitled question"
 msgstr "Untitled question"
 
 #: src/pages/ActivityEditor.tsx
+#: src/pages/Run.tsx
 msgid "Untitled step"
 msgstr "Untitled step"
 
@@ -1165,9 +1284,17 @@ msgstr "Web link"
 msgid "What to add"
 msgstr "What to add"
 
+#: src/pages/Distribute.tsx
+msgid "Whole class"
+msgstr "Whole class"
+
 #: src/content/NotesPanel.tsx
 msgid "Worked well"
 msgstr "Worked well"
+
+#: src/pages/Run.tsx
+msgid "Your teacher has not opened any step."
+msgstr "Your teacher has not opened any step."
 
 #: src/pages/Activities.tsx
 msgid "Your teacher will share activities here."

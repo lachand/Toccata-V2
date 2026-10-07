@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "../auth/session";
-import type { MasterContent, TeacherNoteDoc } from "@toccata/schema";
+import type { InstanceDoc, MasterContent, ParticipantStateDoc, TeacherNoteDoc } from "@toccata/schema";
 import { useWorkspace } from "./provider";
 import type { ActivityRow, SyncState } from "./workspace";
 
@@ -17,12 +17,12 @@ export function useActivities(): ActivityRow[] | null {
 }
 
 /** `undefined` : chargement ; `null` : l'activité n'est pas (encore) arrivée sur cet appareil. */
-export function useContent(activityId: string): MasterContent | null | undefined {
+export function useContent(activityId: string | null): MasterContent | null | undefined {
   const ws = useWorkspace();
   const [content, setContent] = useState<MasterContent | null | undefined>(undefined);
   useEffect(() => {
     setContent(undefined);
-    if (!ws) return;
+    if (!ws || !activityId) return;
     const s = ws.content$(activityId).subscribe(setContent);
     return () => s.unsubscribe();
   }, [ws, activityId]);
@@ -69,4 +69,55 @@ export function usePendingUploads(): number {
     return () => s.unsubscribe();
   }, [ws]);
   return n;
+}
+
+/** Groupes (instances) d'une activité, vus par l'enseignant propriétaire. */
+export function useGroups(activityId: string): { id: string; def: InstanceDoc | null }[] {
+  const ws = useWorkspace();
+  const { user } = useSession();
+  const [rows, setRows] = useState<{ id: string; def: InstanceDoc | null }[]>([]);
+  useEffect(() => {
+    if (!ws || !user) return setRows([]);
+    const s = ws.activityInstances$(activityId, user.id).subscribe(setRows);
+    return () => s.unsubscribe();
+  }, [ws, user, activityId]);
+  return rows;
+}
+
+/** Séances de l'élève connecté (une par inscription). `null` tant que la base locale s'ouvre. */
+export function useRuns(): { instanceId: string; activityId: string; title: string | null }[] | null {
+  const ws = useWorkspace();
+  const [rows, setRows] = useState<{ instanceId: string; activityId: string; title: string | null }[] | null>(null);
+  useEffect(() => {
+    if (!ws) return setRows(null);
+    const s = ws.runs$().subscribe(setRows);
+    return () => s.unsubscribe();
+  }, [ws]);
+  return rows;
+}
+
+/** Définition d'une instance (écrite par `ownerId`). `undefined` : chargement ; `null` : pas encore arrivée sur l'appareil. */
+export function useInstanceDef(instanceId: string, ownerId: string | null): InstanceDoc | null | undefined {
+  const ws = useWorkspace();
+  const [def, setDef] = useState<InstanceDoc | null | undefined>(undefined);
+  useEffect(() => {
+    setDef(undefined);
+    if (!ws || !ownerId) return;
+    const s = ws.instance$(instanceId, ownerId).subscribe(setDef);
+    return () => s.unsubscribe();
+  }, [ws, instanceId, ownerId]);
+  return def;
+}
+
+/** État du participant (étape en cours…) ; `undefined` : chargement. */
+export function useParticipant(instanceId: string, userId: string): ParticipantStateDoc | null | undefined {
+  const ws = useWorkspace();
+  const [st, setSt] = useState<ParticipantStateDoc | null | undefined>(undefined);
+  useEffect(() => {
+    setSt(undefined);
+    if (!ws) return;
+    const s = ws.participant$(instanceId, userId).subscribe(setSt);
+    return () => s.unsubscribe();
+  }, [ws, instanceId, userId]);
+  return st;
 }

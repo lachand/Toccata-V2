@@ -7,8 +7,10 @@ import { Activities } from "./pages/Activities";
 import { ActivityEditor } from "./pages/ActivityEditor";
 import { ClassDetail } from "./pages/ClassDetail";
 import { Classes } from "./pages/Classes";
+import { Distribute } from "./pages/Distribute";
 import { Gallery } from "./pages/Gallery";
 import { Login } from "./pages/Login";
+import { Run } from "./pages/Run";
 import { Signup } from "./pages/Signup";
 
 /** Routes de l'application (séparées de `main.tsx` pour être testées avec un routeur en mémoire). */
@@ -26,6 +28,8 @@ export function AppRoutes({ locale }: { locale: Locale }) {
               <Routes>
                 <Route path="/" element={<Activities locale={locale} />} />
                 <Route path="/activities/:id" element={<RequireTeacher><ActivityEditor locale={locale} /></RequireTeacher>} />
+                <Route path="/activities/:id/distribute" element={<RequireTeacher><Distribute locale={locale} /></RequireTeacher>} />
+                <Route path="/run/:instanceId" element={<Run locale={locale} />} />
                 <Route path="/gallery" element={<Gallery locale={locale} />} />
                 <Route path="/classes" element={<RequireTeacher><Classes locale={locale} /></RequireTeacher>} />
                 <Route path="/classes/:id" element={<RequireTeacher><ClassDetail locale={locale} /></RequireTeacher>} />

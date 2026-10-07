@@ -39,19 +39,29 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ws || !online) return;
     let cancelled = false;
-    void (async () => {
-      if (role === "teacher") {
-        try {
-          const refs = await activitiesApi(session.authorizedFetch, () => session.getAccessToken()).list();
-          for (const r of refs) await ws.remember(r.id);
-        } catch {
-          /* réseau ou droits : on garde ce qu'on connaît déjà */
-        }
+    const api = activitiesApi(session.authorizedFetch, () => session.getAccessToken());
+    /** Aligne le registre local sur le serveur : activités et groupes de l'enseignant, séances de l'élève. */
+    const refreshRegistry = async () => {
+      try {
+        if (role === "teacher") {
+          for (const a of await api.list()) {
+            await ws.remember(a.id);
+            for (const i of a.instances) await ws.rememberInstance(a.id, i.id);
+          }
+        } else if (role === "student") await ws.syncMemberships(await api.memberships());
+      } catch {
+        /* réseau ou droits : on garde ce qu'on connaît déjà */
       }
+    };
+    void (async () => {
+      await refreshRegistry();
       if (!cancelled && dataConfig.sync) await ws.startSync({ fetch: syncFetch(session.authorizedFetch), baseUrl: dataConfig.syncBaseUrl });
     })();
+    // un nouveau groupe créé depuis un autre appareil, une inscription ajoutée ou retirée : on s'en aperçoit sans recharger
+    const poll = setInterval(() => void refreshRegistry(), 60_000);
     return () => {
       cancelled = true;
+      clearInterval(poll);
       void ws.stopSync();
     };
   }, [ws, online, role]);
