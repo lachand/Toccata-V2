@@ -24,6 +24,10 @@ msgstr "“{0}” dropped."
 msgid "“{0}” is now at position {1}."
 msgstr "“{0}” is now at position {1}."
 
+#: src/pages/Activities.tsx
+msgid "{appCount, plural, one {# app} other {# apps}}"
+msgstr "{appCount, plural, one {# app} other {# apps}}"
+
 #: src/pages/Classes.tsx
 msgid "{count, plural, one {# student} other {# students}}"
 msgstr "{count, plural, one {# student} other {# students}}"
@@ -40,9 +44,17 @@ msgstr "{hiddenCount, plural, one {# hidden} other {# hidden}}"
 msgid "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
 msgstr "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
 
+#: src/components/Layout.tsx
+msgid "{pending, plural, one {# file waiting to be sent} other {# files waiting to be sent}}"
+msgstr "{pending, plural, one {# file waiting to be sent} other {# files waiting to be sent}}"
+
 #: src/pages/Gallery.tsx
 msgid "{pendingCount, plural, one {# change waiting to sync} other {# changes waiting to sync}}"
 msgstr "{pendingCount, plural, one {# change waiting to sync} other {# changes waiting to sync}}"
+
+#: src/pages/Activities.tsx
+msgid "{resourceCount, plural, one {# resource} other {# resources}}"
+msgstr "{resourceCount, plural, one {# resource} other {# resources}}"
 
 #: src/pages/Activities.tsx
 msgid "{stepCount, plural, one {# step} other {# steps}}"
@@ -196,6 +208,10 @@ msgstr "Bold"
 #: src/pages/Gallery.tsx
 msgid "Bonus"
 msgstr "Bonus"
+
+#: src/content/NotesPanel.tsx
+msgid "Bookmark"
+msgstr "Bookmark"
 
 #: src/pages/Gallery.tsx
 msgid "Build"
@@ -400,6 +416,10 @@ msgstr "File"
 #: src/apps/form.tsx
 msgid "File answers are not available yet."
 msgstr "File answers are not available yet."
+
+#: src/content/NotesPanel.tsx
+msgid "Flag"
+msgstr "Flag"
 
 #: src/pages/Classes.tsx
 msgid "For example: 4th grade B"
@@ -658,6 +678,14 @@ msgstr "No student yet."
 msgid "Not found."
 msgstr "Not found."
 
+#: src/pages/ActivityEditor.tsx
+msgid "Notes on the activity"
+msgstr "Notes on the activity"
+
+#: src/pages/ActivityEditor.tsx
+msgid "Notes on this step"
+msgstr "Notes on this step"
+
 #: src/content/ContentPanel.tsx
 msgid "Nothing here yet."
 msgstr "Nothing here yet."
@@ -691,6 +719,10 @@ msgstr "One step behind"
 #: src/pages/Gallery.tsx
 msgid "Online"
 msgstr "Online"
+
+#: src/content/NotesPanel.tsx
+msgid "Only you can see these notes."
+msgstr "Only you can see these notes."
 
 #: src/pages/Classes.tsx
 msgid "Open"
@@ -753,6 +785,10 @@ msgstr "Print"
 #: src/components/CredentialsSheet.tsx
 msgid "Print or save these details now: passphrases cannot be shown again. A lost passphrase can be replaced by a new one."
 msgstr "Print or save these details now: passphrases cannot be shown again. A lost passphrase can be replaced by a new one."
+
+#: src/content/NotesPanel.tsx
+msgid "Private notes"
+msgstr "Private notes"
 
 #: src/pages/Signup.tsx
 msgid "Provided by your school, if one is required."
@@ -917,6 +953,11 @@ msgstr "Start"
 msgid "Status"
 msgstr "Status"
 
+#. placeholder {0}: index + 1
+#: src/pages/ActivityEditor.tsx
+msgid "Step {0}"
+msgstr "Step {0}"
+
 #: src/pages/ActivityEditor.tsx
 msgid "Step locked until a questionnaire is submitted"
 msgstr "Step locked until a questionnaire is submitted"
@@ -957,6 +998,10 @@ msgstr "Students stay on this step until they have submitted the chosen question
 #: src/apps/form.tsx
 msgid "Submit"
 msgstr "Submit"
+
+#: src/components/Layout.tsx
+msgid "Sync problem, retrying"
+msgstr "Sync problem, retrying"
 
 #: src/pages/Gallery.tsx
 msgid "Syncing"
@@ -1065,6 +1110,10 @@ msgstr "Title"
 msgid "To do"
 msgstr "To do"
 
+#: src/content/NotesPanel.tsx
+msgid "To improve"
+msgstr "To improve"
+
 #: src/components/SortableTimeline.tsx
 msgid "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
 msgstr "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
@@ -1115,6 +1164,10 @@ msgstr "Web link"
 #: src/content/AddContentDialog.tsx
 msgid "What to add"
 msgstr "What to add"
+
+#: src/content/NotesPanel.tsx
+msgid "Worked well"
+msgstr "Worked well"
 
 #: src/pages/Activities.tsx
 msgid "Your teacher will share activities here."

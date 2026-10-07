@@ -8,6 +8,7 @@ import { registry } from "../apps/registry";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { fileKind } from "../data/files";
 import type { Workspace } from "../data/workspace";
+import { Heading } from "../components/Heading";
 import { AddContentDialog } from "./AddContentDialog";
 import { ResourceView } from "./ResourceView";
 
@@ -61,7 +62,7 @@ function AppBody({ app, ws, activityId, store }: { app: AppDoc; ws: Workspace; a
  * Ressources et applications d'une portée (toute l'activité, ou une étape). Même composant pour l'activité et pour
  * chaque étape : l'enseignant ajoute par l'assistant unique, renomme, déplie l'aperçu fidèle, supprime.
  */
-export function ContentPanel({ ws, activityId, content, scope, heading, store }: { ws: Workspace; activityId: string; content: MasterContent; scope: Scope; heading: string; store: InstanceStore }) {
+export function ContentPanel({ ws, activityId, content, scope, heading, headingLevel = 3, store }: { ws: Workspace; activityId: string; content: MasterContent; scope: Scope; heading: string; headingLevel?: 2 | 3; store: InstanceStore }) {
   const { t } = useLingui();
   const [adding, setAdding] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
@@ -78,7 +79,7 @@ export function ContentPanel({ ws, activityId, content, scope, heading, store }:
   return (
     <section aria-label={heading} style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", flexWrap: "wrap" }}>
-        <h3 className="tc-h" style={{ fontSize: "var(--text-md)", marginInlineEnd: "auto" }}>{heading}</h3>
+        <Heading level={headingLevel} style={{ marginInlineEnd: "auto" }}>{heading}</Heading>
         <Button icon={<Plus size={16} />} onClick={() => setAdding(true)}>{t`Add`}</Button>
       </div>
       {items.length === 0 ? (

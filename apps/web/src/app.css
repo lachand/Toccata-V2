@@ -35,7 +35,7 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
 .tc-item__head .tc-input { flex: 1 1 12rem; min-inline-size: 0; }
 
 /* Kanban */
-.tc-kanban { display: flex; gap: var(--space-3); overflow-x: auto; padding-block-end: var(--space-2); align-items: flex-start; }
+.tc-kanban { position: relative; display: flex; gap: var(--space-3); overflow-x: auto; padding-block-end: var(--space-2); align-items: flex-start; }
 .tc-kcol { flex: 1 0 15rem; max-inline-size: 22rem; display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-3); border-radius: var(--radius); background: var(--bg); border: 1px solid var(--line); }
 .tc-kcard { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--line-strong); }
 .tc-kcard__row { display: flex; gap: var(--space-2); align-items: center; }

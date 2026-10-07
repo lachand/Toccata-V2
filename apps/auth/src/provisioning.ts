@@ -1,6 +1,6 @@
-import { instanceDbName, masterDbName } from "@toccata/schema";
+import { instanceDbName, masterDbName, teacherDbName } from "@toccata/schema";
 import type { CouchAdmin } from "./couch";
-import { instanceValidator, masterValidator } from "./vdu";
+import { instanceValidator, masterValidator, teacherValidator } from "./vdu";
 
 /** Crée et met à jour les bases CouchDB des activités et des instances (ADR 0003). */
 export class Provisioner {
@@ -30,6 +30,15 @@ export class Provisioner {
       members: { names: [], roles: [...ownerIds.map((o) => `owner:${o}`), `inst:${instanceId}:member`] },
     });
     await this.setDesign(db, instanceValidator(instanceId, ownerIds));
+    return db;
+  }
+
+  /** Base privée d'un enseignant (idempotent). */
+  async provisionTeacher(userId: string): Promise<string> {
+    const db = teacherDbName(userId);
+    await this.couch.ensureDb(db);
+    await this.couch.putSecurity(db, { admins: { names: [], roles: [] }, members: { names: [], roles: [`owner:${userId}`] } });
+    await this.setDesign(db, teacherValidator(userId));
     return db;
   }
 

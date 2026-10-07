@@ -24,6 +24,10 @@ msgstr ""
 msgid "“{0}” is now at position {1}."
 msgstr ""
 
+#: src/pages/Activities.tsx
+msgid "{appCount, plural, one {# app} other {# apps}}"
+msgstr ""
+
 #: src/pages/Classes.tsx
 msgid "{count, plural, one {# student} other {# students}}"
 msgstr ""
@@ -40,8 +44,16 @@ msgstr ""
 msgid "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
 msgstr ""
 
+#: src/components/Layout.tsx
+msgid "{pending, plural, one {# file waiting to be sent} other {# files waiting to be sent}}"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "{pendingCount, plural, one {# change waiting to sync} other {# changes waiting to sync}}"
+msgstr ""
+
+#: src/pages/Activities.tsx
+msgid "{resourceCount, plural, one {# resource} other {# resources}}"
 msgstr ""
 
 #: src/pages/Activities.tsx
@@ -195,6 +207,10 @@ msgstr ""
 
 #: src/pages/Gallery.tsx
 msgid "Bonus"
+msgstr ""
+
+#: src/content/NotesPanel.tsx
+msgid "Bookmark"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -399,6 +415,10 @@ msgstr ""
 
 #: src/apps/form.tsx
 msgid "File answers are not available yet."
+msgstr ""
+
+#: src/content/NotesPanel.tsx
+msgid "Flag"
 msgstr ""
 
 #: src/pages/Classes.tsx
@@ -658,6 +678,14 @@ msgstr ""
 msgid "Not found."
 msgstr ""
 
+#: src/pages/ActivityEditor.tsx
+msgid "Notes on the activity"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+msgid "Notes on this step"
+msgstr ""
+
 #: src/content/ContentPanel.tsx
 msgid "Nothing here yet."
 msgstr ""
@@ -690,6 +718,10 @@ msgstr ""
 #: src/components/Layout.tsx
 #: src/pages/Gallery.tsx
 msgid "Online"
+msgstr ""
+
+#: src/content/NotesPanel.tsx
+msgid "Only you can see these notes."
 msgstr ""
 
 #: src/pages/Classes.tsx
@@ -752,6 +784,10 @@ msgstr ""
 
 #: src/components/CredentialsSheet.tsx
 msgid "Print or save these details now: passphrases cannot be shown again. A lost passphrase can be replaced by a new one."
+msgstr ""
+
+#: src/content/NotesPanel.tsx
+msgid "Private notes"
 msgstr ""
 
 #: src/pages/Signup.tsx
@@ -917,6 +953,11 @@ msgstr ""
 msgid "Status"
 msgstr ""
 
+#. placeholder {0}: index + 1
+#: src/pages/ActivityEditor.tsx
+msgid "Step {0}"
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 msgid "Step locked until a questionnaire is submitted"
 msgstr ""
@@ -956,6 +997,10 @@ msgstr ""
 
 #: src/apps/form.tsx
 msgid "Submit"
+msgstr ""
+
+#: src/components/Layout.tsx
+msgid "Sync problem, retrying"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -1065,6 +1110,10 @@ msgstr ""
 msgid "To do"
 msgstr ""
 
+#: src/content/NotesPanel.tsx
+msgid "To improve"
+msgstr ""
+
 #: src/components/SortableTimeline.tsx
 msgid "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
 msgstr ""
@@ -1114,6 +1163,10 @@ msgstr ""
 
 #: src/content/AddContentDialog.tsx
 msgid "What to add"
+msgstr ""
+
+#: src/content/NotesPanel.tsx
+msgid "Worked well"
 msgstr ""
 
 #: src/pages/Activities.tsx

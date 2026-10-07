@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "../auth/session";
-import type { MasterContent } from "@toccata/schema";
+import type { MasterContent, TeacherNoteDoc } from "@toccata/schema";
 import { useWorkspace } from "./provider";
 import type { ActivityRow, SyncState } from "./workspace";
 
@@ -45,4 +45,28 @@ export function usePreviewStore(activityId: string) {
   const ws = useWorkspace();
   const { user } = useSession();
   return useMemo(() => (ws && user ? ws.previewStore(activityId, { id: user.id, role: user.role }) : null), [ws, user, activityId]);
+}
+
+/** Notes privées de l'enseignant sur une activité. */
+export function useNotes(activityId: string): TeacherNoteDoc[] {
+  const ws = useWorkspace();
+  const [notes, setNotes] = useState<TeacherNoteDoc[]>([]);
+  useEffect(() => {
+    if (!ws) return setNotes([]);
+    const s = ws.notes$(activityId).subscribe(setNotes);
+    return () => s.unsubscribe();
+  }, [ws, activityId]);
+  return notes;
+}
+
+/** Nombre de fichiers gardés sur l'appareil en attente d'envoi. */
+export function usePendingUploads(): number {
+  const ws = useWorkspace();
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (!ws) return setN(0);
+    const s = ws.pendingUploads$().subscribe(setN);
+    return () => s.unsubscribe();
+  }, [ws]);
+  return n;
 }

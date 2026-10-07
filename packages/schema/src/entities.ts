@@ -238,6 +238,20 @@ export const formAnswerDocSchema = z.object({
   submitted: z.boolean(),
 });
 
+/** Note privée de l'enseignant sur une activité ou une étape (base `teacher_<id>`, jamais lisible par les élèves). */
+export const teacherNoteDocSchema = z.object({
+  id: idSchema,
+  kind: z.literal("tnote"),
+  authorId: idSchema,
+  activityId: idSchema,
+  stepId: idSchema.nullable(),
+  body: z.string().max(20_000),
+  /** Drapeaux de réflexion (D9) : ce qui a bien marché, à améliorer, à retrouver. */
+  flag: z.enum(["good", "improve", "bookmark"]).nullable(),
+  createdAt: epoch,
+  updatedAt: epoch,
+});
+
 export const instanceScopedDocSchema = z.discriminatedUnion("kind", [
   instanceDocSchema,
   participantStateDocSchema,
@@ -257,6 +271,7 @@ export type StepDoc = z.infer<typeof stepDocSchema>;
 export type ResourceDoc = z.infer<typeof resourceDocSchema>;
 export type AppDoc = z.infer<typeof appDocSchema>;
 export type FileDoc = z.infer<typeof fileDocSchema>;
+export type TeacherNoteDoc = z.infer<typeof teacherNoteDocSchema>;
 export type MasterDoc = z.infer<typeof masterDocSchema>;
 export type StepPatch = z.infer<typeof stepPatchSchema>;
 export type Overrides = z.infer<typeof overridesSchema>;

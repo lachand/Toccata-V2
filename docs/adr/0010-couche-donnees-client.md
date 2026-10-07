@@ -33,3 +33,5 @@ Statut : accepté (Phase 3A).
   la frappe n'écrase pas la saisie, mais elle apparaît à la prochaine sélection d'étape.
 - Pas encore de résolution d'endpoint local/cloud (Phase 6) : une seule adresse, `/couch`.
 - Les élèves n'ouvrent pas encore d'activité (instances en Phase 4).
+- Un fichier absent de l'appareil et jamais ouvert en ligne n'est pas lisible hors ligne ; l'interface le dit.
+- Le schéma d'enveloppe RxDB a changé (identifiants plus longs : fichiers, envois) : une base locale créée avant la Phase 3C doit être recréée (aucune donnée de production à ce stade).

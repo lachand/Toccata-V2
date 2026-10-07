@@ -203,4 +203,29 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     expect([400, 401]).toContain(r.status);
     expect((await asUser(forged)("_all_dbs")).status).not.toBe(200);
   });
+
+  it("la base privée d'un enseignant (notes) n'est lisible ni inscriptible par personne d'autre, élèves compris", async () => {
+    const a = await ctx.signupTeacher("access.notes.a");
+    const b = await ctx.signupTeacher("access.notes.b");
+    const { students: [s1] } = await ctx.makeClass(a.token, ["Alice Notes"]);
+    const db = `teacher_${a.id}`;
+    ctx.track(db);
+    const tok1 = (await ctx.login(s1!.username, s1!.passphrase)).json.accessToken as string;
+    const [A, B, S] = [asUser(a.token), asUser(b.token), asUser(tok1)];
+    const put = (u: typeof A, id: string, doc: object) => u(`${db}/${id}`, { method: "PUT", body: JSON.stringify(doc) });
+
+    expect(rolesOf(a.token)).toEqual([`owner:${a.id}`]);
+    expect((await put(A, "n1", { kind: "tnote", authorId: a.id, body: "à revoir" })).status).toBe(201);
+    expect((await A(`${db}/n1`)).status).toBe(200);
+    expect((await put(A, "n2", { kind: "tnote", authorId: b.id, body: "usurpation" })).status).toBe(403); // l'auteur doit être le propriétaire
+
+    for (const [who, u] of [["autre enseignant", B], ["élève", S]] as const) {
+      expect((await u(db)).status, `lecture (${who})`).toBe(403);
+      expect((await u(`${db}/n1`)).status, `document (${who})`).toBe(403);
+      expect((await put(u, "intrus", { kind: "tnote", authorId: a.id })).status, `écriture (${who})`).toBe(403);
+    }
+    // un compte créé avant l'existence de la base la reçoit à la connexion (idempotent)
+    expect((await ctx.login("access.notes.a", "Tb9#kLm2-vq8Zr!xW")).status).toBe(200);
+    expect((await A(`${db}/n1`)).status).toBe(200);
+  });
 });

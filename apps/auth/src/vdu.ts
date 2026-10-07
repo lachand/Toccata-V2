@@ -38,3 +38,12 @@ export function instanceValidator(instanceId: string, ownerIds: readonly string[
   }
 }`;
 }
+
+/** Base `teacher_<id>` : privée. Seul son propriétaire lit et écrit, et chaque document porte son identifiant d'auteur. */
+export function teacherValidator(ownerId: string): string {
+  return `function (newDoc, oldDoc, userCtx, secObj) {${OWNER_CHECK.replace("__OWNERS__", ownersLiteral([ownerId]))}
+  if (userCtx.roles.indexOf('_admin') !== -1) return;
+  if (!isOwner(userCtx.roles)) throw ({ forbidden: 'private' });
+  if (!newDoc._deleted && newDoc.authorId !== userCtx.name) throw ({ forbidden: 'author_mismatch' });
+}`;
+}

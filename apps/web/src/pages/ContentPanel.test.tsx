@@ -1,5 +1,6 @@
 import { cleanup, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import axe from "axe-core";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { session } from "../auth/session";
 import { renderApp, resetSession, stubApi, teacher, tokenFor } from "../test-utils";
@@ -86,5 +87,35 @@ describe("Ressources et applications", () => {
     await panel.findByDisplayValue("Web app");
     await userEvent.click(panel.getByRole("button", { name: "Show Web app" }));
     expect(await panel.findByTitle("Web app")).toHaveAttribute("src", "https://framacalc.org/abc");
+  });
+});
+
+describe("accessibilité de l'éditeur", () => {
+  it.each(["en", "fr"] as const)("sans violation axe, avec assistant ouvert (%s)", async (locale) => {
+    const id = nextId();
+    stubApi({
+      "POST /api/auth/refresh": () => tokenFor(teacher),
+      "POST /api/auth/logout": () => ({ status: 204 }),
+      "GET /api/activities": () => ({ json: [] }),
+      "POST /api/activities": () => ({ status: 201, json: { id, dbName: `master_${id}` } }),
+    });
+    await session.bootstrap();
+    const { container } = await renderApp(locale, "/");
+    const [newLabel, titleLabel, createLabel] = locale === "en" ? ["New activity", "Title", "Create"] : ["Nouvelle activité", "Titre", "Créer"];
+    await userEvent.click(await screen.findByRole("button", { name: newLabel }));
+    await userEvent.type(await screen.findByLabelText(titleLabel), "Atelier");
+    await userEvent.click(screen.getByRole("button", { name: createLabel }));
+    await screen.findByRole("heading", { level: 1, name: "Atelier" });
+    await userEvent.click(screen.getByRole("button", { name: locale === "en" ? "Add the first step" : "Ajouter la première étape" }));
+    await screen.findByLabelText(locale === "en" ? "Step title" : "Titre de l’étape");
+    const run = async (el: Element) => {
+      const r = await axe.run(el, { rules: { "color-contrast": { enabled: false }, region: { enabled: false } } });
+      expect(r.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`)).toEqual([]);
+    };
+    await run(container);
+    const panel = within(screen.getAllByRole("region", { name: locale === "en" ? "Resources and apps for this step" : "Ressources et applications de cette étape" })[0]!);
+    await userEvent.click(panel.getByRole("button", { name: locale === "en" ? "Add" : "Ajouter" }));
+    await screen.findByRole("dialog");
+    await run(document.body);
   });
 });

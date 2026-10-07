@@ -6,6 +6,8 @@ import {
   masterDocSchema,
   resourceDocSchema,
   stepDocSchema,
+  teacherNoteDocSchema,
+  type TeacherNoteDoc,
   type InstanceDoc,
   type InstanceScopedDoc,
   type MasterContent,
@@ -31,6 +33,7 @@ function decodeAll<T>(raw: readonly unknown[], parse: (x: unknown) => { success:
 }
 
 export const decodeMasterDocs = (raw: readonly unknown[]) => decodeAll<MasterDoc>(raw, (x) => masterDocSchema.safeParse(x));
+export const decodeTeacherDocs = (raw: readonly unknown[]) => decodeAll<TeacherNoteDoc>(raw, (x) => teacherNoteDocSchema.safeParse(x));
 export const decodeInstanceDocs = (raw: readonly unknown[]) => decodeAll<InstanceScopedDoc>(raw, (x) => instanceScopedDocSchema.safeParse(x));
 
 /**

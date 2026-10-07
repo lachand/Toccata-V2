@@ -90,3 +90,12 @@ non synchronisées.
 - Un document d'instance est limité à 8 Mo par CouchDB (`max_document_size`) ; le texte
   collaboratif est donc découpé en mises à jour (`yupdate`) et compacté (spike c).
 - Les fichiers ne sont pas dans ces documents : ils sont référencés par `fileId` (ADR 0004).
+
+## Ajouts de la Phase 3
+
+| Base | Contenu |
+|---|---|
+| `master_<id>` | + `file` : enveloppe d'un fichier `file_<sha256>` (le contenu est la pièce jointe native `blob`) |
+| `teacher_<id>` | notes privées de l'enseignant (`tnote` : activité ou étape, texte, drapeau) ; propriétaire seul, lecture et écriture |
+| local seulement | `registry` (activités connues), `uploads` (fichiers à envoyer), `preview_<id>` (données d'exécution de l'aperçu) |
+

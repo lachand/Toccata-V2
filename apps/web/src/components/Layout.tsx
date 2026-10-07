@@ -1,9 +1,11 @@
+import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Avatar, AppShell, Button, Rail, RailItem, SyncStatus } from "@toccata/ui";
 import { BookOpen, Copy, LayoutGrid, LogOut, Users } from "lucide-react";
 import type { MouseEvent, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { session, useSession } from "../auth/session";
+import { usePendingUploads, useSyncState } from "../data/hooks";
 import { useOnline } from "../useOnline";
 
 function NavItem({ to, icon, children }: { to: string; icon: ReactNode; children: ReactNode }) {
@@ -62,5 +64,10 @@ export function Layout({ children }: { children: ReactNode }) {
 export function OnlineStatus() {
   const { t } = useLingui();
   const online = useOnline();
-  return online ? <SyncStatus state="online" label={t`Online`} /> : <SyncStatus state="offline" label={t`Offline, your changes are kept`} />;
+  const sync = useSyncState();
+  const pending = usePendingUploads();
+  if (!online) return <SyncStatus state="offline" label={t`Offline, your changes are kept`} />;
+  if (sync.failing) return <SyncStatus state="pending" label={t`Sync problem, retrying`} />;
+  if (pending > 0) return <SyncStatus state="pending" label={plural(pending, { one: "# file waiting to be sent", other: "# files waiting to be sent" })} />;
+  return <SyncStatus state="online" label={t`Online`} />;
 }

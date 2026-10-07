@@ -32,3 +32,6 @@ export function newId(now: number = Date.now(), random: RandomBytes = defaultRan
 /** Bases CouchDB : une pour le contenu d'une activité, une par instance (ADR 0003). */
 export const masterDbName = (id: Id): string => `master_${id}`;
 export const instanceDbName = (id: Id): string => `inst_${id}`;
+
+/** Base privée d'un enseignant (notes de préparation et de réflexion) : lisible et inscriptible par lui seul. */
+export const teacherDbName = (id: Id): string => `teacher_${id}`;

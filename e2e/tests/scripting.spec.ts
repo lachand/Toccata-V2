@@ -230,3 +230,34 @@ test("applications : chrono, kanban, texte partagé et questionnaire s'ajoutent,
   await a.context.close();
   await b.context.close();
 });
+
+test("notes privées synchronisées entre appareils, et éditeur sans débordement à 360 px", async ({ browser }) => {
+  const a = await device(browser);
+  await signIn(a.page);
+  await a.page.getByRole("article", { name: "Atelier Agile" }).getByRole("link", { name: "Modifier" }).click();
+  await a.page.getByRole("button", { name: "Remue-méninges", exact: true }).click();
+  const stepNotes = a.page.getByRole("region", { name: "Notes sur cette étape" });
+  await stepNotes.getByLabel("Notes privées").fill("Prévoir 10 minutes de plus");
+  await stepNotes.getByLabel("Notes privées").blur();
+  await stepNotes.getByRole("button", { name: "À améliorer" }).click();
+  await expect(stepNotes.getByRole("button", { name: "À améliorer" })).toHaveAttribute("aria-pressed", "true");
+
+  const b = await device(browser);
+  await signIn(b.page);
+  await b.page.getByRole("article", { name: "Atelier Agile" }).getByRole("link", { name: "Modifier" }).click();
+  await b.page.getByRole("button", { name: "Remue-méninges", exact: true }).click();
+  const notesB = b.page.getByRole("region", { name: "Notes sur cette étape" });
+  await expect(notesB.getByLabel("Notes privées")).toHaveValue("Prévoir 10 minutes de plus", { timeout: 30_000 });
+  await expect(notesB.getByRole("button", { name: "À améliorer" })).toHaveAttribute("aria-pressed", "true");
+
+  // aucun débordement horizontal de la page à 360 px, avec un kanban et un questionnaire ouverts
+  await b.page.setViewportSize({ width: 360, height: 740 });
+  const panel = b.page.getByRole("region", { name: "Ressources et applications de cette étape" });
+  await panel.getByRole("button", { name: "Afficher Tableau kanban" }).click();
+  await panel.getByRole("button", { name: "Afficher Questionnaire" }).click();
+  await panel.getByRole("button", { name: "Afficher Minuteur" }).click();
+  const overflow = await b.page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+  await a.context.close();
+  await b.context.close();
+});

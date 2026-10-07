@@ -64,6 +64,8 @@ export function Activities({ locale }: { locale: Locale }) {
             {rows.map((a) => {
               const stepCount = a.stepCount;
               const hiddenCount = a.hiddenCount;
+              const resourceCount = a.resourceCount;
+              const appCount = a.appCount;
               return (
                 <li key={a.id} style={{ display: "contents" }}>
                   <Card as="article" aria-labelledby={`t-${a.id}`} style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
@@ -76,6 +78,11 @@ export function Activities({ locale }: { locale: Locale }) {
                       {plural(stepCount, { one: "# step", other: "# steps" })}
                       {hiddenCount > 0 ? <> · {plural(hiddenCount, { one: "# hidden", other: "# hidden" })}</> : null}
                     </p>
+                    {resourceCount + appCount > 0 ? (
+                      <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>
+                        {plural(resourceCount, { one: "# resource", other: "# resources" })} · {plural(appCount, { one: "# app", other: "# apps" })}
+                      </p>
+                    ) : null}
                     {a.updatedAt > 0 ? (
                       <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>{t`Edited ${i18n.date(new Date(a.updatedAt), { dateStyle: "medium", timeStyle: "short" })}`}</p>
                     ) : null}

@@ -6,6 +6,7 @@ import {
   collectionNameFor,
   decodeInstanceDocs,
   decodeMasterDocs,
+  decodeTeacherDocs,
   estimateClockOffset,
   envelopeSchema,
   masterDbName,
@@ -17,6 +18,8 @@ import {
   type MasterDoc,
   type ResourceDoc,
   type StepDoc,
+  type TeacherNoteDoc,
+  teacherDbName,
 } from "@toccata/schema";
 import type { InstanceStore, NewRuntimeDoc, RuntimeDoc, RuntimeKind, Viewer } from "@toccata/apps-sdk";
 import { memoryBlobStore, type BlobStore } from "./blobs";
@@ -37,9 +40,9 @@ export type SyncOptions = {
 export type SyncState = { running: boolean; failing: boolean };
 
 /** Une ligne de la liste « Mes activités ». `title` est `null` tant que le document d'activité n'est pas arrivé. */
-export type ActivityRow = { id: string; title: string | null; description: string; stepCount: number; hiddenCount: number; updatedAt: number };
+export type ActivityRow = { id: string; title: string | null; description: string; stepCount: number; hiddenCount: number; resourceCount: number; appCount: number; updatedAt: number };
 
-export type WorkspaceOptions = { userId: string; storage: RxStorage<unknown, unknown>; multiInstance?: boolean; now?: () => number; blobs?: BlobStore };
+export type WorkspaceOptions = { userId: string; storage: RxStorage<unknown, unknown>; multiInstance?: boolean; now?: () => number; blobs?: BlobStore; role?: "teacher" | "student" };
 
 /** Un document sans les champs que `Workspace` renseigne lui-même. */
 type Fresh<T> = T extends unknown ? Omit<T, "id" | "kind" | "createdAt" | "updatedAt"> : never;
@@ -73,7 +76,9 @@ export class Workspace {
   static async open(o: WorkspaceOptions): Promise<Workspace> {
     const db = await createRxDatabase({ name: `toccata_${o.userId}`.toLowerCase(), storage: o.storage as RxStorage<never, never>, multiInstance: o.multiInstance ?? true });
     const cols = await db.addCollections({ [REGISTRY]: { schema: envelopeSchema as never }, [UPLOADS]: { schema: envelopeSchema as never } });
-    return new Workspace(db, cols[REGISTRY] as unknown as Col, cols[UPLOADS] as unknown as Col, o.now ?? Date.now, o.blobs ?? memoryBlobStore(), o.userId);
+    const ws = new Workspace(db, cols[REGISTRY] as unknown as Col, cols[UPLOADS] as unknown as Col, o.now ?? Date.now, o.blobs ?? memoryBlobStore(), o.userId);
+    if (o.role === "teacher") await ws.named(collectionNameFor(teacherDbName(o.userId)));
+    return ws;
   }
 
   /**
@@ -96,7 +101,11 @@ export class Workspace {
   /* ---------------------------------------------------------------- collections */
 
   private master(activityId: string): Promise<Col> {
-    const name = collectionNameFor(masterDbName(activityId));
+    return this.named(collectionNameFor(masterDbName(activityId)));
+  }
+
+  /** Collection répliquée d'une base CouchDB (contenu d'une activité, ou base privée de l'enseignant). */
+  private named(name: string): Promise<Col> {
     let c = this.cols.get(name);
     if (!c) {
       c = this.db.addCollections({ [name]: { schema: envelopeSchema as never } }).then((r) => {
@@ -150,6 +159,41 @@ export class Workspace {
 
   private registryIds(): Observable<string[]> {
     return this.registry.find().$.pipe(map((rows) => rows.map((r) => r.get("id") as string)));
+  }
+
+  /* ---------------------------------------------------------------- notes privées de l'enseignant */
+
+  private notesCol(): Promise<Col> {
+    return this.named(collectionNameFor(teacherDbName(this.userId)));
+  }
+
+  /** Notes de l'enseignant sur une activité (et ses étapes). Base privée : jamais lisible par les élèves. */
+  notes$(activityId: string): Observable<TeacherNoteDoc[]> {
+    return new Observable<Col>((s) => {
+      void this.notesCol().then((c) => (s.next(c), s.complete()), (e) => s.error(e));
+    }).pipe(
+      switchMap((c) => c.find({ selector: { kind: "tnote" } }).$),
+      map((rows) => decodeTeacherDocs(rows.map((r) => r.toJSON())).docs.filter((d) => d.activityId === activityId)),
+    );
+  }
+
+  /** Une note par cible (activité ou étape) : on la crée au premier enregistrement puis on la met à jour. */
+  async saveNote(activityId: string, stepId: string | null, patch: { body?: string; flag?: TeacherNoteDoc["flag"] }): Promise<void> {
+    const col = await this.notesCol();
+    const existing = decodeTeacherDocs((await col.find({ selector: { kind: "tnote" } }).exec()).map((r) => r.toJSON())).docs.find((d) => d.activityId === activityId && d.stepId === stepId);
+    const t = this.now();
+    const next: TeacherNoteDoc = {
+      id: existing?.id ?? newId(t),
+      kind: "tnote",
+      authorId: this.userId,
+      activityId,
+      stepId,
+      body: patch.body ?? existing?.body ?? "",
+      flag: patch.flag === undefined ? (existing?.flag ?? null) : patch.flag,
+      createdAt: existing?.createdAt ?? t,
+      updatedAt: t,
+    };
+    await col.upsert(next as unknown as Record<string, unknown>);
   }
 
   /* ---------------------------------------------------------------- écriture */
@@ -428,6 +472,8 @@ function summarize(id: string, docs: readonly MasterDoc[]): ActivityRow {
     description: activity?.description ?? "",
     stepCount: steps.length,
     hiddenCount: steps.filter((s) => s.hidden).length,
+    resourceCount: docs.filter((d) => d.kind === "resource").length,
+    appCount: docs.filter((d) => d.kind === "app").length,
     updatedAt: Math.max(0, ...docs.map((d) => d.updatedAt)),
   };
 }

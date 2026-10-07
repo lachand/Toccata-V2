@@ -23,7 +23,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    const { ready, release } = Workspace.acquire({ userId, storage: dataConfig.storage(), multiInstance: dataConfig.multiInstance, blobs: dataConfig.blobs() });
+    const { ready, release } = Workspace.acquire({ userId, storage: dataConfig.storage(), multiInstance: dataConfig.multiInstance, blobs: dataConfig.blobs(), ...(role ? { role } : {}) });
     void ready.then(async (w) => {
       await w.openKnown();
       if (!cancelled) setWs(w);
@@ -33,7 +33,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       setWs(null);
       release();
     };
-  }, [userId]);
+  }, [userId, role]);
 
   const online = !offline && userId !== null;
   useEffect(() => {

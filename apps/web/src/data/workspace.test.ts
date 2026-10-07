@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { newId, type MasterContent } from "@toccata/schema";
 import { Workspace } from "./workspace";
 
-let n = 0;
-const open = (userId = newId()) => Workspace.open({ userId: `${userId}${n++}`, storage: getRxStorageMemory() as never, multiInstance: false });
+
+const open = (userId = newId()) => Workspace.open({ userId, storage: getRxStorageMemory() as never, multiInstance: false });
 const open$ = <T>(w: Workspace, id: string, pick: (c: MasterContent) => T) =>
   firstValueFrom(w.content$(id).pipe(filter((c): c is MasterContent => c !== null))).then(pick);
 
@@ -142,5 +142,22 @@ describe("Workspace (RxDB hors ligne)", () => {
     await w.startSync({ fetch: f, baseUrl: "/couch", replicateData: false });
     await new Promise((r) => setTimeout(r, 30));
     expect(Math.abs(w.serverNow() - skewed)).toBeLessThan(2_500);
+  });
+
+  it("garde une note privée par cible, la met à jour sans doublon et porte un drapeau", async () => {
+    const { w, id } = await make();
+    const step = await w.addStep(id, "A");
+    const read = () => firstValueFrom(w.notes$(id));
+    await w.saveNote(id, null, { body: "Penser aux ciseaux" });
+    await w.saveNote(id, step, { body: "Trop long" });
+    await w.saveNote(id, step, { flag: "improve" });
+    await w.saveNote(id, step, { body: "Trop long, couper la partie 2" });
+    const notes = await read();
+    expect(notes).toHaveLength(2);
+    const onStep = notes.find((n) => n.stepId === step)!;
+    expect(onStep).toMatchObject({ body: "Trop long, couper la partie 2", flag: "improve" });
+    await w.saveNote(id, step, { flag: null });
+    expect((await read()).find((n) => n.stepId === step)!.flag).toBeNull();
+    expect(notes.find((n) => n.stepId === null)).toMatchObject({ body: "Penser aux ciseaux", flag: null });
   });
 });

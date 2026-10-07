@@ -173,6 +173,7 @@ export function createApp(deps: Deps) {
       lockedUntil: 0,
       createdAt: now(),
     });
+    await provisioner.provisionTeacher(user.id);
     return c.json(await issue(c, user), 201);
   });
 
@@ -200,6 +201,8 @@ export function createApp(deps: Deps) {
     }
     limits.guard.recordSuccess(ip, b.username);
     const fresh = user.failedLogins || user.lockedUntil ? await accounts.updateUser(user.id, (u) => ({ ...u, failedLogins: 0, lockedUntil: 0 })) : user;
+    // base privée de l'enseignant : créée à l'inscription, vérifiée à la connexion (comptes créés avant son introduction)
+    if (fresh.role === "teacher") await provisioner.provisionTeacher(fresh.id).catch(() => undefined);
     return c.json(await issue(c, fresh));
   });
 
