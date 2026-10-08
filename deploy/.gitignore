@@ -1,0 +1,6 @@
+.env
+couchdb/secrets.ini
+backups/
+.last-version
+certs/*
+!certs/.gitkeep

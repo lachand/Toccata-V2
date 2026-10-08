@@ -26,6 +26,12 @@ describe("configuration", () => {
     expect(c.ACCESS_TTL_SECONDS).toBe(900);
     expect(c.JWT_SECRET.byteLength).toBeGreaterThanOrEqual(32);
   });
+  it("traite une variable vide (docker compose `VAR=`) comme absente", () => {
+    const c = loadConfig({ ...ok, SIGNUP_CODE: "", UPSTREAM_COUCHDB_URL: "", TEACHER_IDS: "", SERVER_NAME: "" });
+    expect(c.SIGNUP_CODE).toBeUndefined();
+    expect(c.SERVER_NAME).toBe("Toccata");
+    expect(() => loadConfig({ ...ok, JWT_SECRET: "" })).toThrow(/JWT_SECRET/);
+  });
   it("refuse de démarrer sans secret, sans afficher de valeur", () => {
     const { JWT_SECRET: _omit, ...sans } = ok;
     expect(() => loadConfig(sans)).toThrow(/JWT_SECRET/);

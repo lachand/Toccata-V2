@@ -267,6 +267,9 @@ export function createApp(deps: Deps) {
   /** Public, sans secret : sert à l'indicateur de l'interface (« Serveur de classe · Internet indisponible ») et de sonde de santé. */
   app.get("/server-info", (c) => c.json(deps.reconciler?.getInfo() ?? { mode: config.SERVER_MODE, name: config.SERVER_NAME, upstream: config.SERVER_MODE === "local" ? "unknown" : "none", lastSyncAt: null, failing: 0 }));
 
+  /** Sonde pour Docker, la supervision et `doctor.sh` : 200 si le service et sa base de comptes répondent, 503 sinon. Aucun détail. */
+  app.get("/health", async (c) => ((await accounts.ping()) ? c.json({ ok: true }) : c.json({ ok: false }, 503)));
+
   app.get("/auth/me", async (c) => c.json(publicUser(await authenticate(c))));
 
   /* ------------------------------------------------------------------ classes (enseignant) */

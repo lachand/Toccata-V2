@@ -162,6 +162,11 @@ export class AccountStore {
     return this.couch.update<InstanceReg>(this.db, `instance_${id}`, mutate);
   }
 
+  /** Vrai si la base de comptes répond (sonde de santé). */
+  async ping(): Promise<boolean> {
+    return this.couch.request("GET", encodeURIComponent(this.db)).then((r) => r.status === 200, () => false);
+  }
+
   /** Documents écrits par une personne (champ `authorId`) dans les bases de ses séances : export RGPD (accès, portabilité). */
   async authoredDocs(userId: string, instanceIds: string[]): Promise<{ instanceId: string; docs: Record<string, unknown>[] }[]> {
     const out: { instanceId: string; docs: Record<string, unknown>[] }[] = [];

@@ -1,0 +1,75 @@
+# Toccata en production : cloud (SERVER_MODE=cloud) ou serveur de classe (SERVER_MODE=local), même pile.
+# Ne se lance pas à la main : ./install.sh écrit .env et couchdb/secrets.ini (secrets générés, jamais versionnés).
+name: ${COMPOSE_PROJECT_NAME:-toccata}
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "5" }
+
+services:
+  couchdb:
+    image: ${COUCHDB_IMAGE:-couchdb:3.4}
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      COUCHDB_USER: ${COUCHDB_ADMIN_USER:-admin}
+      COUCHDB_PASSWORD: ${COUCHDB_ADMIN_PASSWORD:?lancez ./install.sh}
+    volumes:
+      - couchdb-data:/opt/couchdb/data
+      # pas en lecture seule : l'entrypoint de CouchDB ajuste les droits des fichiers de configuration
+      - ./couchdb/local.ini:/opt/couchdb/etc/local.d/10-toccata.ini
+      - ./couchdb/secrets.ini:/opt/couchdb/etc/local.d/20-secrets.ini
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://127.0.0.1:5984/_up"]
+      interval: 10s
+      timeout: 3s
+      retries: 12
+    # jamais exposé hors de la machine : tout passe par Caddy (HTTPS) et par le service d'authentification
+    expose: ["5984"]
+
+  auth:
+    image: ${TOCCATA_IMAGE_AUTH:-ghcr.io/lachand/toccata-auth}:${TOCCATA_VERSION:-latest}
+    build: { context: .., dockerfile: deploy/Dockerfile.auth, args: { NODE_IMAGE: "${NODE_IMAGE:-node:22-slim}" } }
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      couchdb: { condition: service_healthy }
+    environment:
+      SERVER_MODE: ${SERVER_MODE:-cloud}
+      SERVER_NAME: ${SERVER_NAME:-Toccata}
+      PORT: "8787"
+      COUCHDB_URL: http://couchdb:5984
+      COUCHDB_ADMIN_USER: ${COUCHDB_ADMIN_USER:-admin}
+      COUCHDB_ADMIN_PASSWORD: ${COUCHDB_ADMIN_PASSWORD}
+      # le CouchDB se désigne lui-même ainsi pour ses réplications (mode « classe » : la source est locale, la cible est le cloud)
+      LOCAL_COUCHDB_SELF_URL: http://127.0.0.1:5984
+      JWT_SECRET: ${JWT_SECRET:?lancez ./install.sh}
+      JWT_KID: ${JWT_KID:-prod}
+      SIGNUP_CODE: ${SIGNUP_CODE:-}
+      UPSTREAM_COUCHDB_URL: ${UPSTREAM_COUCHDB_URL:-}
+      UPSTREAM_ADMIN_USER: ${UPSTREAM_ADMIN_USER:-}
+      UPSTREAM_ADMIN_PASSWORD: ${UPSTREAM_ADMIN_PASSWORD:-}
+      TEACHER_IDS: ${TEACHER_IDS:-}
+      TRUST_PROXY: "true"
+      COOKIE_SECURE: "true"
+    expose: ["8787"]
+    mem_limit: 512m
+
+  web:
+    image: ${TOCCATA_IMAGE_WEB:-ghcr.io/lachand/toccata-web}:${TOCCATA_VERSION:-latest}
+    build: { context: .., dockerfile: deploy/Dockerfile.web, args: { NODE_IMAGE: "${NODE_IMAGE:-node:22-slim}", CADDY_IMAGE: "${CADDY_IMAGE:-caddy:2}" } }
+    restart: unless-stopped
+    logging: *logging
+    depends_on: [auth]
+    ports: ["${HTTP_PORT:-80}:${HTTP_PORT:-80}", "${HTTPS_PORT:-443}:${HTTPS_PORT:-443}"]
+    environment:
+      SERVER_HOST: ${SERVER_HOST:?lancez ./install.sh}
+      TLS_DIRECTIVE: ${TLS_DIRECTIVE:-}
+      HTTP_PORT: ${HTTP_PORT:-80}
+      HTTPS_PORT: ${HTTPS_PORT:-443}
+    volumes:
+      - caddy-data:/data
+      - ./certs:/certs:ro
+
+volumes:
+  couchdb-data:
+  caddy-data:

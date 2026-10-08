@@ -22,6 +22,7 @@ export class CouchAdmin {
     this.auth = "Basic " + Buffer.from(`${user}:${password}`).toString("base64");
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- corps JSON de CouchDB, validé par les appelants
   async request(method: string, path: string, body?: unknown): Promise<{ status: number; body: any }> {
     const res = await this.fetchImpl(`${this.base}/${path}`, {
       method,

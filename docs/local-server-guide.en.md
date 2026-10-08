@@ -25,17 +25,21 @@ A **class server** is a small computer (Raspberry Pi, mini-PC) placed in the roo
 
 ## Installation
 
+The class server uses the **same package as the cloud** (`deploy/`, see the [deployment guide](deployment-guide.en.md)):
+
 ```sh
-cd apps/local-server
-./make-secrets.sh              # writes .env and couchdb/secrets.ini (mode 600, never committed): CouchDB password, a JWT key OWN to this server
-$EDITOR .env                   # SERVER_HOST, UPSTREAM_COUCHDB_URL, UPSTREAM_ADMIN_*, TEACHER_IDS
-docker compose up -d --build   # build apps/web first (pnpm --filter @toccata/web build)
+cd deploy
+./install.sh --mode classe --domain class.example.org --tls internal \
+  --upstream https://toccata.example.org/couch --upstream-user admin --upstream-password '<cloud CouchDB password>' \
+  --teachers <your-teacher-identifier>
 ```
 
-**Certificate** (`TLS_DIRECTIVE` in `.env`): `tls /certs/fullchain.pem /certs/privkey.pem` (recommended; get the certificate on a connected machine, e.g. certbot with a
-DNS challenge, copy it to `apps/local-server/certs/`) or `tls internal` (Caddy's own CA; install its root certificate on every device).
+The script generates the CouchDB password and a JWT key OWN to this server, starts the stack and checks its health; `./doctor.sh` also reports the link with the cloud.
 
-**Classroom Wi-Fi**: `sudo SSID=Class-4B PSK='…' DOMAIN=class.example.org ./hotspot/setup-hotspot.sh`.
+**Certificate** (`--tls`): `fichiers` (recommended; get the certificate on a connected machine, e.g. certbot with a DNS challenge, copy `fullchain.pem` and `privkey.pem` to `deploy/certs/`)
+or `internal` (Caddy's own CA; install its root certificate on every device: `docker compose cp web:/data/caddy/pki/authorities/local/root.crt .`).
+
+**Classroom Wi-Fi**: `sudo SSID=Class-4B PSK='…' DOMAIN=class.example.org ./hotspot/setup-hotspot.sh` (from `deploy/`).
 
 > The hotspot script and a real certificate could **not** be tested in the repository (no hardware). Try them once, online, *before* the day.
 

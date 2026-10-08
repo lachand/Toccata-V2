@@ -26,23 +26,28 @@ partage de connexion 4G). C'est la réponse de Toccata aux sorties, aux salles s
 
 ## Installation
 
+Le serveur de classe utilise le **même paquet que le cloud** (`deploy/`, voir le [guide de déploiement](guide-deploiement.md)) :
+
 ```sh
-cd apps/local-server
-./make-secrets.sh                 # écrit .env et couchdb/secrets.ini (droits 600, jamais versionnés) : mot de passe CouchDB, clé JWT PROPRE à ce serveur
-$EDITOR .env                      # SERVER_HOST, UPSTREAM_COUCHDB_URL, UPSTREAM_ADMIN_*, TEACHER_IDS
-(cd ../.. && pnpm install && pnpm --filter @toccata/web build)   # sur une machine de développement : copiez ensuite apps/web/dist sur le Pi
-docker compose up -d --build
+cd deploy
+./install.sh --mode classe --domain classe.exemple.org --tls internal \
+  --upstream https://toccata.exemple.org/couch --upstream-user admin --upstream-password '<mot de passe CouchDB du cloud>' \
+  --teachers <votre-identifiant-enseignant>
 ```
 
-**Certificat.** Deux choix, via `TLS_DIRECTIVE` dans `.env` :
-- `tls /certs/fullchain.pem /certs/privkey.pem` (recommandé) : obtenez un certificat pour votre domaine sur une machine connectée (par exemple avec
-  `certbot` et un défi DNS), copiez-le dans `apps/local-server/certs/` et renouvelez-le régulièrement ;
-- `tls internal` : Caddy crée sa propre autorité ; il faut **installer son certificat racine sur chaque appareil** (`caddy-data`, fichier `root.crt`).
+Le script génère le mot de passe CouchDB et une clé JWT **propre à ce serveur** (un serveur volé ne peut pas forger de jetons valables sur le cloud),
+démarre la pile et vérifie sa santé. `./doctor.sh` affiche en plus l'état de la liaison avec le cloud.
+
+**Certificat.** Deux choix (`--tls`) :
+- `fichiers` (recommandé) : obtenez un certificat pour votre domaine sur une machine connectée (par exemple avec `certbot` et un défi DNS), copiez
+  `fullchain.pem` et `privkey.pem` dans `deploy/certs/` et renouvelez-les régulièrement ;
+- `internal` : Caddy crée sa propre autorité ; il faut **installer son certificat racine sur chaque appareil**
+  (`docker compose cp web:/data/caddy/pki/authorities/local/root.crt .`).
 
 **Wi-Fi de la classe** (Raspberry Pi OS avec NetworkManager) :
 
 ```sh
-sudo SSID=Classe-4B PSK='mot-de-passe-wifi' DOMAIN=classe.exemple.org ./hotspot/setup-hotspot.sh
+sudo SSID=Classe-4B PSK='mot-de-passe-wifi' DOMAIN=classe.exemple.org ./hotspot/setup-hotspot.sh   # depuis deploy/
 ```
 
 > Le script du point d'accès et le certificat réel n'ont **pas** pu être testés dans le dépôt (pas de matériel). Essayez-les une fois, avec Internet,
@@ -69,7 +74,7 @@ sudo SSID=Classe-4B PSK='mot-de-passe-wifi' DOMAIN=classe.exemple.org ./hotspot/
 ## Sauvegarde et mise à jour
 
 - Sauvegarde : le volume `couchdb-data` (arrêtez la pile ou utilisez `docker run --volumes-from`). Le cloud détient une copie dès que la synchronisation a eu lieu.
-- Mise à jour : `git pull`, reconstruisez l'interface, `docker compose up -d --build`.
+- Mise à jour : `./update.sh` (sauvegarde, nouvelle version, retour arrière automatique). Sauvegarde : `./backup.sh`.
 
 ## Sécurité et limites
 

@@ -71,7 +71,9 @@ export type Config = z.infer<typeof schema>;
 
 /** Valide l'environnement. Lève une erreur lisible (sans jamais afficher de valeur) si quelque chose manque. */
 export function loadConfig(env: Record<string, string | undefined> = process.env): Config {
-  const r = schema.safeParse(env);
+  // docker compose transmet `VAR=` (chaîne vide) pour une variable non renseignée : on la traite comme absente
+  const clean = Object.fromEntries(Object.entries(env).filter(([, v]) => v !== ""));
+  const r = schema.safeParse(clean);
   if (!r.success) {
     const lines = r.error.issues.map((i) => `  - ${i.path.join(".")} : ${i.message}`);
     throw new Error(`Configuration invalide :\n${lines.join("\n")}`);

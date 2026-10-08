@@ -1,4 +1,4 @@
 {
   "compilerOptions": { "target": "ES2022", "module": "ESNext", "moduleResolution": "Bundler", "strict": true, "skipLibCheck": true, "noEmit": true, "types": ["node"] },
-  "include": ["tests", "playwright.config.ts"]
+  "include": ["tests", "tests-prod", "playwright.config.ts", "playwright.prod.config.ts"]
 }

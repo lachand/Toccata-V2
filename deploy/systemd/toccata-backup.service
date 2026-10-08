@@ -1,0 +1,7 @@
+[Unit]
+Description=Sauvegarde de Toccata
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=@DIR@/backup.sh

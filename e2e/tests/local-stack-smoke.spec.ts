@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 // Fumée de la pile « serveur de classe » réelle (Caddy + service d'authentification en mode local + CouchDB), lancée à part :
-//   cd apps/local-server && docker compose up -d --build   puis   LOCAL_STACK_URL=https://classe.example.org pnpm e2e
+//   cd deploy && ./install.sh --mode classe …   puis   LOCAL_STACK_URL=https://classe.example.org pnpm e2e
 // Sans cette variable, le test est ignoré (la pile exige Docker, des secrets et un amont).
 const url = process.env["LOCAL_STACK_URL"];
 test.skip(!url, "LOCAL_STACK_URL non défini : pile du serveur de classe non lancée");

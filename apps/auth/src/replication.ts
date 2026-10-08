@@ -73,21 +73,33 @@ export class Reconciler {
 
   async provisionPass(): Promise<void> {
     // la bibliothèque de modèles n'existe que sur le serveur de référence (un serveur de classe n'en a pas l'usage)
-    if (this.cfg.SERVER_MODE === "cloud" && !this.provisioned.has("library")) (await this.provisioner.provisionLibrary(), this.provisioned.add("library"));
+    if (this.cfg.SERVER_MODE === "cloud" && !this.provisioned.has("library")) {
+      await this.provisioner.provisionLibrary();
+      this.provisioned.add("library");
+    }
     const reg = await this.accounts.registry();
     const owners = new Map(reg.activities.map((a) => [a.id, [a.ownerId, ...a.coOwnerIds]]));
     for (const a of reg.activities) {
       const key = `m:${a.id}`;
-      if (!this.provisioned.has(key)) (await this.provisioner.provisionMaster(a.id, owners.get(a.id)!), this.provisioned.add(key));
+      if (!this.provisioned.has(key)) {
+        await this.provisioner.provisionMaster(a.id, owners.get(a.id)!);
+        this.provisioned.add(key);
+      }
     }
     for (const i of reg.instances) {
       const key = `i:${i.id}`;
       const o = owners.get(i.activityId);
-      if (o && !this.provisioned.has(key)) (await this.provisioner.provisionInstance(i.id, o), this.provisioned.add(key));
+      if (o && !this.provisioned.has(key)) {
+        await this.provisioner.provisionInstance(i.id, o);
+        this.provisioned.add(key);
+      }
     }
     for (const t of reg.teacherIds) {
       const key = `t:${t}`;
-      if (!this.provisioned.has(key)) (await this.provisioner.provisionTeacher(t), this.provisioned.add(key));
+      if (!this.provisioned.has(key)) {
+        await this.provisioner.provisionTeacher(t);
+        this.provisioned.add(key);
+      }
     }
   }
 

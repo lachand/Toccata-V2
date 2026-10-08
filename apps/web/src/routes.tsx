@@ -1,23 +1,26 @@
+import { lazy, Suspense } from "react";
 import { Route, Routes } from "react-router";
 import { GuestOnly, RequireAuth, RequireTeacher } from "./auth/guards";
 import { Layout } from "./components/Layout";
 import type { Locale } from "./i18n";
 import { WorkspaceProvider } from "./data/provider";
 import { Activities } from "./pages/Activities";
-import { ActivityEditor } from "./pages/ActivityEditor";
-import { ClassDetail } from "./pages/ClassDetail";
-import { Classes } from "./pages/Classes";
-import { Distribute } from "./pages/Distribute";
-import { Gallery } from "./pages/Gallery";
-import { Mirror } from "./pages/Mirror";
 import { Privacy } from "./pages/Privacy";
-import { Review } from "./pages/Review";
-import { Monitor } from "./pages/Monitor";
-import { Library } from "./pages/Library";
 import { Login } from "./pages/Login";
-import { Remote } from "./pages/Remote";
 import { Run } from "./pages/Run";
 import { Signup } from "./pages/Signup";
+
+// Pages réservées à l'enseignant : chargées à la demande (l'élève et la connexion ne paient pas leur poids)
+const ActivityEditor = lazy(() => import("./pages/ActivityEditor").then((m) => ({ default: m.ActivityEditor })));
+const ClassDetail = lazy(() => import("./pages/ClassDetail").then((m) => ({ default: m.ClassDetail })));
+const Classes = lazy(() => import("./pages/Classes").then((m) => ({ default: m.Classes })));
+const Distribute = lazy(() => import("./pages/Distribute").then((m) => ({ default: m.Distribute })));
+const Gallery = lazy(() => import("./pages/Gallery").then((m) => ({ default: m.Gallery })));
+const Mirror = lazy(() => import("./pages/Mirror").then((m) => ({ default: m.Mirror })));
+const Review = lazy(() => import("./pages/Review").then((m) => ({ default: m.Review })));
+const Monitor = lazy(() => import("./pages/Monitor").then((m) => ({ default: m.Monitor })));
+const Library = lazy(() => import("./pages/Library").then((m) => ({ default: m.Library })));
+const Remote = lazy(() => import("./pages/Remote").then((m) => ({ default: m.Remote })));
 
 /** Routes de l'application (séparées de `main.tsx` pour être testées avec un routeur en mémoire). */
 export function AppRoutes({ locale }: { locale: Locale }) {
@@ -31,6 +34,7 @@ export function AppRoutes({ locale }: { locale: Locale }) {
           <RequireAuth>
             <WorkspaceProvider>
             <Layout>
+              <Suspense fallback={<p role="status" aria-busy="true" style={{ padding: "var(--space-5)" }}>…</p>}>
               <Routes>
                 <Route path="/" element={<Activities locale={locale} />} />
                 <Route path="/activities/:id" element={<RequireTeacher><ActivityEditor locale={locale} /></RequireTeacher>} />
@@ -46,6 +50,7 @@ export function AppRoutes({ locale }: { locale: Locale }) {
                 <Route path="/classes" element={<RequireTeacher><Classes locale={locale} /></RequireTeacher>} />
                 <Route path="/classes/:id" element={<RequireTeacher><ClassDetail locale={locale} /></RequireTeacher>} />
               </Routes>
+              </Suspense>
             </Layout>
             </WorkspaceProvider>
           </RequireAuth>

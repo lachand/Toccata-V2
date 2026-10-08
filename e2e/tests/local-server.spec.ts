@@ -1,4 +1,4 @@
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, test, type Browser } from "@playwright/test";
 import { spawn, type ChildProcess } from "node:child_process";
 import { openSync } from "node:fs";
 // @ts-expect-error — outil de développement en JavaScript, sans déclaration de types

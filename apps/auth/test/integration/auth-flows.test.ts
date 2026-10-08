@@ -19,6 +19,12 @@ describe("inscription et connexion d'un enseignant", () => {
     expect(rolesOf(r.json.accessToken)).toEqual([`owner:${r.json.user.id}`, "teacher"]);
   });
 
+  it("sonde de santé : 200 sans détail tant que la base de comptes répond", async () => {
+    const r = await ctx.call("GET", "/health");
+    expect(r.status).toBe(200);
+    expect(r.json).toEqual({ ok: true });
+  });
+
   it("pose un cookie de rafraîchissement HttpOnly, SameSite=Strict, limité à /auth", async () => {
     const r = await ctx.call("POST", "/auth/teachers", { body: { username: "cookie.teacher", displayName: "C", password: ctx.PASSWORD } });
     expect(r.setCookie).toMatch(/toccata_rt=/);

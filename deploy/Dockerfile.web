@@ -1,0 +1,15 @@
+# Interface (PWA) + Caddy (HTTPS automatique, en-têtes de sécurité, proxy /api et /couch) dans une seule image.
+# Contexte de construction : la RACINE du dépôt.   docker build -f deploy/Dockerfile.web -t toccata-web .
+ARG NODE_IMAGE=node:22-slim
+ARG CADDY_IMAGE=caddy:2
+FROM ${NODE_IMAGE} AS build
+RUN corepack enable
+WORKDIR /app
+COPY . .
+RUN pnpm install --frozen-lockfile --filter @toccata/web... && pnpm --filter @toccata/web build
+
+FROM ${CADDY_IMAGE}
+COPY deploy/caddy/Caddyfile /etc/caddy/Caddyfile
+COPY --from=build /app/apps/web/dist /srv/web
+HEALTHCHECK --interval=15s --timeout=4s --start-period=10s --retries=5 \
+  CMD wget -qO- --no-check-certificate "https://127.0.0.1:${HTTPS_PORT:-443}/" >/dev/null 2>&1 || wget -qO- "http://127.0.0.1:${HTTP_PORT:-80}/" >/dev/null 2>&1 || exit 1

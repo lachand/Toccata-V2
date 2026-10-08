@@ -10,7 +10,7 @@
 | 5 | Orchestration — **terminée** : suivi en direct et mode projecteur, miroir en lecture seule, pilotage (chrono, message, attention, verrou, retours), remise de l'élève, télécommande mobile ; ADR 0014 (Web Push reste à faire) |
 | 6 | Résilience réseau — **terminée** : serveur de classe (réplication entre serveurs, authentification locale, comptes en lecture seule), indicateur d'état réel, paquet Docker/Caddy, guide ; ADR 0015 (point d'accès Wi-Fi et certificat réel non testés faute de matériel) |
 | 7 | Réutilisation et réflexion — **terminée** : fichier `.toccata` (export, import, duplication), bibliothèque de modèles partagés entre enseignants, journal de séance, bilan « prévu vs réalisé » avec notes structurées, export de recherche (consentement), données personnelles (export et effacement) ; ADR 0016 (modèles sans fichiers, bibliothèque en ligne seulement) |
-| 8 | Qualité et mise en production |
+| 8 | Qualité et mise en production — **terminée** : paquet `deploy/` (installation, mise à jour avec retour arrière, sauvegarde/restauration, diagnostic), images multi-architecture et release, CI (lint, audit, budget de poids, fumée de production, charge), accessibilité de toutes les routes fr/en, guides enseignant et déploiement ; ADR 0017 (relecture linguistique native, Let's Encrypt réel et Raspberry Pi restent à faire) |
 
 Directions de conception de l'article (D1–D9) : appareil quelconque, mobilité, résilience
 réseau, planification, distribution et modification en direct, continuité entre séances,
