@@ -22,9 +22,11 @@ export type UserDoc = Doc & {
 };
 export type ClassDoc = Doc & { type: "class"; id: Id; name: string; ownerId: Id; locale: Locale; studentIds: Id[]; createdAt: number };
 export type SessionDoc = Doc & { type: "session"; id: string; userId: Id; familyId: string; tokenHash: string; createdAt: number; expiresAt: number; usedAt: number | null; revoked: boolean };
-export type ActivityReg = Doc & { type: "activity"; id: Id; ownerId: Id; coOwnerIds: Id[]; instanceIds: Id[]; createdAt: number };
-export type InstanceReg = Doc & { type: "instance"; id: Id; activityId: Id; memberIds: Id[]; createdAt: number };
-type UnameDoc = Doc & { type: "uname"; userId: Id };
+/** Les instances d'une activité se déduisent des documents `instance` (`activityId`), jamais d'un tableau modifié des deux côtés (serveur de classe). */
+export type ActivityReg = Doc & { type: "activity"; id: Id; ownerId: Id; coOwnerIds: Id[]; createdAt: number };
+/** `ownerId` : enseignant propriétaire, pour filtrer la réplication vers un serveur de classe. */
+export type InstanceReg = Doc & { type: "instance"; id: Id; activityId: Id; ownerId: Id; memberIds: Id[]; createdAt: number };
+type UnameDoc = Doc & { type: "uname"; userId: Id; ownerId: Id };
 
 /** Comptes, classes, sessions et registre des activités, dans une base CouchDB réservée à l'administrateur. */
 export class AccountStore {
@@ -38,13 +40,14 @@ export class AccountStore {
     await this.couch.createIndex(this.db, ["type", "familyId"]);
     await this.couch.createIndex(this.db, ["type", "userId"]);
     await this.couch.createIndex(this.db, ["type", "ownerId"]);
+    await this.couch.createIndex(this.db, ["type", "activityId"]);
   }
 
   /* ---------------------------------------------------------------- utilisateurs */
 
   /** Crée le compte ; l'identifiant de connexion est réservé d'abord (document `uname_…`, unique par construction). */
   async createUser(user: Omit<UserDoc, "_id" | "_rev" | "type">): Promise<UserDoc> {
-    const uname: UnameDoc = { _id: `uname_${user.username}`, type: "uname", userId: user.id };
+    const uname: UnameDoc = { _id: `uname_${user.username}`, type: "uname", userId: user.id, ownerId: user.createdBy ?? user.id };
     try {
       await this.couch.put(this.db, uname);
     } catch (e) {
@@ -130,6 +133,18 @@ export class AccountStore {
   }
   listActivities(ownerId: string): Promise<ActivityReg[]> {
     return this.couch.find<ActivityReg>(this.db, { type: "activity", ownerId });
+  }
+  listInstances(activityId: string): Promise<InstanceReg[]> {
+    return this.couch.find<InstanceReg>(this.db, { type: "instance", activityId });
+  }
+  /** Tout le registre (activités, instances, enseignants) : sert à approvisionner les bases d'un serveur qui découvre des activités par réplication. */
+  async registry(): Promise<{ activities: ActivityReg[]; instances: InstanceReg[]; teacherIds: string[] }> {
+    const [activities, instances, users] = await Promise.all([
+      this.couch.find<ActivityReg>(this.db, { type: "activity" }, 100_000),
+      this.couch.find<InstanceReg>(this.db, { type: "instance" }, 100_000),
+      this.couch.find<UserDoc>(this.db, { type: "user", role: "teacher" }, 100_000),
+    ]);
+    return { activities, instances, teacherIds: users.map((u) => u.id) };
   }
   getActivity(id: string): Promise<ActivityReg | null> {
     return this.couch.get<ActivityReg>(this.db, `activity_${id}`);

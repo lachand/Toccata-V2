@@ -41,6 +41,30 @@ const schema = z.object({
   SIGNUP_CODE: z.string().min(8).optional(),
   /** Inscription ouverte à tous, sans code. Fermée par défaut : à n'activer qu'en connaissance de cause. */
   OPEN_SIGNUP: bool(false),
+  /** `local` : serveur de classe (Raspberry Pi, mini-PC), copie filtrée d'un serveur amont. `cloud` : le serveur de référence. */
+  SERVER_MODE: z.enum(["cloud", "local"]).default("cloud"),
+  /** Nom affiché dans l'indicateur de l'interface (« Serveur de classe »…). */
+  SERVER_NAME: z.string().min(1).max(60).default("Toccata"),
+  /** Mode local : CouchDB amont (le cloud), vu DEPUIS le CouchDB local, et son compte d'administration. */
+  UPSTREAM_COUCHDB_URL: z.url().optional(),
+  UPSTREAM_ADMIN_USER: z.string().min(1).optional(),
+  UPSTREAM_ADMIN_PASSWORD: z.string().min(1).optional(),
+  /** Mode local : adresse testée pour savoir si l'amont est joignable (par défaut `UPSTREAM_COUCHDB_URL` ; utile si le service et CouchDB ne voient pas le réseau de la même façon). */
+  UPSTREAM_PROBE_URL: z.url().optional(),
+  /** Mode local : adresse du CouchDB local vue de lui-même (celle que le réplicateur utilise pour la source). */
+  LOCAL_COUCHDB_SELF_URL: z.url().default("http://127.0.0.1:5984"),
+  /** Mode local : enseignants servis (identifiants séparés par des virgules). Seuls leurs comptes et leurs activités sont copiés. */
+  TEACHER_IDS: z
+    .string()
+    .default("")
+    .transform((s) => s.split(",").map((x) => x.trim()).filter(Boolean)),
+  /** Période de la passe de rapprochement (provisionnement et réplication), en secondes. */
+  RECONCILE_SECONDS: z.coerce.number().int().min(2).max(3600).default(30),
+}).superRefine((c, ctx) => {
+  if (c.SERVER_MODE !== "local") return;
+  for (const k of ["UPSTREAM_COUCHDB_URL", "UPSTREAM_ADMIN_USER", "UPSTREAM_ADMIN_PASSWORD"] as const) if (!c[k]) ctx.addIssue({ code: "custom", path: [k], message: "requis en mode local" });
+  if (c.TEACHER_IDS.length === 0) ctx.addIssue({ code: "custom", path: ["TEACHER_IDS"], message: "requis en mode local (au moins un enseignant)" });
+  for (const id of c.TEACHER_IDS) if (!/^[0-9a-hjkmnp-tv-z]{22}$/.test(id)) ctx.addIssue({ code: "custom", path: ["TEACHER_IDS"], message: "identifiant d'enseignant invalide" });
 });
 
 export type Config = z.infer<typeof schema>;

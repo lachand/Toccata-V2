@@ -13,6 +13,7 @@ import { ApiError } from "./errors";
 import { baseUsername, foldPassphrase, generatePassphrase } from "./passphrase";
 import { hashPassword, normalizePassword, passwordProblem, verifyPassword } from "./passwords";
 import type { Provisioner } from "./provisioning";
+import type { Reconciler } from "./replication";
 import { LoginGuard } from "./loginguard";
 import { RateLimiter } from "./ratelimit";
 import { rolesFor } from "./roles";
@@ -22,6 +23,8 @@ export type Deps = {
   config: Config;
   accounts: AccountStore;
   provisioner: Provisioner;
+  /** Rapprochement et état du serveur (absent : `GET /server-info` répond à partir de la configuration seule). */
+  reconciler?: Reconciler;
   clock?: () => number;
   random?: RandomBytes;
   limits?: { guard?: LoginGuard; signup?: RateLimiter; refresh?: RateLimiter };
@@ -58,6 +61,10 @@ export function createApp(deps: Deps) {
   };
   const cookiePath = `${config.BASE_PATH}/auth`; // le navigateur voit l'API sous BASE_PATH ; le cookie doit correspondre
   const app = new Hono<{ Variables: Vars }>();
+  /** Serveur de classe : la gestion des COMPTES se fait sur le cloud (unicité des identifiants, un seul propriétaire des mots de passe). */
+  const cloudOnly = () => {
+    if (config.SERVER_MODE === "local") throw new ApiError("local_readonly");
+  };
 
   app.use(secureHeaders());
   app.use(bodyLimit({ maxSize: 100 * 1024, onError: (c) => c.json({ error: "invalid_input" }, 413) }));
@@ -150,6 +157,7 @@ export function createApp(deps: Deps) {
   /* ------------------------------------------------------------------ authentification */
 
   app.post("/auth/teachers", async (c) => {
+    cloudOnly();
     limit(limits.signup, clientIp(c));
     const b = await body(c, signupBody);
     if (!config.SIGNUP_CODE && !config.OPEN_SIGNUP) throw new ApiError("signup_closed"); // fermé par défaut
@@ -256,6 +264,9 @@ export function createApp(deps: Deps) {
     return c.json(user.memberships.map((m) => ({ activityId: m.activityId, instanceId: m.instanceId })));
   });
 
+  /** Public, sans secret : sert à l'indicateur de l'interface (« Serveur de classe · Internet indisponible ») et de sonde de santé. */
+  app.get("/server-info", (c) => c.json(deps.reconciler?.getInfo() ?? { mode: config.SERVER_MODE, name: config.SERVER_NAME, upstream: config.SERVER_MODE === "local" ? "unknown" : "none", lastSyncAt: null, failing: 0 }));
+
   app.get("/auth/me", async (c) => c.json(publicUser(await authenticate(c))));
 
   /* ------------------------------------------------------------------ classes (enseignant) */
@@ -267,6 +278,7 @@ export function createApp(deps: Deps) {
   };
 
   app.post("/classes", async (c) => {
+    cloudOnly();
     const teacher = await authenticate(c, "teacher");
     const b = await body(c, classBody);
     const cls = await accounts.createClass({ id: newId(now(), deps.random), name: b.name, ownerId: teacher.id, locale: teacher.locale, studentIds: [], createdAt: now() });
@@ -288,6 +300,7 @@ export function createApp(deps: Deps) {
 
   /** Crée les comptes élèves. Les phrases de passe ne sont renvoyées qu'ici, une seule fois : seul leur haché est conservé. */
   app.post("/classes/:id/students", async (c) => {
+    cloudOnly();
     const teacher = await authenticate(c, "teacher");
     const cls = await ownClass(teacher, c.req.param("id"));
     const b = await body(c, studentsBody);
@@ -333,6 +346,7 @@ export function createApp(deps: Deps) {
   };
 
   app.post("/classes/:id/students/:sid/reset-password", async (c) => {
+    cloudOnly();
     const teacher = await authenticate(c, "teacher");
     const { cls, student } = await ownStudent(teacher, c.req.param("id"), c.req.param("sid"));
     const passphrase = generatePassphrase(cls.locale, deps.random);
@@ -343,6 +357,7 @@ export function createApp(deps: Deps) {
   });
 
   app.delete("/classes/:id/students/:sid", async (c) => {
+    cloudOnly();
     const teacher = await authenticate(c, "teacher");
     const { cls, student } = await ownStudent(teacher, c.req.param("id"), c.req.param("sid"));
     for (const m of student.memberships) await accounts.updateInstance(m.instanceId, (i) => ({ ...i, memberIds: i.memberIds.filter((x) => x !== student.id) })).catch(() => undefined);
@@ -357,7 +372,7 @@ export function createApp(deps: Deps) {
     const teacher = await authenticate(c, "teacher");
     const id = newId(now(), deps.random);
     const dbName = await provisioner.provisionMaster(id, [teacher.id]);
-    await accounts.createActivity({ id, ownerId: teacher.id, coOwnerIds: [], instanceIds: [], createdAt: now() });
+    await accounts.createActivity({ id, ownerId: teacher.id, coOwnerIds: [], createdAt: now() });
     return c.json({ id, dbName }, 201);
   });
 
@@ -367,8 +382,7 @@ export function createApp(deps: Deps) {
     const withInstances = await Promise.all(
       list.map(async (a) => ({
         id: a.id,
-        instanceIds: a.instanceIds,
-        instances: (await Promise.all(a.instanceIds.map((id) => accounts.getInstance(id)))).filter((i): i is NonNullable<typeof i> => !!i).map((i) => ({ id: i.id, memberIds: i.memberIds })),
+        instances: (await accounts.listInstances(a.id)).sort((x, y) => x.createdAt - y.createdAt || (x.id < y.id ? -1 : 1)).map((i) => ({ id: i.id, memberIds: i.memberIds })),
       })),
     );
     return c.json(withInstances);
@@ -407,8 +421,7 @@ export function createApp(deps: Deps) {
     const id = newId(now(), deps.random);
     const owners = [act.ownerId, ...act.coOwnerIds];
     await provisioner.provisionInstance(id, owners);
-    await accounts.createInstance({ id, activityId: act.id, memberIds: [], createdAt: now() });
-    await accounts.updateActivity(act.id, (a) => ({ ...a, instanceIds: [...a.instanceIds, id] }));
+    await accounts.createInstance({ id, activityId: act.id, ownerId: act.ownerId, memberIds: [], createdAt: now() });
     if (b.memberIds?.length) await setMembers(teacher, act.id, id, b.memberIds);
     return c.json({ id, dbName: `inst_${id}` }, 201);
   });

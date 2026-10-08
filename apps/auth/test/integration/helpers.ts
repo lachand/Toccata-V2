@@ -3,6 +3,7 @@ import { createApp, type Deps } from "../../src/app";
 import { loadConfig, type Config } from "../../src/config";
 import { CouchAdmin } from "../../src/couch";
 import { Provisioner } from "../../src/provisioning";
+import { Reconciler } from "../../src/replication";
 import { LoginGuard } from "../../src/loginguard";
 import { RateLimiter } from "../../src/ratelimit";
 
@@ -15,15 +16,16 @@ export const DEV_SECRET_B64 = Buffer.from("dev-only-secret-change-me-32-bytes!!"
 export type Ctx = Awaited<ReturnType<typeof bootstrap>>;
 
 /** Prépare un service neuf sur une base de comptes jetable, face à un vrai CouchDB (voir apps/auth/README.md). */
-export async function bootstrap(overrides: Partial<Record<string, string>> = {}, deps: Partial<Deps> = {}) {
-  const couch = new CouchAdmin(COUCH_URL, ADMIN_USER, ADMIN_PASS);
+export async function bootstrap(overrides: Partial<Record<string, string>> = {}, deps: Partial<Deps> = {}, opts: { couchUrl?: string } = {}) {
+  const couchUrl = opts.couchUrl ?? COUCH_URL;
+  const couch = new CouchAdmin(couchUrl, ADMIN_USER, ADMIN_PASS);
   const up = await couch.request("GET", "").catch(() => null);
-  if (!up || up.status !== 200) throw new Error(`CouchDB injoignable sur ${COUCH_URL} : lancez docker compose -f infra/docker-compose.yml up -d`);
+  if (!up || up.status !== 200) throw new Error(`CouchDB injoignable sur ${couchUrl} : lancez docker compose -f infra/docker-compose.yml up -d`);
   for (const db of ["_users", "_replicator"]) await couch.ensureDb(db);
 
-  const accountsDb = `acc_test_${Math.random().toString(36).slice(2, 10)}`;
+  const accountsDb = overrides["ACCOUNTS_DB"] ?? `acc_test_${Math.random().toString(36).slice(2, 10)}`;
   const config: Config = loadConfig({
-    COUCHDB_URL: COUCH_URL,
+    COUCHDB_URL: couchUrl,
     COUCHDB_ADMIN_USER: ADMIN_USER,
     COUCHDB_ADMIN_PASSWORD: ADMIN_PASS,
     ACCOUNTS_DB: accountsDb,
@@ -36,11 +38,12 @@ export async function bootstrap(overrides: Partial<Record<string, string>> = {},
   const accounts = new AccountStore(couch, accountsDb);
   await accounts.init();
   const provisioner = new Provisioner(couch);
+  const reconciler = new Reconciler(config, accounts, couch, provisioner);
   let offset = 0;
   const clock = () => Date.now() + offset;
   // limites larges par défaut : les tests de limitation en fournissent de plus étroites
   const open = (n = 10_000) => new RateLimiter(n, 60_000, clock);
-  const app = createApp({ config, accounts, provisioner, clock, limits: { guard: new LoginGuard({ now: clock }), signup: open(), refresh: open() }, ...deps });
+  const app = createApp({ config, accounts, provisioner, reconciler, clock, limits: { guard: new LoginGuard({ now: clock }), signup: open(), refresh: open() }, ...deps });
   const created: string[] = [];
 
   async function call(method: string, path: string, o: { body?: unknown; token?: string; cookie?: string; headers?: Record<string, string> } = {}) {
@@ -91,7 +94,7 @@ export async function bootstrap(overrides: Partial<Record<string, string>> = {},
   }
 
   return {
-    app, call, couch, config, accounts, accountsDb, signupTeacher, login, refresh, makeClass, cleanup, created, refreshHeaders, PASSWORD,
+    app, call, couch, config, accounts, accountsDb, reconciler, signupTeacher, login, refresh, makeClass, cleanup, created, refreshHeaders, PASSWORD,
     advance: (ms: number) => { offset += ms; },
     track: (db: string) => { created.push(db); },
   };
@@ -105,4 +108,12 @@ export const asUser = (token: string) => (path: string, init: RequestInit = {}) 
   headers.set("authorization", `Bearer ${token}`);
   if (init.body) headers.set("content-type", "application/json");
   return fetch(`${COUCH_URL}/${path}`, { ...init, headers });
+};
+
+/** Comme `asUser`, vers un autre CouchDB (le serveur de classe, par exemple). */
+export const asUserOn = (base: string, token: string) => (path: string, init: RequestInit = {}) => {
+  const headers = new Headers(init.headers);
+  headers.set("authorization", `Bearer ${token}`);
+  if (init.body) headers.set("content-type", "application/json");
+  return fetch(`${base}/${path}`, { ...init, headers });
 };

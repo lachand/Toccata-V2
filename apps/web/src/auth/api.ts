@@ -73,7 +73,7 @@ export const classesApi = (f: Fetcher, token: () => Promise<string>) => ({
 });
 
 export type InstanceRef = { id: string; memberIds: string[] };
-export type ActivityRef = { id: string; instanceIds: string[]; instances: InstanceRef[] };
+export type ActivityRef = { id: string; instances: InstanceRef[] };
 export type Membership = { activityId: string; instanceId: string };
 
 export const activitiesApi = (f: Fetcher, token: () => Promise<string>) => ({

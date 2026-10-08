@@ -13,9 +13,10 @@ export type ErrorCode =
   | "refresh_reused"
   | "signup_closed"
   | "conflict"
+  | "local_readonly"
   | "internal";
 
-const STATUS: Record<ErrorCode, 400 | 401 | 403 | 404 | 409 | 429 | 500> = {
+const STATUS: Record<ErrorCode, 400 | 401 | 403 | 404 | 409 | 429 | 500 | 503> = {
   invalid_input: 400,
   weak_password: 400,
   invalid_credentials: 401,
@@ -29,6 +30,7 @@ const STATUS: Record<ErrorCode, 400 | 401 | 403 | 404 | 409 | 429 | 500> = {
   conflict: 409,
   rate_limited: 429,
   locked: 429,
+  local_readonly: 503,
   internal: 500,
 };
 

@@ -187,7 +187,7 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     expect(ok.status).toBe(201);
     ctx.track(ok.json.dbName);
     expect((await ctx.call("PUT", `/instances/${ok.json.id}/members`, { token: b.token, body: { memberIds: [] } })).status).toBe(404);
-    expect((await ctx.call("GET", "/activities", { token: a.token })).json).toEqual([{ id: act.id, instanceIds: [ok.json.id], instances: [{ id: ok.json.id, memberIds: [mine!.id] }] }]);
+    expect((await ctx.call("GET", "/activities", { token: a.token })).json).toEqual([{ id: act.id, instances: [{ id: ok.json.id, memberIds: [mine!.id] }] }]);
     expect((await ctx.call("GET", "/activities", { token: b.token })).json).toEqual([]);
   });
 

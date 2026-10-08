@@ -15,3 +15,5 @@ services:
   couch-local:
     <<: *couch
     ports: ["5985:5984"]
+    # le serveur de classe joint « le cloud » à travers un proxy coupable lancé sur l'hôte (tests de coupure) : tools/switchable-proxy.mjs
+    extra_hosts: ["host.docker.internal:host-gateway"]
