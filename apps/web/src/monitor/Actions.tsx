@@ -77,7 +77,7 @@ export function TileActions({ ctx, content, g }: { ctx: Ctx; content: MasterCont
     <>
       <Button disabled={g.stepId === null} onClick={() => (setBody(""), setAccepted(false), setOpen(true))}>{t`Feedback`}</Button>
       {g.nextStepId ? (
-        <Button icon={g.nextLocked ? <LockOpen size={16} /> : <Lock size={16} />} onClick={() => void setStepLockedFor(ctx.ws, g.instanceId, g.nextStepId!, !g.nextLocked, content)}>
+        <Button icon={g.nextLocked ? <LockOpen size={16} /> : <Lock size={16} />} onClick={() => void setStepLockedFor(ctx.ws, g.instanceId, g.nextStepId!, !g.nextLocked, content, ctx.ownerId)}>
           {g.nextLocked ? t`Unlock next step` : t`Lock next step`}
         </Button>
       ) : null}

@@ -14,6 +14,7 @@ import { useContent, useInstanceDef, useParticipant, useRuns } from "../data/hoo
 import { useWorkspace } from "../data/provider";
 import type { Locale } from "../i18n";
 import { AttentionOverlay, MessageBanner, StepProgressPanel } from "../run/Orchestration";
+import { logEvent } from "../data/events";
 import { saveSubmission } from "../run/submit";
 import { RichView } from "../richtext/RichView";
 import { reachableCount, resumeIndex } from "../run/progress";
@@ -121,7 +122,18 @@ export function Run({ locale }: { locale: Locale }) {
     return () => clearTimeout(h);
   }, [ws, user, instanceId, current?.id, open?.key, settled, saved === null]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const go = (i: number) => ((touched.current = true), setIndex(i), setOpenKey(null));
+  const go = (i: number) => {
+    touched.current = true;
+    setIndex(i);
+    setOpenKey(null);
+    const target = steps[i];
+    if (target && user) void logEvent(ws!, instanceId, user.id, "step.enter", { object: target.id });
+  };
+  const openElement = (key: string | null) => {
+    touched.current = true;
+    setOpenKey(key);
+    if (key && user) void logEvent(ws!, instanceId, user.id, "element.open", { object: key.split(":")[1] ?? key, meta: { type: key.split(":")[0] ?? "" } });
+  };
   const top = (title: string) => (
     <TopBar title={title}>
       <OnlineStatus />
@@ -164,7 +176,7 @@ export function Run({ locale }: { locale: Locale }) {
             {current.instructions ? <RichView html={current.instructions} /> : null}
             {elements.length > 0 ? (
               <>
-                <Segmented label={t`Open an item`} value={open?.key ?? ""} onChange={(v) => ((touched.current = true), setOpenKey(v === openKey ? null : v))} options={elements.map((e) => ({ value: e.key, label: e.name }))} />
+                <Segmented label={t`Open an item`} value={open?.key ?? ""} onChange={(v) => openElement(v === openKey ? null : v)} options={elements.map((e) => ({ value: e.key, label: e.name }))} />
                 {open ? (
                   <section aria-label={open.name} style={{ display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
                     {open.resource ? <ResourceView activityId={run.activityId} resource={open.resource} /> : null}
@@ -176,8 +188,14 @@ export function Run({ locale }: { locale: Locale }) {
             <StepProgressPanel
               submission={submissionFor(current.id)}
               feedback={feedbackFor(current.id)}
-              onStatus={(status) => void saveSubmission(ws, instanceId, user.id, current.id, { status })}
-              onAssess={(n) => void saveSubmission(ws, instanceId, user.id, current.id, { selfAssessment: n })}
+              onStatus={(status) => {
+                void saveSubmission(ws, instanceId, user.id, current.id, { status });
+                void logEvent(ws, instanceId, user.id, status === "submitted" ? "submission.submitted" : status === "needs_help" ? "submission.needs_help" : "submission.cleared", { object: current.id });
+              }}
+              onAssess={(n) => {
+                void saveSubmission(ws, instanceId, user.id, current.id, { selfAssessment: n });
+                void logEvent(ws, instanceId, user.id, "self_assessment.set", { object: current.id, meta: { score: n } });
+              }}
             />
             <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
               <Button icon={<ArrowLeft size={16} />} disabled={index <= 0} onClick={() => go(index - 1)}>{t`Previous step`}</Button>

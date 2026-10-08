@@ -10,6 +10,7 @@ import { session, useSession } from "../auth/session";
 import { useErrorText } from "../auth/useErrorText";
 import { OnlineStatus } from "../components/Layout";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
+import { logEvent } from "../data/events";
 import { useContent, useGroups } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
 import type { Locale } from "../i18n";
@@ -75,6 +76,7 @@ export function Distribute({ locale }: { locale: Locale }) {
       for (const g of plan) {
         const { id: instanceId } = await acts.createInstance(id, g.members);
         await ws!.createInstanceDef(instanceId, id, user!.id, g.name, g.members);
+        void logEvent(ws!, instanceId, user!.id, "group.create", { meta: { members: g.members.length }, teacher: true });
       }
     } catch (e) {
       setError(e);
@@ -90,6 +92,7 @@ export function Distribute({ locale }: { locale: Locale }) {
       const memberIds = [...picked];
       await acts.setMembers(instanceId, memberIds);
       await ws!.updateInstanceDef(instanceId, (d) => ({ ...d, memberIds }));
+      void logEvent(ws!, instanceId, user!.id, "group.members", { meta: { members: memberIds.length }, teacher: true });
       setEditing(null);
     } catch (e) {
       setError(e);

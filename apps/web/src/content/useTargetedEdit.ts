@@ -1,5 +1,6 @@
 import { applyToOverrides, planEdit, type Edit, type InstanceDoc, type MasterContent, type Plan } from "@toccata/schema";
 import { useState } from "react";
+import { logEvent } from "../data/events";
 import type { Workspace } from "../data/workspace";
 
 export type TargetMode = "all" | "groups";
@@ -9,7 +10,7 @@ export type TargetMode = "all" | "groups";
  * vue par tous les groupes qui le suivent) ou à des groupes choisis (écrite dans leurs surcharges, le master ne bouge pas).
  * La logique de ciblage est celle, pure et testée, de `planEdit`.
  */
-export function useTargetedEdit(ws: Workspace | null, activityId: string, content: MasterContent | null | undefined, groups: readonly { id: string; def: InstanceDoc | null }[]) {
+export function useTargetedEdit(ws: Workspace | null, actorId: string | null, activityId: string, content: MasterContent | null | undefined, groups: readonly { id: string; def: InstanceDoc | null }[]) {
   const [mode, setMode] = useState<TargetMode>("all");
   const [chosen, setChosen] = useState<ReadonlySet<string>>(new Set());
   const [report, setReport] = useState<(Plan & { applied: number }) | null>(null);
@@ -27,6 +28,11 @@ export function useTargetedEdit(ws: Workspace | null, activityId: string, conten
       } else {
         await ws.updateInstanceDef(w.instanceId, (d) => ({ ...d, overrides: applyToOverrides(d.overrides, edit, d.linked ? content : (d.snapshot ?? content)) }));
       }
+    }
+    // le journal garde le geste : quoi (code), pour qui (chaque groupe atteint), jamais le contenu écrit
+    if (actorId) {
+      const reached = plan.writes.some((w) => w.scope === "master") ? defs.filter((d) => d.linked && !plan.shadowed.includes(d.id)) : defs.filter((d) => plan.writes.some((w) => w.scope === "instance" && w.instanceId === d.id));
+      for (const d of reached) void logEvent(ws, d.id, actorId, "edit.apply", { object: "stepId" in edit ? edit.stepId : undefined, meta: { type: edit.type, everyone: mode === "all" }, teacher: true });
     }
     setReport({ ...plan, applied: plan.writes.length });
   }

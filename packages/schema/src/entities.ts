@@ -210,12 +210,39 @@ export const broadcastDocSchema = z.object({
   active: z.boolean(),
 });
 
-/** Journal de recherche : codes neutres (`step.complete`), jamais de texte localisé (ADR 0007). */
+/**
+ * Journal de séance (append-only) : codes d'action neutres, jamais de texte localisé (ADR 0007), pour que des exports de classes
+ * différentes soient comparables. Ne contient ni nom, ni contenu produit par un élève : identifiants pseudonymes et codes seulement.
+ */
+export const EVENT_ACTIONS = [
+  // élève
+  "step.enter",
+  "element.open",
+  "submission.submitted",
+  "submission.needs_help",
+  "submission.cleared",
+  "self_assessment.set",
+  // enseignant
+  "group.create",
+  "group.members",
+  "timer.extend",
+  "timer.reset",
+  "broadcast.message",
+  "broadcast.clear",
+  "attention.start",
+  "attention.stop",
+  "feedback.give",
+  "step.lock",
+  "step.unlock",
+  "edit.apply",
+] as const;
+export type EventAction = (typeof EVENT_ACTIONS)[number];
+
 export const eventDocSchema = z.object({
   ...instanceBase,
   kind: z.literal("event"),
   instanceId: idSchema,
-  action: z.string().regex(/^[a-z]+(\.[a-z_]+)+$/),
+  action: z.string().regex(/^[a-z_]+(\.[a-z_]+)+$/),
   object: z.string().max(100).optional(),
   meta: z.record(z.string(), z.union([z.string().max(200), z.number(), z.boolean()])).optional(),
   initiatedBy: z.enum(["user", "system"]),

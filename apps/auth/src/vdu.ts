@@ -37,6 +37,8 @@ export function instanceValidator(instanceId: string, ownerIds: readonly string[
   if (newDoc && newDoc.kind === 'participant' && newDoc._id !== userCtx.name) throw ({ forbidden: 'participant_id' });
   var target = newDoc._deleted ? oldDoc : newDoc;
   if ((target && target.teacherOnly === true) || (oldDoc && oldDoc.teacherOnly === true)) throw ({ forbidden: 'teacher_only' });
+  // journal de séance : on y ajoute, on n'y réécrit rien (seul l'enseignant peut purger, p. ex. à la demande d'un élève)
+  if (oldDoc && oldDoc.kind === 'event') throw ({ forbidden: 'append_only' });
   if (!newDoc._deleted) {
     if (!oldDoc && newDoc.authorId !== userCtx.name) throw ({ forbidden: 'author_mismatch' });
     if (oldDoc && oldDoc.authorId !== undefined && newDoc.authorId !== oldDoc.authorId) throw ({ forbidden: 'author_immutable' });

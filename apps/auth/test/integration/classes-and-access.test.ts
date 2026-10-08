@@ -263,6 +263,14 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     expect((await put(S1, "msg", { ...base, _rev: msgRev, kind: "broadcast", mode: "message", body: "Piraté", active: false })).status).toBe(403);
     expect((await S1(`${inst.dbName}/msg`)).status).toBe(200); // lecture : oui
 
+    // journal de séance : on y ajoute, on n'y réécrit rien ; l'enseignant peut purger
+    const ev = { kind: "event", authorId: s1!.id, instanceId: inst.id, action: "step.enter", initiatedBy: "user" };
+    expect((await put(S1, "ev1", ev)).status).toBe(201);
+    const evRev = ((await (await S1(`${inst.dbName}/ev1`)).json()) as { _rev: string })._rev;
+    expect((await put(S1, "ev1", { ...ev, _rev: evRev, action: "step.leave" })).status).toBe(403);
+    expect((await S1(`${inst.dbName}/ev1?rev=${evRev}`, { method: "DELETE" })).status).toBe(403);
+    expect((await T(`${inst.dbName}/ev1?rev=${evRev}`, { method: "DELETE" })).status).toBe(200);
+
     // état de participant : à son propre nom seulement
     expect((await put(S2, s1!.id, { kind: "participant", authorId: s2!.id, userId: s1!.id })).status).toBe(403); // place déjà « réservée » à s1
     expect((await put(S1, s1!.id, { kind: "participant", authorId: s1!.id, userId: s1!.id })).status).toBe(201);

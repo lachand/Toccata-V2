@@ -23,13 +23,13 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
   const { t } = useLingui();
   const { id = "" } = useParams();
   const ws = useWorkspace();
+  const { user } = useSession();
   const content = useContent(id);
   const groups = useGroups(id);
-  const target = useTargetedEdit(ws, id, content, groups);
+  const target = useTargetedEdit(ws, user?.id ?? null, id, content, groups);
   const notes = useNotes(id);
   const [selected, setSelected] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const { user } = useSession();
   const preview = usePreviewStore(id);
   const store = useMemo(() => preview ?? inertStore({ id: user?.id ?? "", role: "teacher" }), [preview, user?.id]);
 

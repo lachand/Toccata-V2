@@ -1,4 +1,5 @@
 import { applyToOverrides, decodeInstanceDocs, newId, timerRemainingMs, type BroadcastDoc, type FeedbackDoc, type InstanceDoc, type MasterContent, type TimerStateDoc } from "@toccata/schema";
+import { logEvent } from "../data/events";
 import type { Workspace } from "../data/workspace";
 
 /**
@@ -28,6 +29,7 @@ export async function adjustTimer({ ws, ownerId }: Ctx, instanceId: string, appI
   const t = ws.now();
   const doc: TimerStateDoc = { id: cur?.id ?? newId(t), authorId: cur?.authorId ?? ownerId, kind: "timerstate", appId, createdAt: cur?.createdAt ?? t, updatedAt: t, ...next };
   await col.upsert(doc as unknown as Record<string, unknown>);
+  void logEvent(ws, instanceId, ownerId, change.type === "reset" ? "timer.reset" : "timer.extend", { object: appId, ...(change.type === "extend" ? { meta: { ms: change.ms } } : {}), teacher: true });
 }
 
 /** Message affiché en bandeau, ou demande d'attention qui fige les écrans ; `active: false` la lève. Un document par mode. */
@@ -37,6 +39,7 @@ export async function setBroadcast({ ws, ownerId }: Ctx, instanceId: string, mod
   const t = ws.now();
   const doc: BroadcastDoc = { id: cur?.id ?? newId(t), authorId: ownerId, teacherOnly: true, kind: "broadcast", mode, body, active, createdAt: cur?.createdAt ?? t, updatedAt: t };
   await col.upsert(doc as unknown as Record<string, unknown>);
+  void logEvent(ws, instanceId, ownerId, mode === "attention" ? (active ? "attention.start" : "attention.stop") : active ? "broadcast.message" : "broadcast.clear", { teacher: true });
 }
 
 /** Retour de l'enseignant sur une étape (un document par étape) : commentaire et acceptation. */
@@ -46,9 +49,11 @@ export async function saveFeedback({ ws, ownerId }: Ctx, instanceId: string, ste
   const t = ws.now();
   const doc: FeedbackDoc = { id: cur?.id ?? newId(t), authorId: ownerId, teacherOnly: true, kind: "feedback", stepId, body: patch.body ?? cur?.body ?? "", accepted: patch.accepted ?? cur?.accepted ?? false, createdAt: cur?.createdAt ?? t, updatedAt: t };
   await col.upsert(doc as unknown as Record<string, unknown>);
+  void logEvent(ws, instanceId, ownerId, "feedback.give", { object: stepId, meta: { accepted: doc.accepted, commented: doc.body.length > 0 }, teacher: true });
 }
 
 /** Verrouille ou déverrouille une étape pour UN groupe (surcharge de son instance, le script commun ne bouge pas). */
-export async function setStepLockedFor(ws: Workspace, instanceId: string, stepId: string, locked: boolean, content: MasterContent): Promise<void> {
+export async function setStepLockedFor(ws: Workspace, instanceId: string, stepId: string, locked: boolean, content: MasterContent, actorId?: string): Promise<void> {
+  if (actorId) void logEvent(ws, instanceId, actorId, locked ? "step.lock" : "step.unlock", { object: stepId, teacher: true });
   await ws.updateInstanceDef(instanceId, (d: InstanceDoc) => ({ ...d, overrides: applyToOverrides(d.overrides, { type: "setStepLocked", stepId, locked }, d.linked ? content : (d.snapshot ?? content)) }));
 }
