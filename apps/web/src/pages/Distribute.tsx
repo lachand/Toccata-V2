@@ -205,7 +205,10 @@ export function Distribute({ locale }: { locale: Locale }) {
             {students.map((s) => (
               <li key={s.id}>
                 <label style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", minBlockSize: "var(--hit)" }}>
-                  <input type="checkbox" checked={picked.has(s.id)} onChange={(e) => setPicked((p) => (e.currentTarget.checked ? new Set(p).add(s.id) : (p.delete(s.id), new Set(p))))} />
+                  <input type="checkbox" checked={picked.has(s.id)} onChange={(e) => {
+                    const on = e.currentTarget.checked; // lu tout de suite : `currentTarget` n'existe plus quand React exécute la mise à jour
+                    setPicked((p) => (on ? new Set(p).add(s.id) : new Set([...p].filter((x) => x !== s.id))));
+                  }} />
                   {s.displayName}
                 </label>
               </li>

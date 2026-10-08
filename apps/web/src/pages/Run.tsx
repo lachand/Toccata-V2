@@ -86,6 +86,14 @@ export function Run({ locale }: { locale: Locale }) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   /** Vrai dès que la personne a elle-même navigué : à partir de là, l'état reçu ne déplace plus l'écran et notre position est enregistrée. */
   const touched = useRef(false);
+  // « présence » : une personne qui ouvre la séance sans rien toucher doit quand même apparaître au suivi. On attend un court
+  // instant que la position déjà enregistrée (autre appareil) arrive ; sinon on enregistre le point de départ. Si le serveur avait
+  // déjà un état, il l'emporte au rattachement (conflit de réplication : le serveur gagne) : on n'écrase donc rien.
+  const [settled, setSettled] = useState(false);
+  useEffect(() => {
+    const h = setTimeout(() => setSettled(true), 2000);
+    return () => clearTimeout(h);
+  }, []);
 
   // reprise : on rouvre l'étape et l'élément laissés ouverts, sur n'importe quel appareil. Les données arrivent par la
   // réplication, dans le désordre (script, position, questionnaires envoyés) : on recalcule tant que personne n'a rien touché.
@@ -108,10 +116,10 @@ export function Run({ locale }: { locale: Locale }) {
 
   // enregistrement de la position (un document par personne) : léger délai pour ne pas écrire à chaque clic
   useEffect(() => {
-    if (!ws || !user || !touched.current || !current) return;
+    if (!ws || !user || !current || !(touched.current || (settled && saved === null))) return;
     const h = setTimeout(() => void ws.saveParticipant(instanceId, user.id, { currentStepId: current.id, openElement: open ? { type: open.type, id: open.id } : null }, deviceId()), 500);
     return () => clearTimeout(h);
-  }, [ws, user, instanceId, current?.id, open?.key]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ws, user, instanceId, current?.id, open?.key, settled, saved === null]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const go = (i: number) => ((touched.current = true), setIndex(i), setOpenKey(null));
   const top = (title: string) => (

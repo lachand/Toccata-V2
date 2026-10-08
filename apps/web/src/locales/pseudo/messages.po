@@ -139,6 +139,10 @@ msgstr ""
 msgid "A student"
 msgstr ""
 
+#: src/monitor/useHelpNotifications.ts
+msgid "A student asks for help"
+msgstr ""
+
 #: src/apps/external.tsx
 msgid "A web page or tool (collaborative document, simulator…) shown inside the activity."
 msgstr ""
@@ -967,6 +971,10 @@ msgstr ""
 
 #: src/pages/Run.tsx
 msgid "Nothing to do yet"
+msgstr ""
+
+#: src/pages/Monitor.tsx
+msgid "Notify me when help is asked"
 msgstr ""
 
 #: src/pages/Distribute.tsx

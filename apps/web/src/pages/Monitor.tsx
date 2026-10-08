@@ -9,6 +9,7 @@ import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { useStudentNames } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
 import { useSession } from "../auth/session";
+import { useHelpNotifications } from "../monitor/useHelpNotifications";
 import { ActionBar, TileActions } from "../monitor/Actions";
 import type { Locale } from "../i18n";
 import { GroupTile } from "../monitor/GroupTile";
@@ -34,6 +35,7 @@ export function Monitor({ locale }: { locale: Locale }) {
   const targets = picked.size === 0 ? groups : groups.filter((g) => picked.has(g.instanceId));
   const ctx = ws && user ? { ws, ownerId: user.id } : null;
   const helpCount = groups.reduce((n, g) => n + g.help.length, 0);
+  const notif = useHelpNotifications(helpCount);
   const title = content?.activity.title ?? t`Activity`;
 
   return (
@@ -46,6 +48,7 @@ export function Monitor({ locale }: { locale: Locale }) {
             <Link className="tc-btn" to={`/activities/${id}/monitor?projecteur`} target="_blank" rel="noopener">
               <Presentation size={16} aria-hidden="true" /> {t`Projector mode`}
             </Link>
+            {notif.permission === "default" ? <Button onClick={notif.enable}>{t`Notify me when help is asked`}</Button> : null}
             <Link className="tc-btn" to={`/remote/${id}`}>
               <Smartphone size={16} aria-hidden="true" /> {t`Remote control`}
             </Link>
@@ -73,7 +76,10 @@ export function Monitor({ locale }: { locale: Locale }) {
                   {ctx && content ? (
                     <>
                       <label style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", minBlockSize: "var(--hit)" }}>
-                        <input type="checkbox" checked={picked.has(g.instanceId)} onChange={(e) => setPicked((p) => (e.currentTarget.checked ? new Set(p).add(g.instanceId) : new Set([...p].filter((x) => x !== g.instanceId))))} />
+                        <input type="checkbox" checked={picked.has(g.instanceId)} onChange={(e) => {
+                          const on = e.currentTarget.checked; // lu tout de suite : `currentTarget` n'existe plus quand React exécute la mise à jour
+                          setPicked((p) => (on ? new Set(p).add(g.instanceId) : new Set([...p].filter((x) => x !== g.instanceId))));
+                        }} />
                         {t`Choose`}
                       </label>
                       <TileActions ctx={ctx} content={content} g={g} />

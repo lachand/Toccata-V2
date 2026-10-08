@@ -107,3 +107,11 @@ non synchronisées.
 | `participant` (`inst_<id>`) | un document par personne, `_id` = identifiant de la personne ; étape en cours, élément ouvert, appareil |
 | local seulement | `registry` : références d'activités (`ref`) et d'instances (`iref`) |
 
+## Ajouts de la Phase 5
+
+| Genre (`inst_<id>`) | Auteur | Règle |
+|---|---|---|
+| `broadcast` (`message` / `attention`) | enseignant propriétaire | création et modification réservées aux propriétaires |
+| `feedback` (retour par étape) | enseignant propriétaire | idem ; le client ignore tout autre auteur |
+| `submission` (terminé / besoin d'aide / ressenti) | l'élève | sans commentaires : les retours sont des `feedback` |
+

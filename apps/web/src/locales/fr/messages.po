@@ -139,6 +139,10 @@ msgstr "Un script est une suite d’étapes. Ajoutez la première."
 msgid "A student"
 msgstr "Un élève"
 
+#: src/monitor/useHelpNotifications.ts
+msgid "A student asks for help"
+msgstr "Un élève demande de l’aide"
+
 #: src/apps/external.tsx
 msgid "A web page or tool (collaborative document, simulator…) shown inside the activity."
 msgstr "Une page ou un outil web (document collaboratif, simulateur…) affiché dans l’activité."
@@ -968,6 +972,10 @@ msgstr "Rien ici pour l’instant."
 #: src/pages/Run.tsx
 msgid "Nothing to do yet"
 msgstr "Rien à faire pour l’instant"
+
+#: src/pages/Monitor.tsx
+msgid "Notify me when help is asked"
+msgstr "Me notifier quand on demande de l’aide"
 
 #: src/pages/Distribute.tsx
 msgid "Number of groups"

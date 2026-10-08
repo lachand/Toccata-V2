@@ -4,7 +4,7 @@
   "private": true,
   "license": "MIT",
   "type": "module",
-  "description": "Tests de bout en bout (Playwright) : sc\u00e9narios de l'article, hors ligne, langues.",
+  "description": "Tests de bout en bout (Playwright) : scénarios de l'article, hors ligne, langues.",
   "scripts": {
     "e2e": "playwright test",
     "typecheck": "tsc -p tsconfig.json"
@@ -12,6 +12,7 @@
   "devDependencies": {
     "@playwright/test": "^1.63.0",
     "@types/node": "^26.6.4",
+    "axe-core": "^4.14.0",
     "typescript": "^7.0.2"
   }
 }
