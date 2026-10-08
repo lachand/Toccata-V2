@@ -16,7 +16,7 @@ describe("inscription et connexion d'un enseignant", () => {
     const me = await ctx.call("GET", "/auth/me", { token: r.json.accessToken });
     expect(me.status).toBe(200);
     expect(me.json.username).toBe("marie.durand");
-    expect(rolesOf(r.json.accessToken)).toEqual([`owner:${r.json.user.id}`]);
+    expect(rolesOf(r.json.accessToken)).toEqual([`owner:${r.json.user.id}`, "teacher"]);
   });
 
   it("pose un cookie de rafraîchissement HttpOnly, SameSite=Strict, limité à /auth", async () => {

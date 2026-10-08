@@ -52,3 +52,20 @@ export function teacherValidator(ownerId: string): string {
   if (!newDoc._deleted && newDoc.authorId !== userCtx.name) throw ({ forbidden: 'author_mismatch' });
 }`;
 }
+
+/**
+ * Base `library` : modèles d'activité partagés entre enseignants. Tout enseignant lit et publie ; un modèle n'est modifiable
+ * ou supprimable que par son auteur ; la taille d'un document est bornée (un modèle n'emporte pas de fichiers).
+ */
+export function libraryValidator(): string {
+  return `function (newDoc, oldDoc, userCtx, secObj) {
+  if (userCtx.roles.indexOf('_admin') !== -1) return;
+  if (userCtx.roles.indexOf('teacher') === -1) throw ({ forbidden: 'teachers_only' });
+  var owner = oldDoc || newDoc;
+  if (owner.authorId !== userCtx.name) throw ({ forbidden: 'author_only' });
+  if (newDoc._deleted) return;
+  if (newDoc.kind !== 'template') throw ({ forbidden: 'template_only' });
+  if (newDoc.authorId !== userCtx.name) throw ({ forbidden: 'author_mismatch' });
+  if (JSON.stringify(newDoc).length > 1000000) throw ({ forbidden: 'too_large' });
+}`;
+}

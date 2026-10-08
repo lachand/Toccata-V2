@@ -1,8 +1,8 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Button, Card, Content, Dialog, EmptyState, Field, Pill, TextInput, TopBar } from "@toccata/ui";
-import { BookPlus, Plus } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { BookPlus, Copy, Download, Plus, Upload } from "lucide-react";
+import { useRef, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { activitiesApi } from "../auth/api";
 import { session, useSession } from "../auth/session";
@@ -11,6 +11,8 @@ import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
 import { useActivities, useRuns } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
+import { createFromBundle, duplicateActivity, exportActivity } from "../exchange/activities";
+import { ImportError, unpackBundle } from "../exchange/zip";
 import type { Locale } from "../i18n";
 
 export function Activities({ locale }: { locale: Locale }) {
@@ -20,6 +22,47 @@ export function Activities({ locale }: { locale: Locale }) {
   const ws = useWorkspace();
   const { user } = useSession();
   const teacher = user?.role === "teacher";
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [exchangeError, setExchangeError] = useState<string | null>(null);
+  const api = { create: () => activitiesApi(session.authorizedFetch, () => session.getAccessToken()).create() };
+
+  /** Importe un `.toccata` : une activité neuve, ouverte aussitôt dans l'éditeur. */
+  async function importFile(file: File) {
+    if (!ws || !user) return;
+    setExchangeError(null);
+    setNotice(null);
+    try {
+      const { bundle, files } = await unpackBundle(file);
+      const out = await createFromBundle(ws, api, user.id, bundle, files);
+      if (out.missingFiles > 0) setNotice(plural(out.missingFiles, { one: "# file was missing from the archive and was left out.", other: "# files were missing from the archive and were left out." }));
+      navigate(`/activities/${out.id}`);
+    } catch (e) {
+      setExchangeError(e instanceof ImportError ? importErrorText(e.code) : errorText(e));
+    }
+  }
+  const importErrorText = (code: ImportError["code"]) =>
+    code === "unsupported_version" ? t`This file comes from a newer version of Toccata.` : code === "too_large" ? t`This archive is too large.` : code === "file_mismatch" ? t`A file in this archive is damaged.` : code === "invalid" ? t`This file does not describe a valid activity.` : t`This is not a Toccata activity file (.toccata).`;
+
+  async function duplicate(id: string, title: string) {
+    if (!ws || !user) return;
+    setExchangeError(null);
+    try {
+      const out = await duplicateActivity(ws, api, user.id, id, t`Copy of ${title}`);
+      navigate(`/activities/${out.id}`);
+    } catch (e) {
+      setExchangeError(errorText(e));
+    }
+  }
+  async function exportOne(id: string) {
+    if (!ws) return;
+    const { blob, filename, missingFiles } = await exportActivity(ws, id);
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement("a"), { href: url, download: filename });
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    setNotice(missingFiles > 0 ? plural(missingFiles, { one: "# file is not available on this device and was left out of the export.", other: "# files are not available on this device and were left out of the export." }) : null);
+  }
   const teacherRows = useActivities();
   const runs = useRuns();
   // l'élève voit ses séances (une par inscription) ; l'enseignant ses activités
@@ -52,9 +95,17 @@ export function Activities({ locale }: { locale: Locale }) {
       <TopBar title={t`My activities`}>
         <OnlineStatus />
         <LocaleSwitcher current={locale} />
-        {teacher ? newButton : null}
+        {teacher ? (
+          <>
+            <Button icon={<Upload size={18} />} onClick={() => fileInput.current?.click()}>{t`Import`}</Button>
+            <input ref={fileInput} type="file" accept=".toccata,application/x-toccata,application/zip" hidden aria-label={t`Activity file to import`} onChange={(e) => { const f = e.currentTarget.files?.[0]; e.currentTarget.value = ""; if (f) void importFile(f); }} />
+            {newButton}
+          </>
+        ) : null}
       </TopBar>
       <Content>
+        {exchangeError ? <p role="alert" className="tc-field__error" style={{ margin: 0 }}>{exchangeError}</p> : null}
+        {notice ? <p role="status" className="tc-callout">{notice}</p> : null}
         {!teacher && runs !== null && runs.length > 0 ? (
           <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: "var(--space-4)", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
             {runs.map((r) => (
@@ -103,8 +154,14 @@ export function Activities({ locale }: { locale: Locale }) {
                     {a.updatedAt > 0 ? (
                       <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>{t`Edited ${i18n.date(new Date(a.updatedAt), { dateStyle: "medium", timeStyle: "short" })}`}</p>
                     ) : null}
-                    <div style={{ marginBlockStart: "auto" }}>
-                      {teacher && a.title !== null ? <Link className="tc-btn tc-btn--primary" to={`/activities/${a.id}`}>{t`Edit`}</Link> : null}
+                    <div style={{ marginBlockStart: "auto", display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
+                      {teacher && a.title !== null ? (
+                        <>
+                          <Link className="tc-btn tc-btn--primary" to={`/activities/${a.id}`}>{t`Edit`}</Link>
+                          <Button icon={<Copy size={16} />} onClick={() => void duplicate(a.id, a.title!)}>{t`Duplicate`}</Button>
+                          <Button icon={<Download size={16} />} onClick={() => void exportOne(a.id)}>{t`Export`}</Button>
+                        </>
+                      ) : null}
                     </div>
                   </Card>
                 </li>

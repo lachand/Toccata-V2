@@ -5,3 +5,4 @@ export * from "./edits";
 export * from "./timer";
 export * from "./content";
 export * from "./rx";
+export * from "./bundle";

@@ -111,7 +111,7 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     const tok1 = (await ctx.login(s1!.username, s1!.passphrase)).json.accessToken as string;
     const tok2 = (await ctx.login(s2!.username, s2!.passphrase)).json.accessToken as string;
     expect(rolesOf(tok1).sort()).toEqual([`inst:${i1.id}:member`, `master:${act.id}:read`].sort());
-    expect(rolesOf(a.token)).toEqual([`owner:${a.id}`]); // un seul rôle d'enseignant
+    expect(rolesOf(a.token)).toEqual([`owner:${a.id}`, "teacher"]); // un rôle de propriété, un rôle d'enseignant (bibliothèque)
 
     const [T, S1, S2, B] = [asUser(a.token), asUser(tok1), asUser(tok2), asUser(b.token)];
     const put = (u: typeof T, db: string, id: string, doc: object) => u(`${db}/${id}`, { method: "PUT", body: JSON.stringify(doc) });
@@ -214,7 +214,7 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     const [A, B, S] = [asUser(a.token), asUser(b.token), asUser(tok1)];
     const put = (u: typeof A, id: string, doc: object) => u(`${db}/${id}`, { method: "PUT", body: JSON.stringify(doc) });
 
-    expect(rolesOf(a.token)).toEqual([`owner:${a.id}`]);
+    expect(rolesOf(a.token)).toEqual([`owner:${a.id}`, "teacher"]);
     expect((await put(A, "n1", { kind: "tnote", authorId: a.id, body: "à revoir" })).status).toBe(201);
     expect((await A(`${db}/n1`)).status).toBe(200);
     expect((await put(A, "n2", { kind: "tnote", authorId: b.id, body: "usurpation" })).status).toBe(403); // l'auteur doit être le propriétaire

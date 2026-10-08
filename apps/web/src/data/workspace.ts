@@ -397,6 +397,33 @@ export class Workspace {
     return resourceId;
   }
 
+  /** Écrit en bloc des documents d'une activité (import, copie, modèle). Les identifiants et dates sont ceux du lot. */
+  async writeMasterDocs(activityId: string, docs: readonly MasterDoc[]): Promise<void> {
+    await this.remember(activityId);
+    await (await this.master(activityId)).bulkUpsert(docs as unknown as Record<string, unknown>[]);
+  }
+
+  /** Reprend un fichier venu d'ailleurs (import, copie) : copie locale, puis envoi vers la base de cette activité. */
+  async adoptFile(activityId: string, fileId: string, blob: Blob): Promise<void> {
+    await this.blobs.put(fileId, blob);
+    await this.uploads.upsert({ id: `${activityId}:${fileId}`, kind: "upload", updatedAt: this.now(), activityId, fileId });
+    void this.flushUploads();
+  }
+
+  /** Contenu d'un fichier de l'activité : copie locale, sinon téléchargement. `null` si indisponible (hors ligne, jamais ouvert). */
+  async readFile(activityId: string, fileId: string): Promise<Blob | null> {
+    const local = await this.blobs.get(fileId);
+    if (local) return local;
+    if (!this.syncOptions) return null;
+    try {
+      const blob = await downloadFile(this.syncOptions.fetch, this.syncOptions.baseUrl, masterDbName(activityId), fileId);
+      await this.blobs.put(fileId, blob);
+      return blob;
+    } catch {
+      return null;
+    }
+  }
+
   /** Envoie les fichiers en attente (appelé après un ajout et à chaque début de synchronisation). Les échecs sont réessayés plus tard. */
   flushUploads(): Promise<void> {
     // à vol unique : deux déclencheurs rapprochés (ajout, début de synchronisation) n'envoient pas deux fois le même fichier

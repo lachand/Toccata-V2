@@ -72,6 +72,8 @@ export class Reconciler {
   }
 
   async provisionPass(): Promise<void> {
+    // la bibliothèque de modèles n'existe que sur le serveur de référence (un serveur de classe n'en a pas l'usage)
+    if (this.cfg.SERVER_MODE === "cloud" && !this.provisioned.has("library")) (await this.provisioner.provisionLibrary(), this.provisioned.add("library"));
     const reg = await this.accounts.registry();
     const owners = new Map(reg.activities.map((a) => [a.id, [a.ownerId, ...a.coOwnerIds]]));
     for (const a of reg.activities) {

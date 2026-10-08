@@ -1,6 +1,6 @@
 import { instanceDbName, masterDbName, teacherDbName } from "@toccata/schema";
 import type { CouchAdmin } from "./couch";
-import { instanceValidator, masterValidator, teacherValidator } from "./vdu";
+import { instanceValidator, libraryValidator, masterValidator, teacherValidator } from "./vdu";
 
 /** Crée et met à jour les bases CouchDB des activités et des instances (ADR 0003). */
 export class Provisioner {
@@ -40,6 +40,14 @@ export class Provisioner {
     await this.couch.putSecurity(db, { admins: { names: [], roles: [] }, members: { names: [], roles: [`owner:${userId}`] } });
     await this.setDesign(db, teacherValidator(userId));
     return db;
+  }
+
+  /** Bibliothèque de modèles partagés (idempotent) : réservée aux enseignants. */
+  async provisionLibrary(): Promise<string> {
+    await this.couch.ensureDb("library");
+    await this.couch.putSecurity("library", { admins: { names: [], roles: [] }, members: { names: [], roles: ["teacher"] } });
+    await this.setDesign("library", libraryValidator());
+    return "library";
   }
 
   /** Rejoue la sécurité et les règles de toutes les bases d'une activité (ajout ou retrait d'un co-enseignant). */
