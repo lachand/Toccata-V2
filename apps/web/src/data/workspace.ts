@@ -31,7 +31,7 @@ import type { InstanceStore, NewRuntimeDoc, RuntimeDoc, RuntimeKind, Viewer } fr
 import { memoryBlobStore, type BlobStore } from "./blobs";
 import { MAX_FILE_BYTES, downloadFile, sha256Hex, uploadFile } from "./files";
 
-type Col = RxCollection<Record<string, unknown>>;
+export type Col = RxCollection<Record<string, unknown>>;
 type Replication = { cancel: () => Promise<unknown>; error$: Observable<unknown> };
 
 export type SyncOptions = {
@@ -76,7 +76,7 @@ export class Workspace {
   private replications = new Map<string, Replication>();
   private syncOptions: SyncOptions | null = null;
 
-  private constructor(private db: RxDatabase, private registry: Col, private uploads: Col, private now: () => number, private blobs: BlobStore, private userId: string) {}
+  private constructor(private db: RxDatabase, private registry: Col, private uploads: Col, readonly now: () => number, private blobs: BlobStore, private userId: string) {}
   private urls = new Map<string, string>();
 
   static async open(o: WorkspaceOptions): Promise<Workspace> {
@@ -135,7 +135,7 @@ export class Workspace {
     const refs = await this.registry.find().exec();
     await Promise.all(
       refs.map(async (r) => {
-        if (r.get("kind") === "iref") await Promise.all([this.master(r.get("activityId") as string), this.instance(r.get("id") as string)]);
+        if (r.get("kind") === "iref") await Promise.all([this.master(r.get("activityId") as string), this.instanceCol(r.get("id") as string)]);
         else await this.master(r.get("id") as string);
       }),
     );
@@ -143,14 +143,15 @@ export class Workspace {
 
   /* ---------------------------------------------------------------- instances */
 
-  private instance(instanceId: string): Promise<Col> {
+  /** Collection RxDB d'une instance (pour les modules d'orchestration qui écrivent des documents de pilotage). */
+  instanceCol(instanceId: string): Promise<Col> {
     return this.named(collectionNameFor(instanceDbName(instanceId)));
   }
 
   /** Mémorise une instance (et ouvre son activité) : l'enseignant pour ses groupes, l'élève pour ses séances. */
   async rememberInstance(activityId: string, instanceId: string): Promise<void> {
     await this.registry.upsert({ id: instanceId, kind: "iref", activityId, updatedAt: this.now() });
-    await Promise.all([this.master(activityId), this.instance(instanceId)]);
+    await Promise.all([this.master(activityId), this.instanceCol(instanceId)]);
   }
 
   /** Élève : aligne les séances locales sur les inscriptions du serveur (ajouts et retraits). */
@@ -167,7 +168,7 @@ export class Workspace {
   /** Tous les documents (décodés) d'une instance : données d'exécution, états, remises, consignes de pilotage. */
   instanceDocs$(instanceId: string): Observable<InstanceScopedDoc[]> {
     return new Observable<Col>((s) => {
-      void this.instance(instanceId).then((c) => (s.next(c), s.complete()), (e) => s.error(e));
+      void this.instanceCol(instanceId).then((c) => (s.next(c), s.complete()), (e) => s.error(e));
     }).pipe(
       switchMap((c) => c.find().$),
       map((rows) => decodeInstanceDocs(rows.map((r) => r.toJSON())).docs),
@@ -206,11 +207,11 @@ export class Workspace {
     await this.rememberInstance(activityId, instanceId);
     const t = this.now();
     const def: InstanceDoc = { id: instanceId, authorId: ownerId, kind: "instance", masterId: activityId, name, memberIds, linked: true, snapshot: null, overrides: emptyOverrides(), createdAt: t, updatedAt: t };
-    await (await this.instance(instanceId)).upsert(def as unknown as Record<string, unknown>);
+    await (await this.instanceCol(instanceId)).upsert(def as unknown as Record<string, unknown>);
   }
 
   async updateInstanceDef(instanceId: string, change: (d: InstanceDoc) => InstanceDoc): Promise<void> {
-    const row = await (await this.instance(instanceId)).findOne(instanceId).exec();
+    const row = await (await this.instanceCol(instanceId)).findOne(instanceId).exec();
     if (!row) return;
     const next = change(row.toJSON() as unknown as InstanceDoc);
     await row.incrementalPatch({ ...(next as unknown as Record<string, unknown>), updatedAt: this.now() });
@@ -222,7 +223,7 @@ export class Workspace {
   }
 
   async saveParticipant(instanceId: string, userId: string, patch: Pick<ParticipantStateDoc, "currentStepId" | "openElement">, deviceId: string): Promise<void> {
-    const col = await this.instance(instanceId);
+    const col = await this.instanceCol(instanceId);
     const t = this.now();
     const previous = await col.findOne(userId).exec();
     const doc: ParticipantStateDoc = { id: userId, authorId: userId, kind: "participant", userId, instanceId, appViewState: {}, deviceId, createdAt: (previous?.toJSON() as { createdAt?: number } | undefined)?.createdAt ?? t, updatedAt: t, ...patch };
@@ -231,7 +232,7 @@ export class Workspace {
 
   /** Données d'exécution RÉELLES d'une instance (`inst_<id>`, répliquées) : même contrat que l'aperçu. */
   instanceStore(instanceId: string, viewer: Viewer): InstanceStore {
-    return this.storeOver(this.instance(instanceId), viewer);
+    return this.storeOver(this.instanceCol(instanceId), viewer);
   }
 
   /* ---------------------------------------------------------------- lecture */

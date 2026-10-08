@@ -44,6 +44,11 @@ msgstr ""
 msgid "{0, plural, one {# needs help} other {# need help}}"
 msgstr ""
 
+#. placeholder {0}: picked.size
+#: src/pages/Monitor.tsx
+msgid "{0, plural, one {Actions apply to # chosen group.} other {Actions apply to # chosen groups.}}"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "{appCount, plural, one {# app} other {# apps}}"
 msgstr ""
@@ -53,6 +58,7 @@ msgid "{count, plural, one {# student} other {# students}}"
 msgstr ""
 
 #: src/pages/Monitor.tsx
+#: src/pages/Remote.tsx
 msgid "{helpCount, plural, one {# student asks for help.} other {# students ask for help.}}"
 msgstr ""
 
@@ -93,6 +99,14 @@ msgstr ""
 msgid "{submitted} of {total} submitted"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "+1 min"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "+5 min"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "200 characters at most"
 msgstr ""
@@ -127,6 +141,15 @@ msgstr ""
 
 #: src/apps/external.tsx
 msgid "A web page or tool (collaborative document, simulator…) shown inside the activity."
+msgstr ""
+
+#: src/pages/Monitor.tsx
+#: src/pages/Remote.tsx
+msgid "Actions apply to all groups."
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Actions for the groups"
 msgstr ""
 
 #: src/monitor/GroupTile.tsx
@@ -279,6 +302,7 @@ msgid "Buttons"
 msgstr ""
 
 #: src/components/ConfirmDialog.tsx
+#: src/monitor/Actions.tsx
 #: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
 #: src/pages/Distribute.tsx
@@ -292,6 +316,10 @@ msgstr ""
 
 #: src/auth/useErrorText.ts
 msgid "Check the fields and try again."
+msgstr ""
+
+#: src/pages/Monitor.tsx
+msgid "Choose"
 msgstr ""
 
 #: src/pages/Distribute.tsx
@@ -329,8 +357,13 @@ msgstr ""
 msgid "Classes"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Clear message"
+msgstr ""
+
 #: src/components/ConfirmDialog.tsx
 #: src/content/AddContentDialog.tsx
+#: src/monitor/Actions.tsx
 #: src/pages/Activities.tsx
 #: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
@@ -338,11 +371,16 @@ msgstr ""
 #: src/pages/Distribute.tsx
 #: src/pages/Gallery.tsx
 #: src/richtext/RichToolbar.tsx
+#: src/run/Orchestration.tsx
 msgid "Close"
 msgstr ""
 
 #: src/apps/kanban.tsx
 msgid "Columns"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Comment"
 msgstr ""
 
 #: src/components/Layout.tsx
@@ -497,6 +535,15 @@ msgstr ""
 msgid "Everyone"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Feedback"
+msgstr ""
+
+#. placeholder {0}: g.name
+#: src/monitor/Actions.tsx
+msgid "Feedback for {0}"
+msgstr ""
+
 #: src/content/AddContentDialog.tsx
 msgid "File"
 msgstr ""
@@ -525,8 +572,20 @@ msgstr ""
 msgid "Form controls"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Freeze screens"
+msgstr ""
+
 #: src/pages/Monitor.tsx
 msgid "Full screen"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Get attention"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Get everyone's attention"
 msgstr ""
 
 #: src/pages/Run.tsx
@@ -584,12 +643,24 @@ msgstr ""
 msgid "Hide step {s}"
 msgstr ""
 
+#: src/run/Orchestration.tsx
+msgid "How did it go? (1 = lost, 4 = confident)"
+msgstr ""
+
 #: src/apps/DisplayModeField.tsx
 msgid "How it opens"
 msgstr ""
 
 #: src/pages/Distribute.tsx
 msgid "How to split the class"
+msgstr ""
+
+#: src/run/Orchestration.tsx
+msgid "I need help"
+msgstr ""
+
+#: src/run/Orchestration.tsx
+msgid "I'm done"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -665,6 +736,10 @@ msgstr ""
 msgid "Loading…"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Lock next step"
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
 #: src/pages/Run.tsx
@@ -683,12 +758,32 @@ msgstr ""
 msgid "Long text"
 msgstr ""
 
+#: src/run/Orchestration.tsx
+msgid "Look up, please."
+msgstr ""
+
 #: src/components/Layout.tsx
 msgid "Main navigation"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Mark the step as validated"
+msgstr ""
+
 #: src/pages/Distribute.tsx
 msgid "Members"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Message"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Message (optional)"
+msgstr ""
+
+#: src/run/Orchestration.tsx
+msgid "Message from your teacher"
 msgstr ""
 
 #: src/apps/timer.tsx
@@ -702,6 +797,7 @@ msgstr ""
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Mirror.tsx
+#: src/pages/Remote.tsx
 msgid "Monitoring"
 msgstr ""
 
@@ -821,6 +917,7 @@ msgid "No class yet"
 msgstr ""
 
 #: src/pages/Monitor.tsx
+#: src/pages/Remote.tsx
 msgid "No group to follow yet"
 msgstr ""
 
@@ -1034,11 +1131,16 @@ msgstr ""
 msgid "Ready to work offline."
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Release attention"
+msgstr ""
+
 #: src/UpdatePrompt.tsx
 msgid "Reload"
 msgstr ""
 
 #: src/pages/Monitor.tsx
+#: src/pages/Remote.tsx
 msgid "Remote control"
 msgstr ""
 
@@ -1069,6 +1171,10 @@ msgstr ""
 
 #: src/content/ContentPanel.tsx
 msgid "Reset preview data"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Reset timers"
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -1105,6 +1211,18 @@ msgstr ""
 
 #: src/pages/ActivityEditor.tsx
 msgid "Selected step"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Send"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Send a message"
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Send feedback"
 msgstr ""
 
 #: src/auth/useErrorText.ts
@@ -1225,8 +1343,16 @@ msgstr ""
 msgid "Students"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Students see it at the top of their screen."
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 msgid "Students stay on this step until they have submitted the chosen questionnaire."
+msgstr ""
+
+#: src/monitor/Actions.tsx
+msgid "Students' screens are frozen until you release attention."
 msgstr ""
 
 #: src/apps/form.tsx
@@ -1385,6 +1511,10 @@ msgstr ""
 msgid "Unavailable"
 msgstr ""
 
+#: src/monitor/Actions.tsx
+msgid "Unlock next step"
+msgstr ""
+
 #: src/apps/form.tsx
 msgid "Untitled question"
 msgstr ""
@@ -1398,6 +1528,10 @@ msgstr ""
 #: src/pages/Login.tsx
 #: src/pages/Signup.tsx
 msgid "Username"
+msgstr ""
+
+#: src/run/Orchestration.tsx
+msgid "Validated"
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -1445,8 +1579,20 @@ msgstr ""
 msgid "Worked well"
 msgstr ""
 
+#: src/run/Orchestration.tsx
+msgid "Your progress on this step"
+msgstr ""
+
+#: src/run/Orchestration.tsx
+msgid "Your teacher asks for your attention"
+msgstr ""
+
 #: src/pages/Run.tsx
 msgid "Your teacher has not opened any step."
+msgstr ""
+
+#: src/run/Orchestration.tsx
+msgid "Your teacher says:"
 msgstr ""
 
 #: src/pages/Activities.tsx

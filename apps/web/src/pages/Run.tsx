@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import type { InstanceStore } from "@toccata/apps-sdk";
-import { resolve, type AppDoc, type ResourceDoc } from "@toccata/schema";
+import { resolve, type AppDoc, type BroadcastDoc, type FeedbackDoc, type InstanceScopedDoc, type ResourceDoc, type SubmissionDoc } from "@toccata/schema";
 import { Button, Content, EmptyState, Segmented, StepTimeline, TopBar, type StepItem } from "@toccata/ui";
 import { ArrowLeft, ArrowRight, Hourglass } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -13,6 +13,8 @@ import { ResourceView } from "../content/ResourceView";
 import { useContent, useInstanceDef, useParticipant, useRuns } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
 import type { Locale } from "../i18n";
+import { AttentionOverlay, MessageBanner, StepProgressPanel } from "../run/Orchestration";
+import { saveSubmission } from "../run/submit";
 import { RichView } from "../richtext/RichView";
 import { reachableCount, resumeIndex } from "../run/progress";
 
@@ -59,6 +61,21 @@ export function Run({ locale }: { locale: Locale }) {
   const def = useInstanceDef(instanceId, content?.activity.ownerId ?? null);
   const saved = useParticipant(instanceId, user?.id ?? "");
   const store = useMemo(() => (ws && user ? ws.instanceStore(instanceId, { id: user.id, role: user.role }) : null), [ws, user, instanceId]);
+
+  // consignes de l'enseignant, retours et remises : un seul flux sur la base de l'instance
+  const [docs, setDocs] = useState<InstanceScopedDoc[]>([]);
+  useEffect(() => {
+    if (!ws) return;
+    const s = ws.instanceDocs$(instanceId).subscribe(setDocs);
+    return () => s.unsubscribe();
+  }, [ws, instanceId]);
+  const ownerId = content?.activity.ownerId ?? null;
+  const latestOf = <T extends { updatedAt: number }>(list: T[]) => [...list].sort((a, b) => b.updatedAt - a.updatedAt)[0];
+  // seuls les documents de l'enseignant propriétaire font foi pour les consignes et les retours
+  const message = latestOf(docs.filter((d): d is BroadcastDoc => d.kind === "broadcast" && d.authorId === ownerId && d.mode === "message"));
+  const attention = latestOf(docs.filter((d): d is BroadcastDoc => d.kind === "broadcast" && d.authorId === ownerId && d.mode === "attention"));
+  const feedbackFor = (stepId: string) => latestOf(docs.filter((d): d is FeedbackDoc => d.kind === "feedback" && d.authorId === ownerId && d.stepId === stepId));
+  const submissionFor = (stepId: string) => latestOf(docs.filter((d): d is SubmissionDoc => d.kind === "submission" && d.authorId === user?.id && d.stepId === stepId));
 
   const resolved = useMemo(() => (content && def ? resolve(content, def, { role: "student" }) : null), [content, def]);
   const steps = resolved?.steps ?? [];
@@ -121,7 +138,10 @@ export function Run({ locale }: { locale: Locale }) {
 
   return (
     <>
+      <AttentionOverlay attention={attention} />
+      <div inert={attention?.active ? true : undefined}>
       {top(resolved.title)}
+      <MessageBanner message={message} />
       <StepTimeline
         steps={items}
         labels={{ list: t`Steps`, stateDone: t`done`, stateLocked: t`locked`, stateHidden: t`hidden from students`, hide: (l) => l, show: (l) => l, add: "" }}
@@ -145,6 +165,12 @@ export function Run({ locale }: { locale: Locale }) {
                 ) : null}
               </>
             ) : null}
+            <StepProgressPanel
+              submission={submissionFor(current.id)}
+              feedback={feedbackFor(current.id)}
+              onStatus={(status) => void saveSubmission(ws, instanceId, user.id, current.id, { status })}
+              onAssess={(n) => void saveSubmission(ws, instanceId, user.id, current.id, { selfAssessment: n })}
+            />
             <div style={{ display: "flex", gap: "var(--space-2)", flexWrap: "wrap" }}>
               <Button icon={<ArrowLeft size={16} />} disabled={index <= 0} onClick={() => go(index - 1)}>{t`Previous step`}</Button>
               <Button variant="primary" icon={<ArrowRight size={16} />} disabled={last || index + 1 >= reachable} onClick={() => go(index + 1)}>{t`Next step`}</Button>
@@ -154,6 +180,7 @@ export function Run({ locale }: { locale: Locale }) {
           </>
         )}
       </Content>
+      </div>
     </>
   );
 }

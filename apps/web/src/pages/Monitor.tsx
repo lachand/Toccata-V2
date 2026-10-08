@@ -8,6 +8,8 @@ import { OnlineStatus } from "../components/Layout";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { useStudentNames } from "../data/hooks";
 import { useWorkspace } from "../data/provider";
+import { useSession } from "../auth/session";
+import { ActionBar, TileActions } from "../monitor/Actions";
 import type { Locale } from "../i18n";
 import { GroupTile } from "../monitor/GroupTile";
 import { useMonitor } from "../monitor/useMonitor";
@@ -21,12 +23,16 @@ export function Monitor({ locale }: { locale: Locale }) {
   const ws = useWorkspace();
   const { content, groups, loading } = useMonitor(id);
   const names = useStudentNames();
+  const { user } = useSession();
+  const [picked, setPicked] = useState<ReadonlySet<string>>(new Set());
   const [now, setNow] = useState(() => ws?.serverNow() ?? Date.now());
   useEffect(() => {
     const h = setInterval(() => setNow(ws?.serverNow() ?? Date.now()), 1000);
     return () => clearInterval(h);
   }, [ws]);
 
+  const targets = picked.size === 0 ? groups : groups.filter((g) => picked.has(g.instanceId));
+  const ctx = ws && user ? { ws, ownerId: user.id } : null;
   const helpCount = groups.reduce((n, g) => n + g.help.length, 0);
   const title = content?.activity.title ?? t`Activity`;
 
@@ -54,13 +60,26 @@ export function Monitor({ locale }: { locale: Locale }) {
             {plural(helpCount, { one: "# student asks for help.", other: "# students ask for help." })}
           </p>
         ) : null}
+        {!projector && ctx && content && groups.length > 0 ? (
+          <ActionBar ctx={ctx} content={content} targets={targets} scopeLabel={picked.size === 0 ? t`Actions apply to all groups.` : plural(picked.size, { one: "Actions apply to # chosen group.", other: "Actions apply to # chosen groups." })} />
+        ) : null}
         {loading ? null : groups.length === 0 ? (
           <EmptyState icon={<Users size={32} />} title={t`No group to follow yet`} description={t`Distribute the activity to a class to follow it here.`} action={<Link className="tc-btn tc-btn--primary" to={`/activities/${id}/distribute`}>{t`Distribute`}</Link>} />
         ) : (
           <ul className="tc-gtiles" data-projector={projector ? "true" : "false"}>
             {groups.map((g) => (
               <li key={g.instanceId} style={{ display: "contents" }}>
-                <GroupTile g={g} activityId={id} now={now} names={names} projector={projector} />
+                <GroupTile g={g} activityId={id} now={now} names={names} projector={projector}>
+                  {ctx && content ? (
+                    <>
+                      <label style={{ display: "flex", alignItems: "center", gap: "var(--space-2)", minBlockSize: "var(--hit)" }}>
+                        <input type="checkbox" checked={picked.has(g.instanceId)} onChange={(e) => setPicked((p) => (e.currentTarget.checked ? new Set(p).add(g.instanceId) : new Set([...p].filter((x) => x !== g.instanceId))))} />
+                        {t`Choose`}
+                      </label>
+                      <TileActions ctx={ctx} content={content} g={g} />
+                    </>
+                  ) : null}
+                </GroupTile>
               </li>
             ))}
           </ul>

@@ -14,6 +14,9 @@ export type GroupSummary = Readonly<{
   stepIndex: number | null;
   stepId: string | null;
   stepTitle: string | null;
+  /** Étape suivante du script de ce groupe (`null` : dernière), et si elle est verrouillée pour lui. */
+  nextStepId: string | null;
+  nextLocked: boolean;
   /** Étape en cours de chaque membre (`null` : n'a rien ouvert). */
   members: readonly { userId: string; stepIndex: number | null }[];
   timers: readonly TimerSummary[];
@@ -111,6 +114,8 @@ export function summarizeGroup(content: MasterContent, def: InstanceDoc, docs: r
     stepIndex: best,
     stepId: stepAt?.id ?? null,
     stepTitle: stepAt?.title ?? null,
+    nextStepId: steps[(best ?? -1) + 1]?.id ?? null,
+    nextLocked: steps[(best ?? -1) + 1]?.locked ?? false,
     members: memberRows,
     timers,
     kanban,

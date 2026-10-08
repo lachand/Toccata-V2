@@ -171,7 +171,7 @@ describe("Workspace (RxDB hors ligne)", () => {
     expect(rows[0]!.def).toMatchObject({ id: inst, name: "Groupe A", memberIds: [m1, m2], linked: true });
 
     // un élève (ou n'importe qui d'autre) écrit une fausse définition, plus récente : elle ne compte pas
-    const col = await (w as unknown as { instance(i: string): Promise<{ upsert(d: object): Promise<unknown> }> }).instance(inst);
+    const col = await w.instanceCol(inst);
     await col.upsert({ ...rows[0]!.def, id: newId(), authorId: m1, name: "Piraté", linked: false, updatedAt: Date.now() + 10_000 });
     expect((await firstValueFrom(w.instance$(inst, owner)))?.name).toBe("Groupe A");
 
