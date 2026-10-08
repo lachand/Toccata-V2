@@ -356,10 +356,27 @@ export function createApp(deps: Deps) {
     return c.json({ id: student.id, username: student.username, passphrase });
   });
 
+  /** Ce que la plateforme détient sur la personne : compte, appartenances et tout ce qu'elle a écrit en séance. */
+  const personalData = async (u: UserDoc) => ({
+    exportedAt: now(),
+    account: { id: u.id, username: u.username, displayName: u.displayName, role: u.role, locale: u.locale, classId: u.classId ?? null, createdAt: u.createdAt },
+    memberships: u.memberships,
+    sessions: await accounts.authoredDocs(u.id, u.memberships.map((m) => m.instanceId)),
+  });
+
+  app.get("/auth/me/export", async (c) => c.json(await personalData(await authenticate(c))));
+
+  app.get("/classes/:id/students/:sid/export", async (c) => {
+    const teacher = await authenticate(c, "teacher");
+    const { student } = await ownStudent(teacher, c.req.param("id"), c.req.param("sid"));
+    return c.json(await personalData(student));
+  });
+
   app.delete("/classes/:id/students/:sid", async (c) => {
     cloudOnly();
     const teacher = await authenticate(c, "teacher");
     const { cls, student } = await ownStudent(teacher, c.req.param("id"), c.req.param("sid"));
+    await accounts.purgeAuthoredDocs(student.id, student.memberships.map((m) => m.instanceId));
     for (const m of student.memberships) await accounts.updateInstance(m.instanceId, (i) => ({ ...i, memberIds: i.memberIds.filter((x) => x !== student.id) })).catch(() => undefined);
     await accounts.deleteUser(student.id);
     await accounts.updateClass(cls.id, (k) => ({ ...k, studentIds: k.studentIds.filter((x) => x !== student.id) }));

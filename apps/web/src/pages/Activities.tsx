@@ -59,7 +59,9 @@ export function Activities({ locale }: { locale: Locale }) {
     const { blob, filename, missingFiles } = await exportActivity(ws, id);
     const url = URL.createObjectURL(blob);
     const a = Object.assign(document.createElement("a"), { href: url, download: filename });
+    document.body.append(a);
     a.click();
+    a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
     setNotice(missingFiles > 0 ? plural(missingFiles, { one: "# file is not available on this device and was left out of the export.", other: "# files are not available on this device and were left out of the export." }) : null);
   }

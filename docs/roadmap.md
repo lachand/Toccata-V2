@@ -9,7 +9,7 @@
 | 4 | Distribution et exécution — **terminée** : groupes (instances), séance de l'élève (une étape et un élément à la fois), questionnaire bloquant, reprise entre appareils, modification en direct ciblée ; ADR 0013 |
 | 5 | Orchestration — **terminée** : suivi en direct et mode projecteur, miroir en lecture seule, pilotage (chrono, message, attention, verrou, retours), remise de l'élève, télécommande mobile ; ADR 0014 (Web Push reste à faire) |
 | 6 | Résilience réseau — **terminée** : serveur de classe (réplication entre serveurs, authentification locale, comptes en lecture seule), indicateur d'état réel, paquet Docker/Caddy, guide ; ADR 0015 (point d'accès Wi-Fi et certificat réel non testés faute de matériel) |
-| 7 | Réutilisation et réflexion : modèles, import/export, « prévu vs réalisé » |
+| 7 | Réutilisation et réflexion — **terminée** : fichier `.toccata` (export, import, duplication), bibliothèque de modèles partagés entre enseignants, journal de séance, bilan « prévu vs réalisé » avec notes structurées, export de recherche (consentement), données personnelles (export et effacement) ; ADR 0016 (modèles sans fichiers, bibliothèque en ligne seulement) |
 | 8 | Qualité et mise en production |
 
 Directions de conception de l'article (D1–D9) : appareil quelconque, mobilité, résilience

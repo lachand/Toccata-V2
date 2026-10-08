@@ -43,6 +43,7 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
       <LocaleSwitcher current={locale} />
       {content && user ? <PublishTemplateDialog content={content} author={{ id: user.id as never, name: user.displayName }} /> : null}
       <Link className="tc-btn" to={`/activities/${id}/monitor`}>{t`Monitoring`}</Link>
+      <Link className="tc-btn" to={`/activities/${id}/review`}>{t`Review`}</Link>
       <Link className="tc-btn tc-btn--primary" to={`/activities/${id}/distribute`}>{t`Distribute`}</Link>
     </TopBar>
   );

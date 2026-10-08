@@ -1,6 +1,6 @@
 import { useLingui } from "@lingui/react/macro";
 import { Avatar, Button, Card, Content, Dialog, Field, TextArea, TopBar } from "@toccata/ui";
-import { KeyRound, Trash2 } from "lucide-react";
+import { Download, KeyRound, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams } from "react-router";
 import type { NewStudent, StudentSummary } from "../auth/api";
@@ -9,6 +9,7 @@ import { CredentialsSheet } from "../components/CredentialsSheet";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
 import type { Locale } from "../i18n";
+import { download } from "../review/download";
 import { api } from "./Classes";
 
 export function ClassDetail({ locale }: { locale: Locale }) {
@@ -54,6 +55,14 @@ export function ClassDetail({ locale }: { locale: Locale }) {
     }
   }
 
+  async function exportData(s: StudentSummary) {
+    try {
+      download(`toccata-${s.username}.json`, "application/json", JSON.stringify(await api().exportStudent(id, s.id), null, 2));
+    } catch (e) {
+      setError(e);
+    }
+  }
+
   async function remove(s: StudentSummary) {
     try {
       await api().removeStudent(id, s.id);
@@ -96,6 +105,7 @@ export function ClassDetail({ locale }: { locale: Locale }) {
                 <Avatar name={s.displayName} />
                 <span style={{ marginInlineEnd: "auto" }}><strong>{s.displayName}</strong> <span className="tc-mono" style={{ color: "var(--muted)" }}>{s.username}</span></span>
                 <Button icon={<KeyRound size={16} />} onClick={() => void reset(s)} aria-label={t`New passphrase for ${name}`}>{t`New passphrase`}</Button>
+                <Button icon={<Download size={16} />} onClick={() => void exportData(s)} aria-label={t`Download the data of ${name}`}>{t`Data`}</Button>
                 <Button variant="danger" icon={<Trash2 size={16} />} onClick={() => setToRemove(s)} aria-label={t`Remove ${name}`}>{t`Remove`}</Button>
               </li>
               );
@@ -108,7 +118,7 @@ export function ClassDetail({ locale }: { locale: Locale }) {
         open={!!toRemove}
         onOpenChange={(o) => !o && setToRemove(null)}
         title={t`Remove this student?`}
-        description={t`The account and its sessions will be deleted. This cannot be undone.`}
+        description={t`The account, its sessions and everything this student wrote during activities will be deleted. This cannot be undone.`}
         closeLabel={t`Close`}
         footer={<><Button variant="ghost" onClick={() => setToRemove(null)}>{t`Cancel`}</Button><Button variant="danger" onClick={() => toRemove && void remove(toRemove)}>{t`Remove`}</Button></>}
       >

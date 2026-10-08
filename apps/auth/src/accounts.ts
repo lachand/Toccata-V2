@@ -1,4 +1,4 @@
-import type { Id } from "@toccata/schema";
+import { instanceDbName, type Id } from "@toccata/schema";
 import { CouchAdmin, CouchConflict, type Doc } from "./couch";
 import { ApiError } from "./errors";
 import type { Membership } from "./roles";
@@ -160,5 +160,29 @@ export class AccountStore {
   }
   updateInstance(id: string, mutate: (i: InstanceReg) => InstanceReg): Promise<InstanceReg> {
     return this.couch.update<InstanceReg>(this.db, `instance_${id}`, mutate);
+  }
+
+  /** Documents écrits par une personne (champ `authorId`) dans les bases de ses séances : export RGPD (accès, portabilité). */
+  async authoredDocs(userId: string, instanceIds: string[]): Promise<{ instanceId: string; docs: Record<string, unknown>[] }[]> {
+    const out: { instanceId: string; docs: Record<string, unknown>[] }[] = [];
+    for (const instanceId of instanceIds) {
+      const docs = await this.couch.find<Doc & Record<string, unknown>>(instanceDbName(instanceId), { authorId: userId }, 100_000).catch(() => []);
+      out.push({ instanceId, docs: docs.map(({ _id, _rev, ...rest }) => rest) });
+    }
+    return out;
+  }
+
+  /** Efface ce qu'une personne a écrit dans les bases de ses séances (droit à l'effacement). Renvoie le nombre de documents supprimés. */
+  async purgeAuthoredDocs(userId: string, instanceIds: string[]): Promise<number> {
+    let n = 0;
+    for (const instanceId of instanceIds) {
+      const db = instanceDbName(instanceId);
+      const docs = await this.couch.find<Doc>(db, { authorId: userId }, 100_000).catch(() => []);
+      if (docs.length === 0) continue;
+      const r = await this.couch.request("POST", `${encodeURIComponent(db)}/_bulk_docs`, { docs: docs.map((d) => ({ _id: d._id, _rev: d._rev, _deleted: true })) });
+      if (r.status !== 201) throw new Error(`effacement ${db} : ${r.status}`);
+      n += docs.length;
+    }
+    return n;
   }
 }

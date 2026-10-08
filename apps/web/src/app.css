@@ -59,3 +59,10 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
 .tc-gtiles--remote { grid-template-columns: minmax(0, 1fr); }
 .tc-remote .tc-btn { min-block-size: 48px; }
 .tc-remote .tc-actionbar__row .tc-btn { flex: 1 1 8rem; justify-content: center; }
+
+.tc-table { inline-size: 100%; border-collapse: collapse; background: var(--surface, #fff); border-radius: var(--radius); overflow: hidden; }
+.tc-table caption { text-align: start; font-weight: 700; padding-block-end: var(--space-2); }
+.tc-table th, .tc-table td { text-align: start; padding: var(--space-2) var(--space-3); border-block-end: 1px solid var(--line, #d8e4de); vertical-align: top; }
+.tc-table thead th { background: var(--accent-soft); color: var(--accent-ink); }
+.tc-table td[data-tone="warn"] { background: var(--warn-soft, #fde7c3); color: var(--warn-ink, #7a3b00); }
+@media (max-width: 720px) { .tc-table { display: block; overflow-x: auto; } }

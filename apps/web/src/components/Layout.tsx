@@ -1,7 +1,7 @@
 import { plural } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 import { Avatar, AppShell, Button, Rail, RailItem, SyncStatus } from "@toccata/ui";
-import { BookOpen, Copy, LayoutGrid, LogOut, Users } from "lucide-react";
+import { BookOpen, Copy, LayoutGrid, LogOut, ShieldCheck, Users } from "lucide-react";
 import type { MouseEvent, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { session, useSession } from "../auth/session";
@@ -54,6 +54,7 @@ export function Layout({ children }: { children: ReactNode }) {
           }
         >
           <NavItem to="/" icon={<BookOpen size={18} />}>{t`My activities`}</NavItem>
+          <NavItem to="/privacy" icon={<ShieldCheck size={18} />}>{t`Privacy`}</NavItem>
           <NavItem to="/gallery" icon={<LayoutGrid size={18} />}>{t`Components`}</NavItem>
           {user?.role === "teacher" ? <NavItem to="/classes" icon={<Users size={18} />}>{t`Classes`}</NavItem> : null}
           {user?.role === "teacher" ? <NavItem to="/library" icon={<Copy size={18} />}>{t`Templates`}</NavItem> : null}

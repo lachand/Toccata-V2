@@ -283,7 +283,7 @@ export class Workspace {
   }
 
   /** Une note par cible (activité ou étape) : on la crée au premier enregistrement puis on la met à jour. */
-  async saveNote(activityId: string, stepId: string | null, patch: { body?: string; flag?: TeacherNoteDoc["flag"] }): Promise<void> {
+  async saveNote(activityId: string, stepId: string | null, patch: { body?: string; flag?: TeacherNoteDoc["flag"]; structured?: TeacherNoteDoc["structured"] }): Promise<void> {
     const col = await this.notesCol();
     const existing = decodeTeacherDocs((await col.find({ selector: { kind: "tnote" } }).exec()).map((r) => r.toJSON())).docs.find((d) => d.activityId === activityId && d.stepId === stepId);
     const t = this.now();
@@ -295,6 +295,7 @@ export class Workspace {
       stepId,
       body: patch.body ?? existing?.body ?? "",
       flag: patch.flag === undefined ? (existing?.flag ?? null) : patch.flag,
+      ...((patch.structured ?? existing?.structured) ? { structured: (patch.structured ?? existing?.structured)! } : {}),
       createdAt: existing?.createdAt ?? t,
       updatedAt: t,
     };

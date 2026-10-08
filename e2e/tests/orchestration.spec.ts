@@ -180,3 +180,39 @@ test("télécommande : tient sur un téléphone sans débordement, et pilote la 
   expect((await btn.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   await context.close();
 });
+
+test("bilan : prévu vs réalisé construit depuis le journal, notes structurées, export soumis au consentement", async ({ browser }) => {
+  const { context, page } = await device(browser);
+  await page.goto("/login");
+  await page.getByLabel("Identifiant").fill(teacherName);
+  await page.getByLabel("Mot de passe").fill(PASSWORD);
+  await page.getByRole("button", { name: "Se connecter" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Mes activités" })).toBeVisible();
+  const activityId = /\/activities\/([^/]+)\/monitor/.exec(monitorUrl)![1]!;
+  await page.goto(`/activities/${activityId}/review`);
+  const table = page.getByRole("table", { name: "Prévu et réalisé, étape par étape" });
+  await expect(table).toBeVisible({ timeout: 45_000 });
+  const row = table.getByRole("row", { name: /Chercher/ });
+  await expect(row).toBeVisible();
+  await expect(row.getByRole("cell").first()).toHaveText(/\d+ min/); // prévu : le minuteur de l'étape
+  expect(await axeViolations(page)).toEqual([]);
+
+  // bilan structuré, retrouvé après rechargement
+  await page.getByLabel("Qu’est-ce qui a bien fonctionné ?").fill("Le minuteur a cadré le travail.");
+  await page.getByRole("button", { name: "Enregistrer le bilan" }).click();
+  await expect(page.getByText("Enregistré")).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel("Qu’est-ce qui a bien fonctionné ?")).toHaveValue("Le minuteur a cadré le travail.", { timeout: 30_000 });
+
+  // export : refusé tant que le consentement n'est pas confirmé ; CSV sans nom d'élève
+  const csv = page.getByRole("button", { name: "Exporter en CSV" });
+  await expect(csv).toBeDisabled();
+  await page.getByRole("checkbox", { name: /consentement a été recueilli/ }).check();
+  const [download] = await Promise.all([page.waitForEvent("download"), csv.click()]);
+  const text = (await import("node:fs")).readFileSync((await download.path())!, "utf8");
+  expect(text.split("\r\n")[0]).toBe("timestamp,group,actor,role,action,object,initiatedBy,meta");
+  expect(text).toContain("step.enter");
+  expect(text).not.toContain("Lina");
+  expect(text).not.toContain("Hugo");
+  await context.close();
+});

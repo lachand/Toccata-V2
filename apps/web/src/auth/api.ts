@@ -69,6 +69,7 @@ export const classesApi = (f: Fetcher, token: () => Promise<string>) => ({
   get: async (id: string) => request<{ id: string; name: string; students: StudentSummary[] }>(f, "GET", `/api/classes/${encodeURIComponent(id)}`, { token: await token() }),
   addStudents: async (id: string, names: string[]) => request<{ students: NewStudent[] }>(f, "POST", `/api/classes/${encodeURIComponent(id)}/students`, { token: await token(), body: { names } }),
   resetPassword: async (id: string, sid: string) => request<{ id: string; username: string; passphrase: string }>(f, "POST", `/api/classes/${encodeURIComponent(id)}/students/${encodeURIComponent(sid)}/reset-password`, { token: await token() }),
+  exportStudent: async (id: string, sid: string) => request<unknown>(f, "GET", `/api/classes/${encodeURIComponent(id)}/students/${encodeURIComponent(sid)}/export`, { token: await token() }),
   removeStudent: async (id: string, sid: string) => request<void>(f, "DELETE", `/api/classes/${encodeURIComponent(id)}/students/${encodeURIComponent(sid)}`, { token: await token() }),
 });
 

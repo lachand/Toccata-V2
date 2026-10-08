@@ -175,7 +175,7 @@ describe("jetons de rafraîchissement", () => {
 
 describe("rôles CouchDB", () => {
   it("l'enseignant n'a qu'un rôle, quel que soit son nombre d'activités", () => {
-    expect(rolesFor({ id: ID_A, role: "teacher" })).toEqual([`owner:${ID_A}`]);
+    expect(rolesFor({ id: ID_A, role: "teacher" })).toEqual([`owner:${ID_A}`, "teacher"]);
   });
   it("l'élève a uniquement ses instances et leurs activités, sans doublon", () => {
     const m = [{ activityId: ID_B, instanceId: INST }, { activityId: ID_B, instanceId: ID_A }];

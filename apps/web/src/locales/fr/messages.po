@@ -44,10 +44,25 @@ msgstr "{0, plural, one {# groupe ne suit plus le script et n’a pas été modi
 msgid "{0, plural, one {# group will be created.} other {# groups will be created.}}"
 msgstr "{0, plural, one {# groupe sera créé.} other {# groupes seront créés.}}"
 
+#. placeholder {0}: review.groups.length
+#: src/pages/Review.tsx
+msgid "{0, plural, one {# group} other {# groups}}"
+msgstr "{0, plural, one {# groupe} other {# groupes}}"
+
+#. placeholder {0}: g.helpRequests
+#: src/pages/Review.tsx
+msgid "{0, plural, one {# help request} other {# help requests}}"
+msgstr "{0, plural, one {# demande d’aide} other {# demandes d’aide}}"
+
 #. placeholder {0}: g.help.length
 #: src/monitor/GroupTile.tsx
 msgid "{0, plural, one {# needs help} other {# need help}}"
 msgstr "{0, plural, one {# demande de l’aide} other {# demandent de l’aide}}"
+
+#. placeholder {0}: g.stepsReached
+#: src/pages/Review.tsx
+msgid "{0, plural, one {# step reached} other {# steps reached}}"
+msgstr "{0, plural, one {# étape atteinte} other {# étapes atteintes}}"
 
 #. placeholder {0}: picked.size
 #: src/pages/Monitor.tsx
@@ -181,6 +196,7 @@ msgstr "actif"
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Distribute.tsx
 #: src/pages/Monitor.tsx
+#: src/pages/Review.tsx
 #: src/pages/Run.tsx
 msgid "Activity"
 msgstr "Activité"
@@ -196,6 +212,10 @@ msgstr "Nom de l'activité"
 #: src/pages/ActivityEditor.tsx
 msgid "Activity title"
 msgstr "Titre de l’activité"
+
+#: src/pages/Review.tsx
+msgid "Actual (median)"
+msgstr "Réalisé (médiane)"
 
 #: src/content/AddContentDialog.tsx
 #: src/content/ContentPanel.tsx
@@ -262,6 +282,10 @@ msgstr "Tous"
 msgid "Already have an account? Sign in"
 msgstr "Déjà un compte ? Se connecter"
 
+#: src/pages/Privacy.tsx
+msgid "An account: a username, a display name and a language. No e-mail address and no photo are required for students."
+msgstr "Un compte : un identifiant, un nom affiché et une langue. Aucune adresse e-mail ni photo n’est demandée aux élèves."
+
 #: src/content/AddContentDialog.tsx
 msgid "An image, a PDF, an audio or video file, a document."
 msgstr "Une image, un PDF, un fichier audio ou vidéo, un document."
@@ -294,6 +318,10 @@ msgstr "Retour"
 #: src/pages/Run.tsx
 msgid "Back to activities"
 msgstr "Retour aux activités"
+
+#: src/pages/Review.tsx
+msgid "Back to the activity"
+msgstr "Retour à l’activité"
 
 #: src/pages/Distribute.tsx
 msgid "Back to the script"
@@ -433,6 +461,14 @@ msgstr "Composants"
 msgid "Copy of {title}"
 msgstr "Copie de {title}"
 
+#: src/pages/Privacy.tsx
+msgid "Could not download the data. Try again when you are online."
+msgstr "Impossible de télécharger les données. Réessayez quand vous êtes en ligne."
+
+#: src/pages/Review.tsx
+msgid "Could not save"
+msgstr "Enregistrement impossible"
+
 #: src/pages/Activities.tsx
 msgid "Create"
 msgstr "Créer"
@@ -466,6 +502,10 @@ msgstr "Créer les groupes"
 #: src/pages/Activities.tsx
 msgid "Create your first activity to get started."
 msgstr "Créez votre première activité pour commencer."
+
+#: src/pages/ClassDetail.tsx
+msgid "Data"
+msgstr "Données"
 
 #: src/content/ContentPanel.tsx
 #: src/pages/ActivityEditor.tsx
@@ -518,6 +558,7 @@ msgstr "Mode d'affichage"
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Monitor.tsx
+#: src/pages/Review.tsx
 msgid "Distribute"
 msgstr "Distribuer"
 
@@ -540,6 +581,14 @@ msgstr "Terminé"
 #: src/content/ResourceView.tsx
 msgid "Download"
 msgstr "Télécharger"
+
+#: src/pages/Privacy.tsx
+msgid "Download my data"
+msgstr "Télécharger mes données"
+
+#: src/pages/ClassDetail.tsx
+msgid "Download the data of {name}"
+msgstr "Télécharger les données de {name}"
 
 #: src/pages/Activities.tsx
 msgid "Draft"
@@ -588,6 +637,14 @@ msgstr "Tout le monde"
 #: src/pages/Activities.tsx
 msgid "Export"
 msgstr "Exporter"
+
+#: src/pages/Review.tsx
+msgid "Export CSV"
+msgstr "Exporter en CSV"
+
+#: src/pages/Review.tsx
+msgid "Export JSON"
+msgstr "Exporter en JSON"
 
 #: src/monitor/Actions.tsx
 msgid "Feedback"
@@ -667,6 +724,7 @@ msgstr "Groupe de {0}"
 #: src/content/TargetPicker.tsx
 #: src/pages/Distribute.tsx
 #: src/pages/Monitor.tsx
+#: src/pages/Review.tsx
 msgid "Groups"
 msgstr "Groupes"
 
@@ -674,13 +732,29 @@ msgstr "Groupes"
 msgid "Groups of this activity"
 msgstr "Groupes de cette activité"
 
+#: src/pages/Review.tsx
+msgid "Groups reached"
+msgstr "Groupes arrivés"
+
+#: src/pages/Review.tsx
+msgid "Groups with a variant"
+msgstr "Groupes avec une variante"
+
 #: src/pages/Gallery.tsx
 msgid "Hand out"
 msgstr "Distribuer"
 
+#: src/pages/Review.tsx
+msgid "Handed in"
+msgstr "Rendus"
+
 #: src/richtext/RichToolbar.tsx
 msgid "Heading"
 msgstr "Titre"
+
+#: src/pages/Review.tsx
+msgid "Help requests"
+msgstr "Demandes d’aide"
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
@@ -712,6 +786,10 @@ msgstr "Mode d’ouverture"
 #: src/pages/Distribute.tsx
 msgid "How to split the class"
 msgstr "Répartition de la classe"
+
+#: src/pages/Review.tsx
+msgid "I confirm that consent has been collected for this class."
+msgstr "Je confirme que le consentement a été recueilli pour cette classe."
 
 #: src/run/Orchestration.tsx
 msgid "I need help"
@@ -796,6 +874,10 @@ msgstr "Lien seulement"
 msgid "Linked window"
 msgstr "Fenêtre liée"
 
+#: src/pages/Review.tsx
+msgid "Live changes"
+msgstr "Modifications en direct"
+
 #: src/content/ResourceView.tsx
 #: src/content/TargetPicker.tsx
 #: src/pages/Activities.tsx
@@ -823,6 +905,10 @@ msgstr "Identifiants de connexion"
 #: src/apps/form.tsx
 msgid "Long text"
 msgstr "Texte long"
+
+#: src/pages/Review.tsx
+msgid "longer than planned"
+msgstr "plus long que prévu"
 
 #: src/run/Orchestration.tsx
 msgid "Look up, please."
@@ -999,6 +1085,10 @@ msgstr "Aucun blocage"
 msgid "No resource yet"
 msgstr "Aucune ressource pour l'instant"
 
+#: src/pages/Review.tsx
+msgid "No session recorded yet"
+msgstr "Aucune séance enregistrée pour l’instant"
+
 #: src/pages/ActivityEditor.tsx
 msgid "No step yet"
 msgstr "Aucune étape pour l’instant"
@@ -1081,6 +1171,10 @@ msgstr "Une étape de retard"
 msgid "Online"
 msgstr "En ligne"
 
+#: src/pages/Review.tsx
+msgid "Only you can read this. It stays with the activity so that you can improve it next time."
+msgstr "Vous seul pouvez lire ceci. Le bilan reste attaché à l’activité pour l’améliorer la prochaine fois."
+
 #: src/content/NotesPanel.tsx
 msgid "Only you can see these notes."
 msgstr "Vous seul voyez ces notes."
@@ -1153,6 +1247,14 @@ msgstr "Personnes"
 msgid "Picked up “{0}”."
 msgstr "« {0} » saisie."
 
+#: src/pages/Review.tsx
+msgid "Planned"
+msgstr "Prévu"
+
+#: src/pages/Review.tsx
+msgid "Planned versus actual, per step"
+msgstr "Prévu et réalisé, étape par étape"
+
 #: src/apps/kanban.tsx
 msgid "Points"
 msgstr "Points"
@@ -1168,6 +1270,14 @@ msgstr "Imprimer"
 #: src/components/CredentialsSheet.tsx
 msgid "Print or save these details now: passphrases cannot be shown again. A lost passphrase can be replaced by a new one."
 msgstr "Imprimez ou enregistrez ces identifiants maintenant : les phrases de passe ne peuvent pas être affichées de nouveau. Une phrase perdue peut être remplacée par une nouvelle."
+
+#: src/components/Layout.tsx
+msgid "Privacy"
+msgstr "Données personnelles"
+
+#: src/pages/Privacy.tsx
+msgid "Privacy and your data"
+msgstr "Données personnelles et confidentialité"
 
 #: src/content/NotesPanel.tsx
 msgid "Private notes"
@@ -1252,6 +1362,10 @@ msgstr "Retirer cet élève ?"
 msgid "Required"
 msgstr "Obligatoire"
 
+#: src/pages/Review.tsx
+msgid "Research log"
+msgstr "Journal de recherche"
+
 #: src/apps/timer.tsx
 msgid "Reset"
 msgstr "Réinitialiser"
@@ -1281,6 +1395,18 @@ msgstr "Reprendre"
 msgid "Retry"
 msgstr "Réessayer"
 
+#: src/pages/ActivityEditor.tsx
+msgid "Review"
+msgstr "Bilan"
+
+#: src/pages/Review.tsx
+msgid "Review · {title}"
+msgstr "Bilan · {title}"
+
+#: src/pages/Review.tsx
+msgid "Run the activity with a class: planned and actual timings will appear here."
+msgstr "Jouez l’activité avec une classe : les durées prévues et réelles apparaîtront ici."
+
 #: src/monitor/GroupTile.tsx
 msgid "running"
 msgstr "en cours"
@@ -1288,6 +1414,14 @@ msgstr "en cours"
 #: src/pages/Distribute.tsx
 msgid "Save"
 msgstr "Enregistrer"
+
+#: src/pages/Review.tsx
+msgid "Save the review"
+msgstr "Enregistrer le bilan"
+
+#: src/pages/Review.tsx
+msgid "Saved"
+msgstr "Enregistré"
 
 #: src/pages/Gallery.tsx
 msgid "Saving"
@@ -1324,6 +1458,13 @@ msgstr "Envoyer le retour"
 #: src/auth/useErrorText.ts
 msgid "Server unreachable. Check the connection."
 msgstr "Serveur injoignable. Connexion à vérifier."
+
+#. placeholder {0}: fmtDate(review.startedAt)
+#. placeholder {1}: fmtDate(review.endedAt)
+#. placeholder {2}: fmtMin(review.plannedTotalSec)
+#: src/pages/Review.tsx
+msgid "Session from {0} to {1} · planned {2}"
+msgstr "Séance du {0} au {1} · prévu {2}"
 
 #: src/library/PublishTemplateDialog.tsx
 msgid "Share"
@@ -1403,6 +1544,10 @@ msgstr "Démarrer"
 msgid "Status"
 msgstr "États"
 
+#: src/pages/Review.tsx
+msgid "Step"
+msgstr "Étape"
+
 #. placeholder {0}: index + 1
 #: src/pages/ActivityEditor.tsx
 msgid "Step {0}"
@@ -1465,6 +1610,10 @@ msgstr "Les élèves restent sur cette étape tant qu’ils n’ont pas envoyé 
 msgid "Students' screens are frozen until you release attention."
 msgstr "Les écrans des élèves restent figés jusqu’à ce que vous leviez l’attention."
 
+#: src/pages/Privacy.tsx
+msgid "Students’ work is readable by you and by the students of the same group only."
+msgstr "Le travail des élèves n’est lisible que par vous et par les élèves du même groupe."
+
 #: src/apps/form.tsx
 msgid "Submit"
 msgstr "Envoyer"
@@ -1481,6 +1630,10 @@ msgstr "Problème de synchronisation, nouvel essai en cours"
 msgid "Syncing"
 msgstr "Synchronisation"
 
+#: src/pages/Privacy.tsx
+msgid "Teachers’ private notes are stored apart and are never readable by students."
+msgstr "Les notes privées des enseignants sont stockées à part et ne sont jamais lisibles par les élèves."
+
 #: src/pages/Library.tsx
 msgid "Template library"
 msgstr "Bibliothèque de modèles"
@@ -1494,8 +1647,12 @@ msgid "Text formatting"
 msgstr "Mise en forme du texte"
 
 #: src/pages/ClassDetail.tsx
-msgid "The account and its sessions will be deleted. This cannot be undone."
-msgstr "Le compte et ses sessions seront supprimés. Cette action est irréversible."
+msgid "The account, its sessions and everything this student wrote during activities will be deleted. This cannot be undone."
+msgstr "Le compte, ses sessions et tout ce que cet élève a écrit pendant les activités seront supprimés. Cette action est irréversible."
+
+#: src/pages/Review.tsx
+msgid "The export contains neutral action codes with pseudonymised participants (no names, no student content). Use it only if the people concerned and their guardians agreed to take part in research."
+msgstr "L’export contient des codes d’action neutres et des participants pseudonymisés (ni noms, ni contenu produit par les élèves). Ne l’utilisez que si les personnes concernées et leurs responsables légaux ont accepté de participer à une recherche."
 
 #: src/pages/Gallery.tsx
 msgid "The name is required"
@@ -1621,6 +1778,11 @@ msgstr "Temps restant"
 msgid "Timer"
 msgstr "Minuteur"
 
+#. placeholder {0}: fmtMin(g.timerExtensionsSec)
+#: src/pages/Review.tsx
+msgid "timers extended by {0}"
+msgstr "chronomètres prolongés de {0}"
+
 #: src/pages/Activities.tsx
 msgid "Title"
 msgstr "Titre"
@@ -1702,9 +1864,33 @@ msgstr "Application web"
 msgid "Web link"
 msgstr "Lien web"
 
+#: src/pages/Privacy.tsx
+msgid "What is kept"
+msgstr "Ce qui est conservé"
+
+#: src/pages/Privacy.tsx
+msgid "What is kept about you"
+msgstr "Ce qui est conservé sur toi"
+
+#: src/pages/Privacy.tsx
+msgid "What is written during activities: answers, cards, texts, the step you are on, and a log of actions (opening a step, asking for help…) with no names in it."
+msgstr "Ce qui est écrit pendant les activités : réponses, cartes, textes, étape en cours, et un journal d’actions (ouverture d’une étape, demande d’aide…) sans aucun nom."
+
 #: src/content/AddContentDialog.tsx
 msgid "What to add"
 msgstr "Que souhaitez-vous ajouter ?"
+
+#: src/pages/Review.tsx
+msgid "What will you do next time?"
+msgstr "Que ferez-vous la prochaine fois ?"
+
+#: src/pages/Review.tsx
+msgid "What worked well?"
+msgstr "Qu’est-ce qui a bien fonctionné ?"
+
+#: src/pages/Review.tsx
+msgid "What would you change?"
+msgstr "Que changeriez-vous ?"
 
 #: src/content/TargetPicker.tsx
 msgid "Who receives your changes"
@@ -1722,13 +1908,37 @@ msgstr "Écran de"
 msgid "Worked well"
 msgstr "A bien fonctionné"
 
+#: src/pages/Privacy.tsx
+msgid "You can download everything the platform holds about you. To have your account and your work erased, ask your teacher."
+msgstr "Tu peux télécharger tout ce que la plateforme conserve sur toi. Pour faire effacer ton compte et ton travail, demande à ton enseignant."
+
+#: src/pages/Privacy.tsx
+msgid "You can download your data at any time. A student’s account and everything the student wrote can be exported or erased from the class page. Research exports are pseudonymised and require a confirmation that consent was collected."
+msgstr "Vous pouvez télécharger vos données à tout moment. Le compte d’un élève et tout ce qu’il a écrit peuvent être exportés ou effacés depuis la page de la classe. Les exports de recherche sont pseudonymisés et exigent la confirmation que le consentement a été recueilli."
+
+#: src/pages/Review.tsx
+msgid "Your notes"
+msgstr "Vos notes"
+
 #: src/run/Orchestration.tsx
 msgid "Your progress on this step"
 msgstr "Où tu en es sur cette étape"
 
+#: src/pages/Review.tsx
+msgid "Your review"
+msgstr "Votre bilan"
+
+#: src/pages/Privacy.tsx
+msgid "Your rights"
+msgstr "Vos droits"
+
 #: src/run/Orchestration.tsx
 msgid "Your teacher asks for your attention"
 msgstr "Ton enseignant demande ton attention"
+
+#: src/pages/Privacy.tsx
+msgid "Your teacher can read what you write during an activity. Nobody else can."
+msgstr "Ton enseignant peut lire ce que tu écris pendant une activité. Personne d’autre ne le peut."
 
 #: src/pages/Run.tsx
 msgid "Your teacher has not opened any step."

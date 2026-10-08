@@ -75,6 +75,36 @@ describe("classes et comptes élèves", () => {
     expect((await ctx.refresh(first.cookie!)).status).toBe(401); // l'ancienne session est révoquée
   });
 
+  it("RGPD : export des données d'un élève (par lui ou son enseignant), effacement de ce qu'il a écrit en séance", async () => {
+    const t = await ctx.signupTeacher("classes.gdpr");
+    const other = await ctx.signupTeacher("classes.gdpr.autre");
+    const { classId, students: [s1, s2] } = await ctx.makeClass(t.token, ["Lou Un", "Max Deux"]);
+    const act = (await ctx.call("POST", "/activities", { token: t.token })).json;
+    ctx.track(act.dbName);
+    const inst = (await ctx.call("POST", `/activities/${act.id}/instances`, { token: t.token, body: { memberIds: [s1!.id, s2!.id] } })).json;
+    ctx.track(inst.dbName);
+    const tok1 = (await ctx.login(s1!.username, s1!.passphrase)).json.accessToken as string;
+    const tok2 = (await ctx.login(s2!.username, s2!.passphrase)).json.accessToken as string;
+    const put = (token: string, id: string, doc: object) => asUser(token)(`${inst.dbName}/${id}`, { method: "PUT", body: JSON.stringify(doc) });
+    expect((await put(tok1, s1!.id, { kind: "participant", authorId: s1!.id, userId: s1!.id })).status).toBe(201);
+    expect((await put(tok1, "e1", { kind: "event", authorId: s1!.id, instanceId: inst.id, action: "step.enter", initiatedBy: "user" })).status).toBe(201);
+    expect((await put(tok2, "e2", { kind: "event", authorId: s2!.id, instanceId: inst.id, action: "step.enter", initiatedBy: "user" })).status).toBe(201);
+
+    const mine = await ctx.call("GET", "/auth/me/export", { token: tok1 });
+    expect(mine.status).toBe(200);
+    expect(mine.json.account).toMatchObject({ id: s1!.id, role: "student" });
+    expect(mine.json.account.passwordHash).toBeUndefined();
+    expect(mine.json.sessions[0].docs.map((d: { kind: string }) => d.kind).sort()).toEqual(["event", "participant"]);
+    expect(JSON.stringify(mine.json)).not.toContain(s2!.id); // rien sur un camarade
+    expect((await ctx.call("GET", `/classes/${classId}/students/${s1!.id}/export`, { token: t.token })).status).toBe(200);
+    expect((await ctx.call("GET", `/classes/${classId}/students/${s1!.id}/export`, { token: other.token })).status).toBe(404);
+    expect((await ctx.call("GET", "/auth/me/export")).status).toBe(401);
+
+    expect((await ctx.call("DELETE", `/classes/${classId}/students/${s1!.id}`, { token: t.token })).status).toBe(204);
+    expect((await asUser(tok2)(`${inst.dbName}/e1`)).status).toBe(404); // effacé
+    expect((await asUser(tok2)(`${inst.dbName}/e2`)).status).toBe(200); // celui d'un autre reste
+  });
+
   it("supprime un élève : plus de connexion, plus de session, identifiant libéré", async () => {
     const t = await ctx.signupTeacher("classes.del");
     const { classId, students: [s] } = await ctx.makeClass(t.token, ["Noah Petit"]);

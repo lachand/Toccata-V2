@@ -298,6 +298,8 @@ export const teacherNoteDocSchema = z.object({
   body: z.string().max(20_000),
   /** Drapeaux de réflexion (D9) : ce qui a bien marché, à améliorer, à retrouver. */
   flag: z.enum(["good", "improve", "bookmark"]).nullable(),
+  /** Bilan de séance (D9) : trois questions fixes, réponses libres. Facultatif. */
+  structured: z.object({ worked: z.string().max(5_000), change: z.string().max(5_000), next: z.string().max(5_000) }).optional(),
   createdAt: epoch,
   updatedAt: epoch,
 });

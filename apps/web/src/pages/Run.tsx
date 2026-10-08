@@ -122,6 +122,14 @@ export function Run({ locale }: { locale: Locale }) {
     return () => clearTimeout(h);
   }, [ws, user, instanceId, current?.id, open?.key, settled, saved === null]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // première ouverture de la séance : l'entrée dans la première étape est aussi un geste du journal (reprises : rien, pour ne pas compter l'absence)
+  const loggedFirst = useRef(false);
+  useEffect(() => {
+    if (loggedFirst.current || !ws || !user || !current || !settled || saved !== null || touched.current) return;
+    loggedFirst.current = true;
+    void logEvent(ws, instanceId, user.id, "step.enter", { object: current.id });
+  }, [ws, user, instanceId, current?.id, settled, saved === null]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const go = (i: number) => {
     touched.current = true;
     setIndex(i);

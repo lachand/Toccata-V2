@@ -115,3 +115,14 @@ non synchronisées.
 | `feedback` (retour par étape) | enseignant propriétaire | idem ; le client ignore tout autre auteur |
 | `submission` (terminé / besoin d'aide / ressenti) | l'élève | sans commentaires : les retours sont des `feedback` |
 
+
+## Ajouts de la Phase 7
+
+| Document | Base | Règle |
+|---|---|---|
+| `event` (journal de séance) | `inst_<id>` | **ajout seul** (CouchDB refuse toute modification par un membre) ; code d'action neutre (`step.enter`, `submission.needs_help`, `timer.extend`…), objet = identifiant, méta scalaires ; jamais de nom ni de contenu |
+| `template` (modèle partagé) | `library` | lecture : tout enseignant ; écriture et suppression : l'auteur ; contient un lot `.toccata` **sans fichiers** (< 1 Mo) |
+| `tnote.structured` | `teacher_<id>` | bilan en trois questions (`worked`, `change`, `next`), privé |
+
+Lot d'échange `.toccata` : ZIP contenant `activity.json` (version, étapes, ressources, applications) et `files/file_<sha256>`.
+À l'import, **tous les identifiants sont régénérés**, les fichiers sont vérifiés par leur empreinte, les consignes sont assainies.

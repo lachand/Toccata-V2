@@ -296,7 +296,7 @@ describe("page d'une classe", () => {
     await renderApp("en", "/classes/k1");
     await userEvent.click(await screen.findByRole("button", { name: "Remove Hugo Martin" }));
     const dialog = await screen.findByRole("dialog", { name: "Remove this student?" });
-    expect(dialog).toHaveAccessibleDescription("The account and its sessions will be deleted. This cannot be undone.");
+    expect(dialog).toHaveAccessibleDescription("The account, its sessions and everything this student wrote during activities will be deleted. This cannot be undone.");
     expect(calls.some((c) => c.key.startsWith("DELETE"))).toBe(false); // rien n'est supprimé avant confirmation
     await userEvent.click(within(dialog).getByRole("button", { name: "Remove" }));
     await waitFor(() => expect(screen.queryByText("Hugo Martin")).toBeNull());
