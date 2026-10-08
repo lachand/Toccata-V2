@@ -37,13 +37,17 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      # CouchDB avec la configuration JWT de développement (clé jetable, voir infra/couchdb/local.ini)
+      # Deux CouchDB avec la configuration JWT de développement (clé jetable, voir infra/couchdb/local.ini) :
+      # « cloud » (5984) et « serveur de classe » (5985, qui joint l'hôte par host.docker.internal : proxy coupable des tests de la Phase 6)
       - run: |
-          docker run -d --name couch -p 5984:5984 \
-            -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=ci-only-admin-pass \
-            -v "$PWD/infra/couchdb/local.ini:/opt/couchdb/etc/local.d/10-toccata.ini" couchdb:3.4
-          for i in $(seq 1 60); do curl -sf -u admin:ci-only-admin-pass http://127.0.0.1:5984/ >/dev/null && exit 0; sleep 1; done
-          docker logs couch; exit 1
+          for spec in "couch:5984" "couch-local:5985"; do
+            name="${spec%%:*}"; port="${spec##*:}"
+            docker run -d --name "$name" -p "$port:5984" --add-host host.docker.internal:host-gateway \
+              -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=ci-only-admin-pass \
+              -v "$PWD/infra/couchdb/local.ini:/opt/couchdb/etc/local.d/10-toccata.ini" couchdb:3.4
+            for i in $(seq 1 60); do curl -sf -u admin:ci-only-admin-pass "http://127.0.0.1:$port/" >/dev/null && break; sleep 1; done
+            curl -sf -u admin:ci-only-admin-pass "http://127.0.0.1:$port/" >/dev/null || { docker logs "$name"; exit 1; }
+          done
       - run: pnpm --filter @toccata/e2e exec playwright install --with-deps chromium
       - run: pnpm --filter @toccata/e2e e2e
       - uses: actions/upload-artifact@v4
@@ -64,11 +68,15 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      # CouchDB avec la configuration JWT de développement (clé jetable, voir infra/couchdb/local.ini)
+      # Deux CouchDB avec la configuration JWT de développement (clé jetable, voir infra/couchdb/local.ini) :
+      # « cloud » (5984) et « serveur de classe » (5985, qui joint l'hôte par host.docker.internal : proxy coupable des tests de la Phase 6)
       - run: |
-          docker run -d --name couch -p 5984:5984 \
-            -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=ci-only-admin-pass \
-            -v "$PWD/infra/couchdb/local.ini:/opt/couchdb/etc/local.d/10-toccata.ini" couchdb:3.4
-          for i in $(seq 1 60); do curl -sf -u admin:ci-only-admin-pass http://127.0.0.1:5984/ >/dev/null && exit 0; sleep 1; done
-          docker logs couch; exit 1
+          for spec in "couch:5984" "couch-local:5985"; do
+            name="${spec%%:*}"; port="${spec##*:}"
+            docker run -d --name "$name" -p "$port:5984" --add-host host.docker.internal:host-gateway \
+              -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=ci-only-admin-pass \
+              -v "$PWD/infra/couchdb/local.ini:/opt/couchdb/etc/local.d/10-toccata.ini" couchdb:3.4
+            for i in $(seq 1 60); do curl -sf -u admin:ci-only-admin-pass "http://127.0.0.1:$port/" >/dev/null && break; sleep 1; done
+            curl -sf -u admin:ci-only-admin-pass "http://127.0.0.1:$port/" >/dev/null || { docker logs "$name"; exit 1; }
+          done
       - run: pnpm --filter @toccata/auth test:integration

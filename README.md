@@ -26,7 +26,7 @@ Détails et décisions : [`docs/adr/`](docs/adr).
 ```
 apps/web           PWA React
 apps/auth          service d'authentification / provisioning
-apps/local-server  serveur local (Raspberry Pi) : CouchDB + PWA + hotspot
+apps/local-server  serveur de classe (Raspberry Pi, mini-PC) : CouchDB + authentification locale + HTTPS (voir docs/guide-serveur-local.md)
 packages/schema    types, schémas, résolution master/instance
 packages/apps-sdk  contrat des applications embarquées
 packages/ui        design system

@@ -5,7 +5,7 @@ import { Plus, Users } from "lucide-react";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router";
 import { classesApi, type ClassSummary } from "../auth/api";
-import { session } from "../auth/session";
+import { session, useSession } from "../auth/session";
 import { useErrorText } from "../auth/useErrorText";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
 import { OnlineStatus } from "../components/Layout";
@@ -17,6 +17,7 @@ export function Classes({ locale }: { locale: Locale }) {
   const { t } = useLingui();
   const errorText = useErrorText();
   const navigate = useNavigate();
+  const { user } = useSession();
   const [classes, setClasses] = useState<ClassSummary[] | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [open, setOpen] = useState(false);
@@ -74,6 +75,13 @@ export function Classes({ locale }: { locale: Locale }) {
             })}
           </ul>
         )}
+        {user ? (
+          <Card as="section" aria-label={t`Class server`} style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
+            <h2 className="tc-h" style={{ fontSize: "var(--text-md)" }}>{t`Class server`}</h2>
+            <p style={{ margin: 0, color: "var(--muted)", fontSize: "var(--text-sm)" }}>{t`To use a class server (a small computer that keeps working without Internet), give it this teacher identifier. Prepare your classes here first: accounts are managed on this server.`}</p>
+            <code style={{ overflowWrap: "anywhere", fontFamily: "var(--font-mono)" }}>{user.id}</code>
+          </Card>
+        ) : null}
       </Content>
       <Dialog open={open} onOpenChange={setOpen} title={t`New class`} closeLabel={t`Close`}>
         <form onSubmit={create} style={{ display: "flex", flexDirection: "column", gap: "var(--space-4)" }}>

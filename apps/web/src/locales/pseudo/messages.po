@@ -359,6 +359,10 @@ msgstr ""
 msgid "Class name"
 msgstr ""
 
+#: src/pages/Classes.tsx
+msgid "Class server"
+msgstr ""
+
 #: src/components/Layout.tsx
 #: src/pages/Classes.tsx
 #: src/pages/Distribute.tsx
@@ -1513,6 +1517,10 @@ msgstr ""
 
 #: src/components/SortableTimeline.tsx
 msgid "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
+msgstr ""
+
+#: src/pages/Classes.tsx
+msgid "To use a class server (a small computer that keeps working without Internet), give it this teacher identifier. Prepare your classes here first: accounts are managed on this server."
 msgstr ""
 
 #: src/auth/useErrorText.ts

@@ -8,7 +8,7 @@
 | 3 | Scripting — **terminée** : liste d'activités et éditeur d'étapes (glisser-déposer, texte riche), ressources (liens, fichiers), assistant d'ajout unique, applications (minuteur, kanban, texte partagé, questionnaire, application web), notes privées ; ADR 0010–0012 |
 | 4 | Distribution et exécution — **terminée** : groupes (instances), séance de l'élève (une étape et un élément à la fois), questionnaire bloquant, reprise entre appareils, modification en direct ciblée ; ADR 0013 |
 | 5 | Orchestration — **terminée** : suivi en direct et mode projecteur, miroir en lecture seule, pilotage (chrono, message, attention, verrou, retours), remise de l'élève, télécommande mobile ; ADR 0014 (Web Push reste à faire) |
-| 6 | Résilience réseau : serveur local, bascule d'endpoint |
+| 6 | Résilience réseau — **terminée** : serveur de classe (réplication entre serveurs, authentification locale, comptes en lecture seule), indicateur d'état réel, paquet Docker/Caddy, guide ; ADR 0015 (point d'accès Wi-Fi et certificat réel non testés faute de matériel) |
 | 7 | Réutilisation et réflexion : modèles, import/export, « prévu vs réalisé » |
 | 8 | Qualité et mise en production |
 

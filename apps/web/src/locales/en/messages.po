@@ -359,6 +359,10 @@ msgstr "Class"
 msgid "Class name"
 msgstr "Class name"
 
+#: src/pages/Classes.tsx
+msgid "Class server"
+msgstr "Class server"
+
 #: src/components/Layout.tsx
 #: src/pages/Classes.tsx
 #: src/pages/Distribute.tsx
@@ -1514,6 +1518,10 @@ msgstr "To improve"
 #: src/components/SortableTimeline.tsx
 msgid "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
 msgstr "To move this step, press space, then the left or right arrow keys, then space again to drop. Escape cancels."
+
+#: src/pages/Classes.tsx
+msgid "To use a class server (a small computer that keeps working without Internet), give it this teacher identifier. Prepare your classes here first: accounts are managed on this server."
+msgstr "To use a class server (a small computer that keeps working without Internet), give it this teacher identifier. Prepare your classes here first: accounts are managed on this server."
 
 #: src/auth/useErrorText.ts
 msgid "Too many requests. Try again in a moment."
