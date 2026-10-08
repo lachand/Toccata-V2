@@ -164,7 +164,8 @@ export class Workspace {
     return this.registry.find({ selector: { kind: "iref" } }).$.pipe(map((rows) => rows.map((r) => ({ instanceId: r.get("id") as string, activityId: r.get("activityId") as string }))));
   }
 
-  private instDocs$(instanceId: string): Observable<InstanceScopedDoc[]> {
+  /** Tous les documents (décodés) d'une instance : données d'exécution, états, remises, consignes de pilotage. */
+  instanceDocs$(instanceId: string): Observable<InstanceScopedDoc[]> {
     return new Observable<Col>((s) => {
       void this.instance(instanceId).then((c) => (s.next(c), s.complete()), (e) => s.error(e));
     }).pipe(
@@ -178,7 +179,7 @@ export class Workspace {
    * sont ignorés (défense en plus de la règle CouchDB) : un élève ne peut pas réécrire sa propre séance.
    */
   instance$(instanceId: string, ownerId: string): Observable<InstanceDoc | null> {
-    return this.instDocs$(instanceId).pipe(map((docs) => findInstanceDoc(docs.filter((d) => d.authorId === ownerId))));
+    return this.instanceDocs$(instanceId).pipe(map((docs) => findInstanceDoc(docs.filter((d) => d.authorId === ownerId))));
   }
 
   /** Instances d'une activité (vue de l'enseignant), avec leur définition quand elle est arrivée. */
@@ -217,7 +218,7 @@ export class Workspace {
 
   /** État du participant (étape en cours, élément ouvert) : un document par personne, au nom de la personne (roaming d'appareil). */
   participant$(instanceId: string, userId: string): Observable<ParticipantStateDoc | null> {
-    return this.instDocs$(instanceId).pipe(map((docs) => docs.find((d): d is ParticipantStateDoc => d.kind === "participant" && d.id === userId) ?? null));
+    return this.instanceDocs$(instanceId).pipe(map((docs) => docs.find((d): d is ParticipantStateDoc => d.kind === "participant" && d.id === userId) ?? null));
   }
 
   async saveParticipant(instanceId: string, userId: string, patch: Pick<ParticipantStateDoc, "currentStepId" | "openElement">, deviceId: string): Promise<void> {

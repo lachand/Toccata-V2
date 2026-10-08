@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSession } from "../auth/session";
+import { classesApi } from "../auth/api";
+import { session, useSession } from "../auth/session";
 import type { InstanceDoc, MasterContent, ParticipantStateDoc, TeacherNoteDoc } from "@toccata/schema";
 import { useWorkspace } from "./provider";
 import type { ActivityRow, SyncState } from "./workspace";
@@ -120,4 +121,34 @@ export function useParticipant(instanceId: string, userId: string): ParticipantS
     return () => s.unsubscribe();
   }, [ws, instanceId, userId]);
   return st;
+}
+
+let namesCache: { uid: string; p: Promise<Map<string, string>> } | null = null;
+
+/** Noms des élèves de toutes les classes de l'enseignant (identifiant → nom affiché). Chargé une fois ; vide hors ligne. */
+export function useStudentNames(): Map<string, string> {
+  const { user } = useSession();
+  const uid = user?.id ?? "";
+  const [names, setNames] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    if (!uid) return;
+    let live = true;
+    if (namesCache?.uid !== uid) {
+      const p = (async () => {
+        const api = classesApi(session.authorizedFetch, () => session.getAccessToken());
+        const m = new Map<string, string>();
+        for (const k of await api.list()) for (const s of (await api.get(k.id)).students) m.set(s.id, s.displayName);
+        return m;
+      })().catch(() => {
+        namesCache = null; // réessayer plus tard (hors ligne)
+        return new Map<string, string>();
+      });
+      namesCache = { uid, p };
+    }
+    void namesCache.p.then((m) => live && setNames(m));
+    return () => {
+      live = false;
+    };
+  }, [uid]);
+  return names;
 }

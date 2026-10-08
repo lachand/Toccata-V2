@@ -30,8 +30,9 @@ export function instanceValidator(instanceId: string, ownerIds: readonly string[
   if (userCtx.roles.indexOf('_admin') !== -1) return;
   if (isOwner(userCtx.roles)) return;
   if (userCtx.roles.indexOf('inst:${instanceId}:member') === -1) throw ({ forbidden: 'access_denied' });
-  // la définition de l'instance (membres, surcharges) n'appartient qu'à l'enseignant : sinon un élève la réécrirait
-  if ((newDoc && newDoc.kind === 'instance') || (oldDoc && oldDoc.kind === 'instance')) throw ({ forbidden: 'owner_only' });
+  // la définition de l'instance (membres, surcharges), les consignes de pilotage et les retours n'appartiennent qu'à l'enseignant : sinon un élève les réécrirait
+  var OWNER_KINDS = ['instance', 'broadcast', 'feedback'];
+  if ((newDoc && OWNER_KINDS.indexOf(newDoc.kind) !== -1) || (oldDoc && OWNER_KINDS.indexOf(oldDoc.kind) !== -1)) throw ({ forbidden: 'owner_only' });
   // un seul état de participant par personne, à son nom : personne ne peut occuper la place d'un autre
   if (newDoc && newDoc.kind === 'participant' && newDoc._id !== userCtx.name) throw ({ forbidden: 'participant_id' });
   var target = newDoc._deleted ? oldDoc : newDoc;

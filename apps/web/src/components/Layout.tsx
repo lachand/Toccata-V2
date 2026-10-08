@@ -31,6 +31,9 @@ export function Layout({ children }: { children: ReactNode }) {
   const { t } = useLingui();
   const { user } = useSession();
   const navigate = useNavigate();
+  const { pathname, search } = useLocation();
+  // projecteur et télécommande : plein écran, sans navigation (rien de superflu sur un mur ou dans une main)
+  if (pathname.startsWith("/remote/") || new URLSearchParams(search).has("projecteur")) return <>{children}</>;
   return (
     <AppShell
       rail={

@@ -39,12 +39,21 @@ msgstr ""
 msgid "{0, plural, one {# group will be created.} other {# groups will be created.}}"
 msgstr ""
 
+#. placeholder {0}: g.help.length
+#: src/monitor/GroupTile.tsx
+msgid "{0, plural, one {# needs help} other {# need help}}"
+msgstr ""
+
 #: src/pages/Activities.tsx
 msgid "{appCount, plural, one {# app} other {# apps}}"
 msgstr ""
 
 #: src/pages/Classes.tsx
 msgid "{count, plural, one {# student} other {# students}}"
+msgstr ""
+
+#: src/pages/Monitor.tsx
+msgid "{helpCount, plural, one {# student asks for help.} other {# students ask for help.}}"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -55,6 +64,7 @@ msgstr ""
 msgid "{hiddenCount, plural, one {# hidden} other {# hidden}}"
 msgstr ""
 
+#: src/monitor/GroupTile.tsx
 #: src/pages/Distribute.tsx
 msgid "{memberCount, plural, one {# student} other {# students}}"
 msgstr ""
@@ -77,6 +87,10 @@ msgstr ""
 
 #: src/pages/Activities.tsx
 msgid "{stepCount, plural, one {# step} other {# steps}}"
+msgstr ""
+
+#: src/monitor/GroupTile.tsx
+msgid "{submitted} of {total} submitted"
 msgstr ""
 
 #: src/pages/Gallery.tsx
@@ -107,12 +121,21 @@ msgstr ""
 msgid "A script is a sequence of steps. Add the first one."
 msgstr ""
 
+#: src/monitor/GroupTile.tsx
+msgid "A student"
+msgstr ""
+
 #: src/apps/external.tsx
 msgid "A web page or tool (collaborative document, simulator…) shown inside the activity."
 msgstr ""
 
+#: src/monitor/GroupTile.tsx
+msgid "active"
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Distribute.tsx
+#: src/pages/Monitor.tsx
 #: src/pages/Run.tsx
 msgid "Activity"
 msgstr ""
@@ -411,7 +434,12 @@ msgid "Display mode"
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
+#: src/pages/Monitor.tsx
 msgid "Distribute"
+msgstr ""
+
+#: src/pages/Monitor.tsx
+msgid "Distribute the activity to a class to follow it here."
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -497,6 +525,10 @@ msgstr ""
 msgid "Form controls"
 msgstr ""
 
+#: src/pages/Monitor.tsx
+msgid "Full screen"
+msgstr ""
+
 #: src/pages/Run.tsx
 msgid "Getting your activity…"
 msgstr ""
@@ -517,6 +549,7 @@ msgstr ""
 
 #: src/content/TargetPicker.tsx
 #: src/pages/Distribute.tsx
+#: src/pages/Monitor.tsx
 msgid "Groups"
 msgstr ""
 
@@ -662,6 +695,20 @@ msgstr ""
 msgid "Minutes"
 msgstr ""
 
+#. placeholder {0}: def?.name ?? ""
+#: src/pages/Mirror.tsx
+msgid "Mirror · {0}"
+msgstr ""
+
+#: src/pages/ActivityEditor.tsx
+#: src/pages/Mirror.tsx
+msgid "Monitoring"
+msgstr ""
+
+#: src/pages/Monitor.tsx
+msgid "Monitoring · {title}"
+msgstr ""
+
 #. placeholder {0}: card.title
 #: src/apps/kanban.tsx
 msgid "Move “{0}” to"
@@ -773,6 +820,10 @@ msgstr ""
 msgid "No class yet"
 msgstr ""
 
+#: src/pages/Monitor.tsx
+msgid "No group to follow yet"
+msgstr ""
+
 #: src/pages/Distribute.tsx
 msgid "No group yet. Create them below."
 msgstr ""
@@ -795,6 +846,14 @@ msgstr ""
 
 #: src/auth/useErrorText.ts
 msgid "Not found."
+msgstr ""
+
+#: src/monitor/GroupTile.tsx
+msgid "not started"
+msgstr ""
+
+#: src/monitor/GroupTile.tsx
+msgid "Not started"
 msgstr ""
 
 #: src/pages/ActivityEditor.tsx
@@ -901,6 +960,10 @@ msgstr ""
 msgid "Pause"
 msgstr ""
 
+#: src/monitor/GroupTile.tsx
+msgid "paused"
+msgstr ""
+
 #: src/pages/Gallery.tsx
 msgid "People"
 msgstr ""
@@ -928,6 +991,10 @@ msgstr ""
 
 #: src/content/NotesPanel.tsx
 msgid "Private notes"
+msgstr ""
+
+#: src/pages/Monitor.tsx
+msgid "Projector mode"
 msgstr ""
 
 #: src/pages/Signup.tsx
@@ -959,12 +1026,20 @@ msgstr ""
 msgid "Quote"
 msgstr ""
 
+#: src/pages/Mirror.tsx
+msgid "Read-only copy of the student's screen"
+msgstr ""
+
 #: src/UpdatePrompt.tsx
 msgid "Ready to work offline."
 msgstr ""
 
 #: src/UpdatePrompt.tsx
 msgid "Reload"
+msgstr ""
+
+#: src/pages/Monitor.tsx
+msgid "Remote control"
 msgstr ""
 
 #: src/pages/ClassDetail.tsx
@@ -1010,6 +1085,10 @@ msgstr ""
 
 #: src/pages/Classes.tsx
 msgid "Retry"
+msgstr ""
+
+#: src/monitor/GroupTile.tsx
+msgid "running"
 msgstr ""
 
 #: src/pages/Distribute.tsx
@@ -1102,6 +1181,11 @@ msgstr ""
 msgid "Step {0}"
 msgstr ""
 
+#. placeholder {0}: g.stepCount
+#: src/monitor/GroupTile.tsx
+msgid "Step {stepNumber} of {0}"
+msgstr ""
+
 #: src/pages/ActivityEditor.tsx
 msgid "Step locked until a questionnaire is submitted"
 msgstr ""
@@ -1122,6 +1206,11 @@ msgstr ""
 
 #: src/apps/kanban.tsx
 msgid "Sticky notes moved between columns (to do, in progress, done…)."
+msgstr ""
+
+#. placeholder {0}: i + 1
+#: src/pages/Mirror.tsx
+msgid "Student {0}"
 msgstr ""
 
 #: src/pages/ClassDetail.tsx
@@ -1227,6 +1316,10 @@ msgstr ""
 msgid "This file is too large (25 MB at most)."
 msgstr ""
 
+#: src/pages/Mirror.tsx
+msgid "This group is not available yet"
+msgstr ""
+
 #: src/auth/useErrorText.ts
 msgid "This password is too common or easy to guess."
 msgstr ""
@@ -1239,13 +1332,21 @@ msgstr ""
 msgid "This questionnaire has no question yet."
 msgstr ""
 
+#: src/pages/Mirror.tsx
+msgid "This student has not started yet."
+msgstr ""
+
 #: src/content/ContentPanel.tsx
-#: src/pages/Run.tsx
+#: src/run/AppRuntime.tsx
 msgid "This type of app is not available in this version."
 msgstr ""
 
 #: src/auth/useErrorText.ts
 msgid "This username is already taken."
+msgstr ""
+
+#: src/monitor/GroupTile.tsx
+msgid "time is up"
 msgstr ""
 
 #: src/apps/timer.tsx
@@ -1308,6 +1409,10 @@ msgstr ""
 msgid "Waiting for sync"
 msgstr ""
 
+#: src/monitor/GroupTile.tsx
+msgid "Watch"
+msgstr ""
+
 #: src/richtext/RichToolbar.tsx
 msgid "Web address"
 msgstr ""
@@ -1330,6 +1435,10 @@ msgstr ""
 
 #: src/pages/Distribute.tsx
 msgid "Whole class"
+msgstr ""
+
+#: src/pages/Mirror.tsx
+msgid "Whose screen"
 msgstr ""
 
 #: src/content/NotesPanel.tsx

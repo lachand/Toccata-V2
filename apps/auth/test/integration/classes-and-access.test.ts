@@ -253,6 +253,16 @@ describe("droits CouchDB de bout en bout (jetons émis par le service, vraies ba
     expect((await put(S1, "def", { ...def, _rev: rev, name: "Piraté" })).status).toBe(403);
     expect((await S1(`${inst.dbName}/def?rev=${rev}`, { method: "DELETE" })).status).toBe(403);
 
+    // consignes de pilotage et retours : l'enseignant les écrit, l'élève ne peut ni en créer ni en modifier
+    const base = { authorId: a.id, teacherOnly: true, stepId: act.id };
+    expect((await put(T, "msg", { ...base, kind: "broadcast", mode: "message", body: "Bravo", active: true })).status).toBe(201);
+    expect((await put(T, "fb1", { ...base, kind: "feedback", body: "Bien", accepted: true })).status).toBe(201);
+    expect((await put(S1, "fake-msg", { kind: "broadcast", authorId: s1!.id, mode: "attention", body: "Piraté", active: true })).status).toBe(403);
+    expect((await put(S1, "fake-fb", { kind: "feedback", authorId: s1!.id, stepId: act.id, body: "x", accepted: true })).status).toBe(403);
+    const msgRev = ((await (await S1(`${inst.dbName}/msg`)).json()) as { _rev: string })._rev;
+    expect((await put(S1, "msg", { ...base, _rev: msgRev, kind: "broadcast", mode: "message", body: "Piraté", active: false })).status).toBe(403);
+    expect((await S1(`${inst.dbName}/msg`)).status).toBe(200); // lecture : oui
+
     // état de participant : à son propre nom seulement
     expect((await put(S2, s1!.id, { kind: "participant", authorId: s2!.id, userId: s1!.id })).status).toBe(403); // place déjà « réservée » à s1
     expect((await put(S1, s1!.id, { kind: "participant", authorId: s1!.id, userId: s1!.id })).status).toBe(201);

@@ -40,3 +40,14 @@ body { background: var(--bg); color: var(--fg); font-family: var(--font-body); }
 .tc-kcard { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--line-strong); }
 .tc-kcard__row { display: flex; gap: var(--space-2); align-items: center; }
 .tc-kcard__row > .tc-input, .tc-kcard__row > .tc-select { min-inline-size: 0; flex: 1 1 6rem; }
+
+/* Suivi de séance */
+.tc-gtiles { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.tc-gtile { display: flex; flex-direction: column; gap: var(--space-2); }
+.tc-gtile[data-help="true"] { border-color: var(--warn, #b45309); box-shadow: 0 0 0 2px var(--warn-soft, #fde7c3); }
+.tc-callout { margin: 0; padding: var(--space-3) var(--space-4); border-radius: var(--radius); background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+.tc-callout[data-tone="warn"] { background: var(--warn-soft, #fde7c3); color: var(--warn-ink, #7a3b00); }
+.tc-projector { min-block-size: 100vh; background: var(--bg); font-size: 1.25rem; }
+.tc-gtiles[data-projector="true"] { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: var(--space-5); }
+.tc-gtiles[data-projector="true"] .tc-gtile { font-size: 1.25rem; padding: var(--space-5); }
+.tc-mirror { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-4); border: 2px dashed var(--line-strong); border-radius: var(--radius); background: var(--surface); }

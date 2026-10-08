@@ -184,7 +184,30 @@ export const submissionDocSchema = z.object({
   stepId: idSchema,
   status: z.enum(["draft", "submitted", "needs_help", "accepted"]),
   selfAssessment: z.number().int().min(1).max(4).optional(),
-  comments: z.array(z.object({ authorId: idSchema, body: z.string().max(5_000), at: epoch })).max(200),
+});
+
+/**
+ * Retour de l'enseignant sur le travail d'un groupe pour une étape. Document DISTINCT de la remise : la remise
+ * appartient à l'élève (qui peut la modifier), le retour appartient à l'enseignant (qu'aucun élève ne peut créer ni changer).
+ */
+export const feedbackDocSchema = z.object({
+  ...instanceBase,
+  kind: z.literal("feedback"),
+  stepId: idSchema,
+  body: z.string().max(5_000),
+  accepted: z.boolean(),
+});
+
+/**
+ * Consigne de pilotage de l'enseignant à un groupe : un message affiché en bandeau, ou une demande d'attention qui fige
+ * les écrans. `active:false` la lève. Réservé aux propriétaires (règle CouchDB), comme le retour.
+ */
+export const broadcastDocSchema = z.object({
+  ...instanceBase,
+  kind: z.literal("broadcast"),
+  mode: z.enum(["message", "attention"]),
+  body: z.string().max(500),
+  active: z.boolean(),
 });
 
 /** Journal de recherche : codes neutres (`step.complete`), jamais de texte localisé (ADR 0007). */
@@ -257,6 +280,8 @@ export const instanceScopedDocSchema = z.discriminatedUnion("kind", [
   participantStateDocSchema,
   noteDocSchema,
   submissionDocSchema,
+  feedbackDocSchema,
+  broadcastDocSchema,
   eventDocSchema,
   timerStateDocSchema,
   kanbanCardDocSchema,
@@ -280,6 +305,8 @@ export type InstanceDoc = z.infer<typeof instanceDocSchema>;
 export type ParticipantStateDoc = z.infer<typeof participantStateDocSchema>;
 export type NoteDoc = z.infer<typeof noteDocSchema>;
 export type SubmissionDoc = z.infer<typeof submissionDocSchema>;
+export type FeedbackDoc = z.infer<typeof feedbackDocSchema>;
+export type BroadcastDoc = z.infer<typeof broadcastDocSchema>;
 export type EventDoc = z.infer<typeof eventDocSchema>;
 export type TimerStateDoc = z.infer<typeof timerStateDocSchema>;
 export type KanbanCardDoc = z.infer<typeof kanbanCardDocSchema>;

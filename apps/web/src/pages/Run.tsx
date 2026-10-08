@@ -1,11 +1,11 @@
 import { useLingui } from "@lingui/react/macro";
-import type { AppModule, AppType, InstanceStore } from "@toccata/apps-sdk";
+import type { InstanceStore } from "@toccata/apps-sdk";
 import { resolve, type AppDoc, type ResourceDoc } from "@toccata/schema";
 import { Button, Content, EmptyState, Segmented, StepTimeline, TopBar, type StepItem } from "@toccata/ui";
 import { ArrowLeft, ArrowRight, Hourglass } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
-import { registry } from "../apps/registry";
+import { AppRuntime } from "../run/AppRuntime";
 import { useSession } from "../auth/session";
 import { OnlineStatus } from "../components/Layout";
 import { LocaleSwitcher } from "../components/LocaleSwitcher";
@@ -45,14 +45,6 @@ function useSubmitted(store: InstanceStore | null, appIds: readonly string[]): S
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `key` résume `appIds`
   }, [store, key]);
   return done;
-}
-
-function AppRuntime({ app, store }: { app: AppDoc; store: InstanceStore }) {
-  const { t } = useLingui();
-  const m = registry.get(app.type as AppType) as AppModule<AppType> | undefined;
-  if (!m) return <p style={{ margin: 0, color: "var(--muted)" }}>{t`This type of app is not available in this version.`}</p>;
-  const R = m.Runtime as React.ComponentType<{ app: AppDoc; store: InstanceStore }>;
-  return <R app={app} store={store} />;
 }
 
 /** Séance d'un participant : le script de son groupe, une étape à la fois, un seul élément ouvert à la fois (D6 de l'article). */

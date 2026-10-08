@@ -40,6 +40,7 @@ export function ActivityEditor({ locale }: { locale: Locale }) {
     <TopBar title={content?.activity.title ?? t`Activity`}>
       <OnlineStatus />
       <LocaleSwitcher current={locale} />
+      <Link className="tc-btn" to={`/activities/${id}/monitor`}>{t`Monitoring`}</Link>
       <Link className="tc-btn tc-btn--primary" to={`/activities/${id}/distribute`}>{t`Distribute`}</Link>
     </TopBar>
   );
