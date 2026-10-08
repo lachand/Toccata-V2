@@ -56,7 +56,7 @@ export function Layout({ children }: { children: ReactNode }) {
           <NavItem to="/" icon={<BookOpen size={18} />}>{t`My activities`}</NavItem>
           <NavItem to="/gallery" icon={<LayoutGrid size={18} />}>{t`Components`}</NavItem>
           {user?.role === "teacher" ? <NavItem to="/classes" icon={<Users size={18} />}>{t`Classes`}</NavItem> : null}
-          <RailItem icon={<Copy size={18} />} disabled>{t`Templates`}</RailItem>
+          {user?.role === "teacher" ? <NavItem to="/library" icon={<Copy size={18} />}>{t`Templates`}</NavItem> : null}
         </Rail>
       }
     >

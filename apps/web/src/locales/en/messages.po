@@ -24,6 +24,11 @@ msgstr "“{0}” dropped."
 msgid "“{0}” is now at position {1}."
 msgstr "“{0}” is now at position {1}."
 
+#. placeholder {0}: out.missingFiles
+#: src/pages/Activities.tsx
+msgid "{0, plural, one {# file was missing from the archive and was left out.} other {# files were missing from the archive and were left out.}}"
+msgstr "{0, plural, one {# file was missing from the archive and was left out.} other {# files were missing from the archive and were left out.}}"
+
 #. placeholder {0}: r.shadowed.length
 #: src/content/TargetPicker.tsx
 msgid "{0, plural, one {# group keeps its own version of this.} other {# groups keep their own version of this.}}"
@@ -79,6 +84,10 @@ msgstr "{memberCount, plural, one {# student} other {# students}}"
 msgid "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
 msgstr "{minutes, plural, one {Too many attempts. Try again in # minute.} other {Too many attempts. Try again in # minutes.}}"
 
+#: src/pages/Activities.tsx
+msgid "{missingFiles, plural, one {# file is not available on this device and was left out of the export.} other {# files are not available on this device and were left out of the export.}}"
+msgstr "{missingFiles, plural, one {# file is not available on this device and was left out of the export.} other {# files are not available on this device and were left out of the export.}}"
+
 #: src/components/Layout.tsx
 msgid "{name} · no Internet, saved here"
 msgstr "{name} · no Internet, saved here"
@@ -96,6 +105,7 @@ msgid "{resourceCount, plural, one {# resource} other {# resources}}"
 msgstr "{resourceCount, plural, one {# resource} other {# resources}}"
 
 #: src/pages/Activities.tsx
+#: src/pages/Library.tsx
 msgid "{stepCount, plural, one {# step} other {# steps}}"
 msgstr "{stepCount, plural, one {# step} other {# steps}}"
 
@@ -126,6 +136,10 @@ msgstr "A countdown shared by everyone, green then orange then red as time runs 
 #: src/apps/text.tsx
 msgid "A document everyone writes in together, at the same time."
 msgstr "A document everyone writes in together, at the same time."
+
+#: src/pages/Activities.tsx
+msgid "A file in this archive is damaged."
+msgstr "A file in this archive is damaged."
 
 #: src/UpdatePrompt.tsx
 msgid "A new version is available."
@@ -170,6 +184,10 @@ msgstr "active"
 #: src/pages/Run.tsx
 msgid "Activity"
 msgstr "Activity"
+
+#: src/pages/Activities.tsx
+msgid "Activity file to import"
+msgstr "Activity file to import"
 
 #: src/pages/Gallery.tsx
 msgid "Activity name"
@@ -235,6 +253,10 @@ msgstr "Add to this step"
 #: src/content/AddContentDialog.tsx
 msgid "Address"
 msgstr "Address"
+
+#: src/pages/Library.tsx
+msgid "All"
+msgstr "All"
 
 #: src/pages/Signup.tsx
 msgid "Already have an account? Sign in"
@@ -309,7 +331,13 @@ msgstr "Bulleted list"
 msgid "Buttons"
 msgstr "Buttons"
 
+#. placeholder {0}: tpl.authorName
+#: src/pages/Library.tsx
+msgid "by {0}"
+msgstr "by {0}"
+
 #: src/components/ConfirmDialog.tsx
+#: src/library/PublishTemplateDialog.tsx
 #: src/monitor/Actions.tsx
 #: src/pages/ActivityEditor.tsx
 #: src/pages/ClassDetail.tsx
@@ -375,6 +403,7 @@ msgstr "Clear message"
 
 #: src/components/ConfirmDialog.tsx
 #: src/content/AddContentDialog.tsx
+#: src/library/PublishTemplateDialog.tsx
 #: src/monitor/Actions.tsx
 #: src/pages/Activities.tsx
 #: src/pages/ActivityEditor.tsx
@@ -399,6 +428,10 @@ msgstr "Comment"
 #: src/pages/Gallery.tsx
 msgid "Components"
 msgstr "Components"
+
+#: src/pages/Activities.tsx
+msgid "Copy of {title}"
+msgstr "Copy of {title}"
 
 #: src/pages/Activities.tsx
 msgid "Create"
@@ -500,6 +533,7 @@ msgstr "done"
 
 #: src/apps/kanban.tsx
 #: src/components/CredentialsSheet.tsx
+#: src/library/PublishTemplateDialog.tsx
 msgid "Done"
 msgstr "Done"
 
@@ -519,6 +553,10 @@ msgstr "Drag card “{0}”"
 #: src/components/SortableTimeline.tsx
 msgid "Drag to reorder"
 msgstr "Drag to reorder"
+
+#: src/pages/Activities.tsx
+msgid "Duplicate"
+msgstr "Duplicate"
 
 #: src/pages/Activities.tsx
 msgid "Edit"
@@ -547,6 +585,10 @@ msgstr "Estimate"
 msgid "Everyone"
 msgstr "Everyone"
 
+#: src/pages/Activities.tsx
+msgid "Export"
+msgstr "Export"
+
 #: src/monitor/Actions.tsx
 msgid "Feedback"
 msgstr "Feedback"
@@ -563,6 +605,10 @@ msgstr "File"
 #: src/apps/form.tsx
 msgid "File answers are not available yet."
 msgstr "File answers are not available yet."
+
+#: src/library/PublishTemplateDialog.tsx
+msgid "Files are not included in a shared template ({fileCount} left out). Web links are."
+msgstr "Files are not included in a shared template ({fileCount} left out). Web links are."
 
 #: src/content/NotesPanel.tsx
 msgid "Flag"
@@ -683,6 +729,10 @@ msgstr "I've finished the step"
 msgid "If the page stays blank, the site does not allow being embedded."
 msgstr "If the page stays blank, the site does not allow being embedded."
 
+#: src/pages/Activities.tsx
+msgid "Import"
+msgstr "Import"
+
 #: src/apps/kanban.tsx
 #: src/pages/Gallery.tsx
 msgid "In progress"
@@ -728,6 +778,10 @@ msgstr "Kanban board “{0}”"
 #: src/components/LocaleSwitcher.tsx
 msgid "Language"
 msgstr "Language"
+
+#: src/pages/Library.tsx
+msgid "Language of the template"
+msgstr "Language of the template"
 
 #: src/pages/Gallery.tsx
 #: src/richtext/RichToolbar.tsx
@@ -953,6 +1007,10 @@ msgstr "No step yet"
 msgid "No student yet."
 msgstr "No student yet."
 
+#: src/pages/Library.tsx
+msgid "No template here yet"
+msgstr "No template here yet"
+
 #: src/auth/useErrorText.ts
 msgid "Not found."
 msgstr "Not found."
@@ -1044,6 +1102,10 @@ msgstr "Open in a new tab"
 msgid "Open in a new window"
 msgstr "Open in a new window"
 
+#: src/pages/Library.tsx
+msgid "Open one of your activities and choose “Share as template” to add the first one."
+msgstr "Open one of your activities and choose “Share as template” to add the first one."
+
 #: src/content/ResourceView.tsx
 msgid "Open the PDF"
 msgstr "Open the PDF"
@@ -1059,6 +1121,11 @@ msgstr "Option 2"
 #: src/apps/form.tsx
 msgid "Options"
 msgstr "Options"
+
+#. placeholder {0}: author.name
+#: src/library/PublishTemplateDialog.tsx
+msgid "Other teachers will be able to copy this script into their own activities. They will see your name ({0}). Nothing about your students is shared: no group, answer, note or result."
+msgstr "Other teachers will be able to copy this script into their own activities. They will see your name ({0}). Nothing about your students is shared: no group, answer, note or result."
 
 #: src/components/CredentialsSheet.tsx
 msgid "Passphrase"
@@ -1173,6 +1240,10 @@ msgstr "Remove {name}"
 msgid "Remove column {0}"
 msgstr "Remove column {0}"
 
+#: src/pages/Library.tsx
+msgid "Remove from the library"
+msgstr "Remove from the library"
+
 #: src/pages/ClassDetail.tsx
 msgid "Remove this student?"
 msgstr "Remove this student?"
@@ -1206,6 +1277,7 @@ msgid "Resume"
 msgstr "Resume"
 
 #: src/pages/Classes.tsx
+#: src/pages/Library.tsx
 msgid "Retry"
 msgstr "Retry"
 
@@ -1220,6 +1292,14 @@ msgstr "Save"
 #: src/pages/Gallery.tsx
 msgid "Saving"
 msgstr "Saving"
+
+#: src/pages/Library.tsx
+msgid "Search templates"
+msgstr "Search templates"
+
+#: src/pages/Library.tsx
+msgid "Search…"
+msgstr "Search…"
 
 #: src/apps/timer.tsx
 msgid "Seconds"
@@ -1244,6 +1324,19 @@ msgstr "Send feedback"
 #: src/auth/useErrorText.ts
 msgid "Server unreachable. Check the connection."
 msgstr "Server unreachable. Check the connection."
+
+#: src/library/PublishTemplateDialog.tsx
+msgid "Share"
+msgstr "Share"
+
+#. placeholder {0}: content.activity.title
+#: src/library/PublishTemplateDialog.tsx
+msgid "Share “{0}” as a template"
+msgstr "Share “{0}” as a template"
+
+#: src/library/PublishTemplateDialog.tsx
+msgid "Share as template"
+msgstr "Share as template"
 
 #: src/apps/text.tsx
 msgid "Shared text"
@@ -1334,6 +1427,7 @@ msgstr "Step title"
 
 #: src/pages/ActivityEditor.tsx
 #: src/pages/Gallery.tsx
+#: src/pages/Library.tsx
 #: src/pages/Run.tsx
 msgid "Steps"
 msgstr "Steps"
@@ -1387,6 +1481,10 @@ msgstr "Sync problem, retrying"
 msgid "Syncing"
 msgstr "Syncing"
 
+#: src/pages/Library.tsx
+msgid "Template library"
+msgstr "Template library"
+
 #: src/components/Layout.tsx
 msgid "Templates"
 msgstr "Templates"
@@ -1427,6 +1525,10 @@ msgstr "The script below shows the common version. Changes made now only create 
 msgid "The step and its content are removed for everyone. This cannot be undone."
 msgstr "The step and its content are removed for everyone. This cannot be undone."
 
+#: src/library/PublishTemplateDialog.tsx
+msgid "The template is now in the library."
+msgstr "The template is now in the library."
+
 #. placeholder {0}: hint.typed
 #: src/pages/Login.tsx
 msgid "The word “{0}” is not in the list. Check it, then sign in again."
@@ -1450,6 +1552,18 @@ msgstr "This activity is not on this device yet"
 msgid "This address is not valid. Only https:// addresses are allowed."
 msgstr "This address is not valid. Only https:// addresses are allowed."
 
+#: src/pages/Activities.tsx
+msgid "This archive is too large."
+msgstr "This archive is too large."
+
+#: src/pages/Activities.tsx
+msgid "This file comes from a newer version of Toccata."
+msgstr "This file comes from a newer version of Toccata."
+
+#: src/pages/Activities.tsx
+msgid "This file does not describe a valid activity."
+msgstr "This file does not describe a valid activity."
+
 #: src/content/ResourceView.tsx
 msgid "This file is not available offline yet. Open it once while connected."
 msgstr "This file is not available offline yet. Open it once while connected."
@@ -1461,6 +1575,10 @@ msgstr "This file is too large (25 MB at most)."
 #: src/pages/Mirror.tsx
 msgid "This group is not available yet"
 msgstr "This group is not available yet"
+
+#: src/pages/Activities.tsx
+msgid "This is not a Toccata activity file (.toccata)."
+msgstr "This is not a Toccata activity file (.toccata)."
 
 #: src/auth/useErrorText.ts
 msgid "This password is too common or easy to guess."
@@ -1540,9 +1658,14 @@ msgid "Untitled question"
 msgstr "Untitled question"
 
 #: src/pages/ActivityEditor.tsx
+#: src/pages/Library.tsx
 #: src/pages/Run.tsx
 msgid "Untitled step"
 msgstr "Untitled step"
+
+#: src/pages/Library.tsx
+msgid "Use this template"
+msgstr "Use this template"
 
 #: src/components/CredentialsSheet.tsx
 #: src/pages/Login.tsx
@@ -1618,3 +1741,7 @@ msgstr "Your teacher says:"
 #: src/pages/Activities.tsx
 msgid "Your teacher will share activities here."
 msgstr "Your teacher will share activities here."
+
+#: src/pages/Library.tsx
+msgid "Yours"
+msgstr "Yours"

@@ -11,6 +11,7 @@ import { Distribute } from "./pages/Distribute";
 import { Gallery } from "./pages/Gallery";
 import { Mirror } from "./pages/Mirror";
 import { Monitor } from "./pages/Monitor";
+import { Library } from "./pages/Library";
 import { Login } from "./pages/Login";
 import { Remote } from "./pages/Remote";
 import { Run } from "./pages/Run";
@@ -36,6 +37,7 @@ export function AppRoutes({ locale }: { locale: Locale }) {
                 <Route path="/activities/:id/monitor" element={<RequireTeacher><Monitor locale={locale} /></RequireTeacher>} />
                 <Route path="/activities/:id/monitor/:instanceId" element={<RequireTeacher><Mirror locale={locale} /></RequireTeacher>} />
                 <Route path="/remote/:id" element={<RequireTeacher><Remote locale={locale} /></RequireTeacher>} />
+                <Route path="/library" element={<RequireTeacher><Library locale={locale} /></RequireTeacher>} />
                 <Route path="/gallery" element={<Gallery locale={locale} />} />
                 <Route path="/classes" element={<RequireTeacher><Classes locale={locale} /></RequireTeacher>} />
                 <Route path="/classes/:id" element={<RequireTeacher><ClassDetail locale={locale} /></RequireTeacher>} />

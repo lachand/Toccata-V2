@@ -91,3 +91,29 @@ export function withoutFiles(bundle: Bundle): Bundle {
   const dropped = new Set(bundle.resources.filter((r) => r.source.type === "file").map((r) => r.id));
   return { ...bundle, resources: bundle.resources.filter((r) => !dropped.has(r.id)) };
 }
+
+/** Modèle partagé dans la bibliothèque (base `library`). Le nom de l'auteur est affiché aux autres enseignants : le publier est un acte volontaire. */
+export const templateDocSchema = z.object({
+  id: idSchemaLocal(),
+  kind: z.literal("template"),
+  authorId: idSchemaLocal(),
+  authorName: z.string().min(1).max(80),
+  title: z.string().max(200),
+  description: z.string().max(10_000),
+  locale: z.string().min(2).max(10).optional(),
+  /** Lot sans fichiers (ADR 0016). */
+  bundle: bundleSchema,
+  createdAt: z.number().int().nonnegative(),
+  updatedAt: z.number().int().nonnegative(),
+});
+export type TemplateDoc = z.infer<typeof templateDocSchema>;
+
+function idSchemaLocal() {
+  return z.string().regex(/^[0-9a-hjkmnp-tv-z]{22}$/, "identifiant invalide");
+}
+
+/** Construit le document de bibliothèque d'un contenu : sans fichiers, avec le nom affiché de l'auteur. */
+export function toTemplate(content: MasterContent, author: { id: Id; name: string }, now: number, id: Id = newId(now)): TemplateDoc {
+  const bundle = withoutFiles(toBundle(content, now));
+  return { id, kind: "template", authorId: author.id, authorName: author.name.slice(0, 80), title: bundle.activity.title, description: bundle.activity.description, ...(bundle.activity.locale ? { locale: bundle.activity.locale } : {}), bundle, createdAt: now, updatedAt: now };
+}

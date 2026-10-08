@@ -90,3 +90,21 @@ describe("lot d'échange .toccata", () => {
     expect(parseBundle(evil)).toEqual({ ok: false, reason: "invalid" });
   });
 });
+
+describe("modèle de bibliothèque", () => {
+  it("n'emporte jamais de fichier, et se relit tel quel", async () => {
+    const { toTemplate, templateDocSchema } = await import("../src");
+    const withFile = { ...master, resources: [...master.resources, { ...master.resources[0]!, id: ids(), scope: { type: "activity" as const }, source: { type: "file" as const, fileId: `file_${"d".repeat(64)}`, mime: "image/png", size: 1 } }] };
+    const t = toTemplate(withFile, { id: OWNER, name: "Marie Durand" }, 5, ids());
+    expect(t.bundle.resources.every((r) => r.source.type !== "file")).toBe(true);
+    expect(templateDocSchema.safeParse(JSON.parse(JSON.stringify(t))).success).toBe(true);
+    expect(t).toMatchObject({ kind: "template", authorId: OWNER, authorName: "Marie Durand", title: master.activity.title });
+  });
+
+  it("refuse un modèle dont le lot est invalide", async () => {
+    const { toTemplate, templateDocSchema } = await import("../src");
+    const t = JSON.parse(JSON.stringify(toTemplate(master, { id: OWNER, name: "M" }, 5, ids())));
+    t.bundle.steps = "n'importe quoi";
+    expect(templateDocSchema.safeParse(t).success).toBe(false);
+  });
+});
