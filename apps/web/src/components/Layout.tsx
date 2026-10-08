@@ -6,6 +6,7 @@ import type { MouseEvent, ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { session, useSession } from "../auth/session";
 import { usePendingUploads, useSyncState } from "../data/hooks";
+import { useServerProbe } from "../data/serverInfo";
 import { useOnline } from "../useOnline";
 
 function NavItem({ to, icon, children }: { to: string; icon: ReactNode; children: ReactNode }) {
@@ -67,10 +68,17 @@ export function Layout({ children }: { children: ReactNode }) {
 export function OnlineStatus() {
   const { t } = useLingui();
   const online = useOnline();
+  const probe = useServerProbe();
   const sync = useSyncState();
   const pending = usePendingUploads();
-  if (!online) return <SyncStatus state="offline" label={t`Offline, your changes are kept`} />;
+  const info = probe.info;
+  // injoignable = le navigateur se dit hors ligne, OU le serveur de cette page ne répond pas (Wi-Fi sans Internet, serveur de classe éteint)
+  if (!online || probe.reachable === false) return <SyncStatus state="offline" label={t`Offline, your changes are kept`} />;
   if (sync.failing) return <SyncStatus state="pending" label={t`Sync problem, retrying`} />;
   if (pending > 0) return <SyncStatus state="pending" label={plural(pending, { one: "# file waiting to be sent", other: "# files waiting to be sent" })} />;
+  if (info?.mode === "local") {
+    const name = info.name;
+    return info.upstream === "offline" ? <SyncStatus state="pending" label={t`${name} · no Internet, saved here`} /> : <SyncStatus state="online" label={name} />;
+  }
   return <SyncStatus state="online" label={t`Online`} />;
 }

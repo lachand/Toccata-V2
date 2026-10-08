@@ -8,3 +8,4 @@ dataConfig.storage = () => getRxStorageMemory() as never;
 dataConfig.multiInstance = false;
 dataConfig.blobs = memoryBlobStore;
 dataConfig.sync = false; // la réplication est couverte par les tests d'intégration et e2e, avec un vrai CouchDB
+dataConfig.probe = false; // la sonde de santé a ses propres tests, qui la réactivent

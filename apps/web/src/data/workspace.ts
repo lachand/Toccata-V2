@@ -32,7 +32,7 @@ import { memoryBlobStore, type BlobStore } from "./blobs";
 import { MAX_FILE_BYTES, downloadFile, sha256Hex, uploadFile } from "./files";
 
 export type Col = RxCollection<Record<string, unknown>>;
-type Replication = { cancel: () => Promise<unknown>; error$: Observable<unknown> };
+type Replication = { cancel: () => Promise<unknown>; error$: Observable<unknown>; reSync?: () => void };
 
 export type SyncOptions = {
   /** `fetch` authentifié (voir `syncFetch`). */
@@ -564,6 +564,12 @@ export class Workspace {
     for (const [name, c] of this.cols) this.replicate(name, await c);
     void this.flushUploads();
     void this.calibrateClock();
+  }
+
+  /** Relance tout de suite les réplications (le serveur vient de redevenir joignable) au lieu d'attendre la prochaine tentative. */
+  kickSync(): void {
+    for (const r of this.replications.values()) r.reSync?.();
+    void this.flushUploads();
   }
 
   async stopSync(): Promise<void> {

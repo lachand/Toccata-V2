@@ -80,6 +80,10 @@ msgid "{minutes, plural, one {Too many attempts. Try again in # minute.} other {
 msgstr ""
 
 #: src/components/Layout.tsx
+msgid "{name} · no Internet, saved here"
+msgstr ""
+
+#: src/components/Layout.tsx
 msgid "{pending, plural, one {# file waiting to be sent} other {# files waiting to be sent}}"
 msgstr ""
 

@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { activitiesApi } from "../auth/api";
 import { session, useSession } from "../auth/session";
 import { dataConfig } from "./config";
+import { useServerProbe } from "./serverInfo";
 import { syncFetch } from "./syncFetch";
 import { Workspace } from "./workspace";
 
@@ -65,6 +66,14 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       void ws.stopSync();
     };
   }, [ws, online, role]);
+
+  // le serveur redevient joignable : on ne laisse pas passer le délai entre deux tentatives
+  const reachable = useServerProbe().reachable;
+  const was = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (reachable === true && was.current === false) ws?.kickSync();
+    was.current = reachable;
+  }, [reachable, ws]);
 
   const value = useMemo(() => ws, [ws]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
