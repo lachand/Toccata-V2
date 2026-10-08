@@ -3,6 +3,8 @@ import { defineConfig } from "@playwright/test";
 // En local sans téléchargement de navigateur : CHROMIUM_PATH=/chemin/vers/chrome pnpm --filter @toccata/e2e e2e
 // Exige un CouchDB (docker compose -f infra/docker-compose.yml up -d) ; la base de comptes est jetable.
 const executablePath = process.env["CHROMIUM_PATH"];
+// Base de comptes jetable, partagée avec les tests (le serveur de classe du scénario « local-server » doit répliquer la même).
+process.env["E2E_ACCOUNTS_DB"] ??= `acc_e2e_${Date.now().toString(36)}`;
 const couch = {
   COUCHDB_URL: process.env["COUCHDB_URL"] ?? "http://127.0.0.1:5984",
   COUCHDB_ADMIN_USER: process.env["COUCHDB_ADMIN_USER"] ?? process.env["COUCHDB_USER"] ?? "admin",
@@ -30,7 +32,7 @@ export default defineConfig({
       timeout: 60_000,
       env: {
         ...couch,
-        ACCOUNTS_DB: `acc_e2e_${Date.now().toString(36)}`,
+        ACCOUNTS_DB: process.env["E2E_ACCOUNTS_DB"]!,
         JWT_SECRET: Buffer.from("dev-only-secret-change-me-32-bytes!!").toString("base64"),
         JWT_KID: "dev",
         COOKIE_SECURE: "false",
@@ -44,6 +46,15 @@ export default defineConfig({
       url: "http://localhost:4173",
       reuseExistingServer: !process.env["CI"],
       timeout: 180_000,
+    },
+    {
+      // Interface servie par le « serveur de classe » du scénario local-server : autre origine (autre port), donc autre stockage
+      // local, et un proxy vers le service d'authentification local (8788, lancé par le test) et vers le CouchDB local (5985).
+      command: "pnpm --filter @toccata/web exec vite preview --port 4174 --strictPort",
+      url: "http://localhost:4174",
+      reuseExistingServer: !process.env["CI"],
+      timeout: 60_000,
+      env: { AUTH_URL: "http://127.0.0.1:8788", COUCHDB_URL: "http://127.0.0.1:5985" },
     },
   ],
 });

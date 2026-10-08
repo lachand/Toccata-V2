@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+.git
+e2e/test-results
+e2e/playwright-report
+spikes
+docs

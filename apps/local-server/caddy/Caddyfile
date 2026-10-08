@@ -1,0 +1,30 @@
+# Serveur de classe : HTTPS (obligatoire pour le service worker et l'installation de l'application), interface, API et CouchDB
+# derrière une seule origine. {$TLS_DIRECTIVE} vaut `tls internal` (autorité locale de Caddy) ou `tls /certs/fullchain.pem /certs/privkey.pem`.
+{$SERVER_HOST} {
+	{$TLS_DIRECTIVE}
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; font-src 'self' data:; connect-src 'self'; frame-src https:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+		-Server
+	}
+
+	handle /api/* {
+		reverse_proxy auth:8787
+	}
+
+	# CouchDB n'est joignable que par ce chemin et avec un jeton valide ; le préfixe /couch est retiré
+	handle_path /couch/* {
+		reverse_proxy couchdb:5984
+	}
+
+	handle {
+		root * /srv/web
+		try_files {path} /index.html
+		file_server
+	}
+}

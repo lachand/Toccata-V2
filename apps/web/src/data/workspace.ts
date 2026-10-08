@@ -554,11 +554,26 @@ export class Workspace {
       pull: { heartbeat: 30_000 },
       push: {},
     }) as unknown as Replication;
-    r.error$.subscribe(() => this.syncState$.next({ running: true, failing: true }));
+    // Une panne se répète à chaque tentative (toutes les 5 s) : tant qu'elle se répète, la synchronisation est « en panne » ;
+    // 8 s sans nouvelle erreur, elle est rétablie (voir `refreshHealth`).
+    r.error$.subscribe(() => {
+      this.lastError.set(name, this.now());
+      this.refreshHealth();
+    });
     this.replications.set(name, r);
   }
 
+  private lastError = new Map<string, number>();
+  private healthTimer: ReturnType<typeof setInterval> | null = null;
+  private refreshHealth(): void {
+    const t = this.now();
+    const failing = [...this.lastError.values()].some((at) => t - at < 8_000);
+    const cur = this.syncState$.value;
+    if (cur.running && cur.failing !== failing) this.syncState$.next({ running: true, failing });
+  }
+
   async startSync(o: SyncOptions): Promise<void> {
+    this.healthTimer ??= setInterval(() => this.refreshHealth(), 2_000);
     this.syncOptions = o;
     this.syncState$.next({ running: true, failing: false });
     for (const [name, c] of this.cols) this.replicate(name, await c);
@@ -577,6 +592,9 @@ export class Workspace {
     const all = [...this.replications.values()];
     this.replications.clear();
     await Promise.all(all.map((r) => r.cancel()));
+    if (this.healthTimer) clearInterval(this.healthTimer);
+    this.healthTimer = null;
+    this.lastError.clear();
     this.syncState$.next({ running: false, failing: false });
   }
 }

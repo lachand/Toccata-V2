@@ -1,0 +1,14 @@
+# Service d'authentification de Toccata (cloud ou serveur de classe). Contexte de construction : la RACINE du dépôt.
+#   docker build -f apps/local-server/Dockerfile.auth -t toccata-auth .
+FROM public.ecr.aws/docker/library/node:22-slim
+ENV NODE_ENV=production
+RUN corepack enable
+WORKDIR /app
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages ./packages
+COPY apps/auth ./apps/auth
+# `tsx` fait partie des dépendances : le service s'exécute directement depuis les sources TypeScript
+RUN pnpm install --frozen-lockfile --filter @toccata/auth... --prod=false
+USER node
+EXPOSE 8787
+CMD ["pnpm", "--filter", "@toccata/auth", "start"]
